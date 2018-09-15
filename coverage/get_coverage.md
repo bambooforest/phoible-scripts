@@ -96,85 +96,132 @@ table(isolates.not.in.phoible$macroarea)
     ## South America 
     ##            29
 
+Isolates missing in phoible
+---------------------------
+
 ``` r
 # Isolates missing in phoible
-kable(isolates.in.phoible %>% filter(in.phoible) %>% select(id, name, isocodes, macroarea), caption = "Isolates not in phoible.")
+kable(isolates %>% filter(!in.phoible) %>% select(id, name, isocodes, macroarea), caption = "Isolates not in phoible.")
 ```
 
-| id       | name                     | isocodes | macroarea     |
-|:---------|:-------------------------|:---------|:--------------|
-| abis1238 | Aewa                     | ash      | South America |
-| aika1237 | Aikanã                   | tba      | South America |
-| ando1256 | Andoque                  | ano      | South America |
-| basq1248 | Basque                   | eus      | Eurasia       |
-| bert1248 | Berta                    | wti      | Africa        |
-| bilu1245 | Bilua                    | blb      | Papunesia     |
-| buru1296 | Burushaski               | bsk      | Eurasia       |
-| cams1241 | Camsá                    | kbh      | South America |
-| cand1248 | Candoshi-Shapra          | cbu      | South America |
-| cayu1262 | Cayubaba                 | cyb      | South America |
-| chim1301 | Chimariko                | cid      | North America |
-| chiq1248 | Chiquitano               | cax      | South America |
-| cofa1242 | Cofán                    | con      | South America |
-| fasu1242 | Fasu                     | faa      | Papunesia     |
-| fuln1247 | Fulniô                   | fun      | South America |
-| gaga1251 | Gaagudju                 | gbu      | Australia     |
-| gily1242 | Nivkh                    | niv      | Eurasia       |
-| guat1253 | Guató                    | gta      | South America |
-| hadz1240 | Hadza                    | hts      | Africa        |
-| iran1263 | Irántxe-Münkü            | irn      | South America |
-| iton1250 | Itonama                  | ito      | South America |
-| kano1245 | Kanoê                    | kxo      | South America |
-| karo1304 | Karok                    | kyh      | North America |
-| klam1254 | Klamath-Modoc            | kla      | North America |
-| kuna1268 | Kunama                   | kun      | Africa        |
-| kung1259 | Kungarakany              | ggk      | Australia     |
-| kunz1244 | Kunza                    | kuz      | South America |
-| kuot1243 | Kuot                     | kto      | Papunesia     |
-| kusu1250 | Kusunda                  | kgg      | Eurasia       |
-| kwaz1243 | Kwaza                    | xwa      | South America |
-| lara1258 | Laragia                  | lrg      | Australia     |
-| lavu1241 | Lavukaleve               | lvk      | Papunesia     |
-| leco1242 | Leco                     | lec      | South America |
-| maib1239 | Maybrat-Karon            | ayz      | Papunesia     |
-| mato1253 | Mato Grosso Arára        | axg      | South America |
-| mink1237 | Minkin                   |          | Australia     |
-| moch1259 | Mochica                  | omc      | South America |
-| mola1238 | Molale                   | mbe      | North America |
-| morb1239 | Mor (Bomberai Peninsula) | moq      | Papunesia     |
-| mose1249 | Mosetén-Chimané          | cas      | South America |
-| movi1243 | Movima                   | mzp      | South America |
-| muni1258 | Muniche                  | myr      | South America |
-| nara1262 | Nara                     | nrb      | Africa        |
-| paez1247 | Páez                     | pbb      | South America |
-| pira1253 | Pirahã                   | myp      | South America |
-| puel1244 | Puelche                  | pue      | South America |
-| puin1248 | Puinave                  | pui      | South America |
-| pume1238 | Pumé                     | yae      | South America |
-| sand1273 | Sandawe                  | sad      | Africa        |
-| savo1255 | Savosavo                 | svs      | Papunesia     |
-| seri1257 | Seri                     | sei      | North America |
-| shab1252 | Shabo                    | sbf      | Africa        |
-| siam1242 | Siamou                   | sif      | Africa        |
-| taus1253 | Taushiro                 | trr      | South America |
-| tini1245 | Tinigua                  | tit      | South America |
-| tiwi1244 | Tiwi                     | tiw      | Australia     |
-| tonk1249 | Tonkawa                  | tqw      | North America |
-| trum1247 | Trumai                   | tpy      | South America |
-| tuni1252 | Tunica                   | tun      | North America |
-| umbu1235 | Umbugarla                | umr      | Australia     |
-| urar1246 | Urarina                  | ura      | South America |
-| vile1241 | Vilela                   | vil      | South America |
-| wadj1254 | Wadjiginy                | wdj      | Australia     |
-| wage1238 | Wageman                  | waq      | Australia     |
-| waor1240 | Waorani                  | auc      | South America |
-| wara1303 | Warao                    | wba      | South America |
-| wash1253 | Washo                    | was      | North America |
-| yama1264 | Yámana                   | yag      | South America |
-| yana1271 | Yana                     | ynn      | North America |
-| yuch1247 | Yuchi                    | yuc      | North America |
-| yura1255 | Yuracaré                 | yuz      | South America |
-| zuni1245 | Zuni                     | zun      | North America |
+| id       | name                                 | isocodes | macroarea     |
+|:---------|:-------------------------------------|:---------|:--------------|
+| abin1243 | Abinomn                              | bsa      | Papunesia     |
+| abun1252 | Abun                                 | kgr      | Papunesia     |
+| adai1235 | Adai                                 | xad      | North America |
+| alse1251 | Alsea-Yaquina                        | aes      | North America |
+| anda1286 | Andaqui                              | ana      | South America |
+| anem1249 | Anem                                 | anz      | Papunesia     |
+| apma1241 | Ap Ma                                | kbx      | Papunesia     |
+| arut1244 | Arutani                              | atx      | South America |
+| atac1235 | Atacame                              |          | South America |
+| atak1252 | Atakapa                              | aqp      | North America |
+| bana1292 | Banaro                               | byz      | Papunesia     |
+| bang1363 | Bangime                              | dba      | Africa        |
+| beot1247 | Beothuk                              | bue      | North America |
+| beto1236 | Betoi-Jirara                         |          | South America |
+| bira1253 | Ongota                               | bxe      | Africa        |
+| boga1247 | Bogaya                               | boq      | Papunesia     |
+| burm1264 | Burmeso                              | bzu      | Papunesia     |
+| cani1243 | Canichana                            | caz      | South America |
+| cayu1241 | Cayuse                               | xcy      | North America |
+| cent2045 | Jalaa                                | cet      | Africa        |
+| chit1248 | Chitimacha                           | ctm      | North America |
+| chon1248 | Chono                                |          | South America |
+| coah1252 | Coahuilteco                          | xcw      | North America |
+| come1251 | Comecrudan                           | xcm      | North America |
+| coto1248 | Cotoname                             | xcn      | North America |
+| cuit1236 | Cuitlatec                            |          | North America |
+| cull1235 | Culli                                |          | South America |
+| dama1272 | Damal                                | uhn      | Papunesia     |
+| demm1245 | Dem                                  | dem      | Papunesia     |
+| dibi1240 | Dibiyaso                             | dby      | Papunesia     |
+| duna1248 | Duna                                 | duc      | Papunesia     |
+| elam1244 | Elamite                              | elx      | Eurasia       |
+| else1239 | Elseng                               | mrf      | Papunesia     |
+| esse1238 | Esselen                              | esq      | North America |
+| etru1241 | Etruscan                             | ett      | Eurasia       |
+| guac1239 | Guachi                               |          | South America |
+| guai1237 | Guaicurian                           |          | North America |
+| guam1236 | Guamo                                |          | South America |
+| gule1241 | Gule                                 | gly      | Africa        |
+| guri1248 | Guriaso                              | grx      | Papunesia     |
+| hatt1246 | Hattic                               | xht      | Eurasia       |
+| hrus1242 | Hruso                                | hru      | Eurasia       |
+| iber1250 | Iberian                              | xib      | Eurasia       |
+| jira1235 | Jirajaran                            |          | South America |
+| kaki1249 | Kaki Ae                              | tbd      | Papunesia     |
+| kapo1250 | Kapori                               | khp      | Papunesia     |
+| kara1289 | Karankawa                            | zkk      | North America |
+| kara1497 | Karami                               | xar      | Papunesia     |
+| kaur1271 | Kaure-Narau                          | bpp      | Papunesia     |
+| kehu1238 | Kehu                                 | khh      | Papunesia     |
+| kemb1250 | Kembra                               | xkw      | Papunesia     |
+| kena1236 | Kenaboi                              | xbn      | Eurasia       |
+| kibi1239 | Kibiri                               | prm      | Papunesia     |
+| kimk1238 | Kimki                                | sbt      | Papunesia     |
+| kolp1236 | Kol (Papua New Guinea)               | kol      | Papunesia     |
+| kosa1251 | Kosadle                              | kiq      | Papunesia     |
+| kuja1239 | Kujarge                              | vkj      | Africa        |
+| kute1249 | Kutenai                              | kut      | North America |
+| laal1242 | Laal                                 | gdm      | Africa        |
+| lafo1243 | Lafofa                               | laf      | Africa        |
+| lule1238 | Lule                                 |          | South America |
+| maku1246 | Máku                                 | xak      | South America |
+| mara1266 | Maratino                             |          | North America |
+| mass1263 | Massep                               | mvs      | Papunesia     |
+| mata1275 | Matanawí                             |          | South America |
+| mawe1251 | Mawes                                | mgk      | Papunesia     |
+| mero1237 | Meroitic                             | xmr      | Africa        |
+| mimi1240 | Mimi-Gaudefroy                       |          | Africa        |
+| molo1262 | Molof                                | msl      | Papunesia     |
+| moro1289 | Marori                               | mok      | Papunesia     |
+| mpur1239 | Mpur                                 | akc      | Papunesia     |
+| mure1235 | Mure                                 |          | South America |
+| natc1249 | Natchez                              | ncz      | North America |
+| niha1238 | Nihali                               | nll      | Eurasia       |
+| odia1239 | Odiai                                | bhf      | Papunesia     |
+| omur1241 | Omurano                              | omu      | South America |
+| otii1244 | Oti                                  | oti      | South America |
+| otom1276 | Otomaco-Taparita                     |          | South America |
+| oyst1235 | Oyster Bay-Big River-Little Swanport |          | Australia     |
+| pank1250 | Pankararú                            | paz      | South America |
+| papi1255 | Papi                                 | ppe      | Papunesia     |
+| pawa1255 | Pawaia                               | pwa      | Papunesia     |
+| paya1236 | Payagua                              |          | South America |
+| pele1245 | Pele-Ata                             | ata      | Papunesia     |
+| puqu1242 | Puquina                              | puq      | South America |
+| pura1257 | Purari                               | iar      | Papunesia     |
+| pyuu1245 | Pyu                                  | pby      | Papunesia     |
+| rama1271 | Ramanos                              |          | South America |
+| sali1253 | Salinan                              | sln      | North America |
+| sape1238 | Sapé                                 | spc      | South America |
+| saus1247 | Sause                                | sao      | Papunesia     |
+| sech1236 | Sechuran                             |          | South America |
+| shom1245 | Shom Peng                            | sii      | Eurasia       |
+| sius1254 | Siuslaw                              | sis      | North America |
+| suar1238 | Asabano                              | seo      | Papunesia     |
+| sulk1246 | Sulka                                | sua      | Papunesia     |
+| sume1241 | Sumerian                             | sux      | Eurasia       |
+| tabo1241 | Tabo                                 | knv      | Papunesia     |
+| taia1239 | Taiap                                | gpn      | Papunesia     |
+| take1257 | Takelma                              | tkm      | North America |
+| tall1235 | Tallán                               |          | South America |
+| tamb1257 | Tambora                              | xxt      | Papunesia     |
+| tana1288 | Tanahmerah                           | tcm      | Papunesia     |
+| taru1236 | Taruma                               | tdm      | South America |
+| timo1237 | Timote-Cuica                         |          | South America |
+| timu1245 | Timucua                              | tjm      | North America |
+| touo1238 | Touo                                 | tqu      | Papunesia     |
+| tuxa1239 | Tuxá                                 | tud      | South America |
+| usku1243 | Usku                                 | ulf      | Papunesia     |
+| wiru1244 | Wiru                                 | wiu      | Papunesia     |
+| xuku1239 | Xukurú                               | xoo      | South America |
+| yale1246 | Yale                                 | nce      | Papunesia     |
+| yele1255 | Yele                                 | yle      | Papunesia     |
+| yera1243 | Yerakai                              | yra      | Papunesia     |
+| yetf1238 | Yetfa                                | yet      | Papunesia     |
+| yuru1243 | Yurumanguí                           |          | South America |
 
 ``` r
 # Get phoible coverage for language families

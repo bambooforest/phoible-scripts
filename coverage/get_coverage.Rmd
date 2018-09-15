@@ -71,9 +71,11 @@ table(isolates.in.phoible$macroarea)
 # isolates not in phoible by macroarea
 table(isolates.not.in.phoible$macroarea)
 ```
+
+## Isolates missing in phoible
 ```{r}
 # Isolates missing in phoible
-kable(isolates.in.phoible %>% filter(in.phoible) %>% select(id, name, isocodes, macroarea), caption = "Isolates not in phoible.")
+kable(isolates %>% filter(!in.phoible) %>% select(id, name, isocodes, macroarea), caption = "Isolates not in phoible.")
 ```
 
 ```{r}
