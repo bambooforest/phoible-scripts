@@ -100,6 +100,18 @@ table(phoible.gcodes$Glottocode %in% families.glottocodes$id)
 # phoible.gcodes$Glottocode
 ```
 
+## Global coverage of phoible
+```{r}
+in.phoible <- families.glottocodes %>% filter(in.phoible)
+ggplot(data=in.phoible, aes(x=longitude,y=latitude)) + borders("world", colour="gray50", fill="gray50") + geom_point()
+```
+
+## Languages not in phoible
+```{r}
+not.in.phoible <- families.glottocodes %>% filter(!in.phoible)
+ggplot(data=not.in.phoible, aes(x=longitude,y=latitude)) + borders("world", colour="gray50", fill="gray50") + geom_point()
+```
+
 # What kind of macroarea coverage does phoible have?
 ```{r}
 languages.geo$in.phoible <- languages.geo$glottocode %in% phoible.gcodes$Glottocode

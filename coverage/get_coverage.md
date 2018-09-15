@@ -276,6 +276,30 @@ table(phoible.gcodes$Glottocode %in% families.glottocodes$id)
 # phoible.gcodes$Glottocode
 ```
 
+Global coverage of phoible
+--------------------------
+
+``` r
+in.phoible <- families.glottocodes %>% filter(in.phoible)
+ggplot(data=in.phoible, aes(x=longitude,y=latitude)) + borders("world", colour="gray50", fill="gray50") + geom_point()
+```
+
+    ## Warning: Removed 7 rows containing missing values (geom_point).
+
+![](get_coverage_files/figure-markdown_github/unnamed-chunk-17-1.png)
+
+Languages not in phoible
+------------------------
+
+``` r
+not.in.phoible <- families.glottocodes %>% filter(!in.phoible)
+ggplot(data=not.in.phoible, aes(x=longitude,y=latitude)) + borders("world", colour="gray50", fill="gray50") + geom_point()
+```
+
+    ## Warning: Removed 703 rows containing missing values (geom_point).
+
+![](get_coverage_files/figure-markdown_github/unnamed-chunk-18-1.png)
+
 What kind of macroarea coverage does phoible have?
 ==================================================
 
