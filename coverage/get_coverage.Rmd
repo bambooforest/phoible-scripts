@@ -1,0 +1,148 @@
+---
+title: "What's PHOIBLE's coverage of Glottolog?"
+author: "Steven Moran"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  github_document:
+  pandoc_args: --webtex
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo=FALSE, include=FALSE}
+library(dplyr)
+library(ggplot2)
+library(knitr)
+```
+
+# PHOIBLE data
+```{r}
+phoible.csv <- read.table(url("https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-LanguageCodes.tsv"), sep="\t", header=TRUE, stringsAsFactors = FALSE, quote="\"")
+glimpse(phoible.csv)
+```
+
+```{r}
+# PHOIBLE inventory data contains duplicate Glottocodes -- remove for coverage analysis
+phoible.gcodes <- phoible.csv %>% select(Glottocode) %>% distinct()
+dim(phoible.gcodes)
+```
+
+# Glottolog data
+```{r}
+load('/Users/stiv/Github/glottolog-scripts/coverage/glottolog-families-isolates.Rdata')
+```
+
+# Isolates coverage
+```{r}
+# Isolates in phoible
+isolates$in.phoible <- isolates$id %in% phoible.gcodes$Glottocode
+table(isolates$in.phoible)
+```
+
+```{r}
+# Add macroarea data
+isolates <- left_join(isolates, languages.geo)
+```
+
+```{r}
+# Isolates in and not in phoible
+isolates.not.in.phoible <- isolates %>% filter(!in.phoible)
+isolates.in.phoible <- isolates %>% filter(in.phoible)
+```
+
+```{r}
+# Isolates in phoible
+ggplot(data=isolates.in.phoible, aes(x=longitude,y=latitude)) + borders("world", colour="gray50", fill="gray50") + geom_point()
+```
+
+```{r}
+# Isolates NOT in phoible
+ggplot(data=isolates.not.in.phoible, aes(x=longitude,y=latitude)) + borders("world", colour="gray50", fill="gray50") + geom_point()
+```
+
+```{r}
+# isolates in phoible by macroarea
+table(isolates.in.phoible$macroarea)
+```
+
+```{r}
+# isolates not in phoible by macroarea
+table(isolates.not.in.phoible$macroarea)
+```
+```{r}
+# Isolates missing in phoible
+kable(isolates.in.phoible %>% filter(in.phoible) %>% select(id, name, isocodes, macroarea), caption = "Isolates not in phoible.")
+```
+
+```{r}
+# Get phoible coverage for language families
+families.glottocodes$in.phoible <- families.glottocodes$id %in% phoible.gcodes$Glottocode
+glimpse(families.glottocodes)
+```
+
+```{r}
+# How many data points in phoible in or not in Glottolog?
+table(families.glottocodes$in.phoible)
+```
+
+```{r}
+# Which Glottocodes are in phoible are not in the Glottolog?
+table(phoible.gcodes$Glottocode %in% families.glottocodes$id)
+# 188 FALSE -- some may be due to isolates
+```
+
+```{r}
+# which(!phoible.gcodes$Glottocode %in% families.glottocodes$id)
+# phoible.gcodes$Glottocode
+```
+
+# What kind of macroarea coverage does phoible have?
+```{r}
+languages.geo$in.phoible <- languages.geo$glottocode %in% phoible.gcodes$Glottocode
+table(languages.geo$in.phoible)
+```
+```{r}
+# Get Glottolog macroareas
+# This should be filtered in the Glottolog data extraction script, but just in case
+languages.geo <- languages.geo %>% filter(level=="language") %>% filter(macroarea!="")
+```
+
+```{r}
+# Get Glottolog macroarea counts
+glottolog.macroarea.counts <- languages.geo %>% group_by(macroarea) %>% summarise(glottolog.count=n())
+glottolog.macroarea.counts
+```
+
+```{r}
+# Get phoible macroarea counts
+phoible.macroarea.counts <- languages.geo %>% filter(in.phoible) %>% group_by(macroarea) %>% summarise(phoible.count=n())
+```
+
+```{r}
+# Join counts and get percentage
+macroarea.counts <- left_join(glottolog.macroarea.counts, phoible.macroarea.counts)
+macroarea.counts$percentage <- macroarea.counts$phoible.count / macroarea.counts$glottolog.count
+kable(macroarea.counts)
+# We have very poor coverage of "Papunesia"
+```
+
+# By language family
+```{r}
+# Get Glottolog family counts
+glottolog.family.counts <- families.glottocodes %>% group_by(family_id) %>% summarize(glottolog.count=n())
+# 241 families without isolates (?)
+```
+
+```{r}
+# Get phoible family counts
+phoible.family.counts <- families.glottocodes %>% filter(in.phoible) %>% group_by(family_id) %>% summarise(phoible.count=n())
+```
+
+````{r}
+# Join the family counts and get percentage
+family.counts <- left_join(glottolog.family.counts, phoible.family.counts)
+family.counts$percentage <- family.counts$phoible.count / family.counts$glottolog.count
+kable(family.counts)
+```
