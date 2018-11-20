@@ -1,0 +1,81 @@
+---
+title: "Which languages and which segments in PHOIBLE are missing feature vectors?"
+author: "Steven Moran"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  github_document:
+  pandoc_args: --webtex
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo=FALSE, include=FALSE}
+library(dplyr)
+library(ggplot2)
+library(knitr)
+```
+
+```{r}
+# PHOIBLE dev data that includes ER inventories
+load('phoible-by-phoneme.RData')
+
+# Get segments missing feature vectors -- assuming that if [high] is NA, then the segment is not specified
+df <- mutate(final.data, missing.segment = ifelse(is.na(high), TRUE, FALSE))
+rm(final.data)
+
+# TODO: fix the data types in the aggregated data... argh
+df$InventoryID <- as.integer(as.character(df$InventoryID))
+```
+
+```{r}
+# The current aggregated phoible dev data does not contain Glottocodes -- add em via the phoible inventory
+phoible.csv <- read.table(url("https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-LanguageCodes.tsv"), sep="\t", header=TRUE, stringsAsFactors = FALSE, quote="\"")
+
+df <- left_join(df, phoible.csv)
+glimpse(df)
+```
+
+```{r}
+# Add in the Glottolog geo data
+# See: https://github.com/bambooforest/glottolog-scripts/blob/master/coverage/get_glottolog_data.md
+load('glottolog-families-isolates.Rdata')
+rm(families.counts, families.glottocodes)
+df <- left_join(df, languages.geo, by=c("Glottocode"="glottocode"))
+```
+
+```{r}
+# Identify which inventories have a missing segment feature vector
+missing.ids <- df %>% group_by(InventoryID, Glottocode, LanguageName, Source, latitude, longitude, macroarea) %>% filter(missing.segment) %>% distinct(InventoryID)
+```
+
+```{r}
+# How many inventories contain segments without features AND no Glottocode?
+table(is.na(missing.ids$Glottocode))
+```
+```{r}
+# Which ones?
+missing.ids %>% filter(is.na(Glottocode))
+```
+
+```{r}
+# Of the inventories with missing segment feature vectors, where are they?
+ggplot(data=missing.ids, aes(x=longitude,y=latitude)) + borders("world", colour="gray50", fill="gray50") + geom_point()
+```
+
+```{r}
+# Which sources do they belong to?
+table(missing.ids$Source)
+```
+
+```{r}
+# Total number of distinct segments
+nrow(df %>% select(Phoneme) %>% group_by(Phoneme) %>% unique())
+```
+
+```{r}
+# Total number of segments that need to be added... by hand? Argh!
+nrow(df %>% filter(missing.segment) %>% select(Phoneme) %>% group_by(Phoneme) %>% unique())
+```
+

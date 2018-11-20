@@ -1,0 +1,159 @@
+Which languages and which segments in PHOIBLE are missing feature vectors?
+================
+Steven Moran
+21 November, 2018
+
+``` r
+# PHOIBLE dev data that includes ER inventories
+load('phoible-by-phoneme.RData')
+
+# Get segments missing feature vectors -- assuming that if [high] is NA, then the segment is not specified
+df <- mutate(final.data, missing.segment = ifelse(is.na(high), TRUE, FALSE))
+rm(final.data)
+
+# TODO: fix the data types in the aggregated data... argh
+df$InventoryID <- as.integer(as.character(df$InventoryID))
+```
+
+``` r
+# The current aggregated phoible dev data does not contain Glottocodes -- add em via the phoible inventory
+phoible.csv <- read.table(url("https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-LanguageCodes.tsv"), sep="\t", header=TRUE, stringsAsFactors = FALSE, quote="\"")
+
+df <- left_join(df, phoible.csv)
+```
+
+    ## Joining, by = c("LanguageCode", "LanguageName", "Source", "InventoryID")
+
+    ## Warning: Column `Source` joining factor and character vector, coercing into
+    ## character vector
+
+``` r
+glimpse(df)
+```
+
+    ## Observations: 105,092
+    ## Variables: 48
+    ## $ LanguageCode           <chr> "kor", "kor", "kor", "kor", "kor", "kor...
+    ## $ LanguageName           <chr> "Korean", "Korean", "Korean", "Korean",...
+    ## $ SpecificDialect        <chr> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,...
+    ## $ Phoneme                <chr> "a", "aː", "e", "eː", "h", "i", "iː", "...
+    ## $ Allophones             <chr> "a", "aː", "e", "eː", "ç h ɦ", "i", "iː...
+    ## $ Source                 <chr> "spa", "spa", "spa", "spa", "spa", "spa...
+    ## $ Trump                  <lgl> FALSE, FALSE, FALSE, FALSE, FALSE, FALS...
+    ## $ GlyphID                <chr> "0061", "0061+02D0", "0065", "0065+02D0...
+    ## $ InventoryID            <int> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+    ## $ tone                   <chr> "0", "0", "0", "0", "0", "0", "0", "0",...
+    ## $ stress                 <chr> "-", "-", "-", "-", "-", "-", "-", "-",...
+    ## $ syllabic               <chr> "+", "+", "+", "+", "-", "+", "+", "-",...
+    ## $ short                  <chr> "-", "-", "-", "-", "-", "-", "-", "-",...
+    ## $ long                   <chr> "-", "+", "-", "+", "-", "-", "+", "-",...
+    ## $ consonantal            <chr> "-", "-", "-", "-", "-", "-", "-", "-",...
+    ## $ sonorant               <chr> "+", "+", "+", "+", "-", "+", "+", "+",...
+    ## $ continuant             <chr> "+", "+", "+", "+", "+", "+", "+", "+",...
+    ## $ delayedRelease         <chr> "0", "0", "0", "0", "+", "0", "0", "0",...
+    ## $ approximant            <chr> "+", "+", "+", "+", "-", "+", "+", "+",...
+    ## $ tap                    <chr> "-", "-", "-", "-", "-", "-", "-", "-",...
+    ## $ trill                  <chr> "-", "-", "-", "-", "-", "-", "-", "-",...
+    ## $ nasal                  <chr> "-", "-", "-", "-", "-", "-", "-", "-",...
+    ## $ lateral                <chr> "-", "-", "-", "-", "-", "-", "-", "-",...
+    ## $ labial                 <chr> "-", "-", "-", "-", "-", "-", "-", "-",...
+    ## $ round                  <chr> "0", "0", "0", "0", "0", "0", "0", "0",...
+    ## $ labiodental            <chr> "0", "0", "0", "0", "0", "0", "0", "0",...
+    ## $ coronal                <chr> "-", "-", "-", "-", "-", "-", "-", "-",...
+    ## $ anterior               <chr> "0", "0", "0", "0", "0", "0", "0", "0",...
+    ## $ distributed            <chr> "0", "0", "0", "0", "0", "0", "0", "0",...
+    ## $ strident               <chr> "0", "0", "0", "0", "0", "0", "0", "0",...
+    ## $ dorsal                 <chr> "+", "+", "+", "+", "-", "+", "+", "+",...
+    ## $ high                   <chr> "-", "-", "-", "-", "0", "+", "+", "+",...
+    ## $ low                    <chr> "+", "+", "-", "-", "0", "-", "-", "-",...
+    ## $ front                  <chr> "-", "-", "+", "+", "0", "+", "+", "+",...
+    ## $ back                   <chr> "-", "-", "-", "-", "0", "-", "-", "-",...
+    ## $ tense                  <chr> "0", "0", "+", "+", "0", "+", "+", "+",...
+    ## $ retractedTongueRoot    <chr> "-", "-", "-", "-", "0", "-", "-", "0",...
+    ## $ advancedTongueRoot     <chr> "-", "-", "-", "-", "0", "-", "-", "0",...
+    ## $ periodicGlottalSource  <chr> "+", "+", "+", "+", "-", "+", "+", "+",...
+    ## $ epilaryngealSource     <chr> "-", "-", "-", "-", "-", "-", "-", "-",...
+    ## $ spreadGlottis          <chr> "-", "-", "-", "-", "+", "-", "-", "-",...
+    ## $ constrictedGlottis     <chr> "-", "-", "-", "-", "-", "-", "-", "-",...
+    ## $ fortis                 <chr> "0", "0", "0", "0", "-", "0", "0", "-",...
+    ## $ raisedLarynxEjective   <chr> "-", "-", "-", "-", "-", "-", "-", "-",...
+    ## $ loweredLarynxImplosive <chr> "-", "-", "-", "-", "-", "-", "-", "-",...
+    ## $ click                  <chr> "0", "0", "0", "0", "-", "0", "0", "-",...
+    ## $ missing.segment        <lgl> FALSE, FALSE, FALSE, FALSE, FALSE, FALS...
+    ## $ Glottocode             <chr> "kore1280", "kore1280", "kore1280", "ko...
+
+``` r
+# Add in the Glottolog geo data
+# See: https://github.com/bambooforest/glottolog-scripts/blob/master/coverage/get_glottolog_data.md
+load('glottolog-families-isolates.Rdata')
+rm(families.counts, families.glottocodes)
+df <- left_join(df, languages.geo, by=c("Glottocode"="glottocode"))
+```
+
+``` r
+# Identify which inventories have a missing segment feature vector
+missing.ids <- df %>% group_by(InventoryID, Glottocode, LanguageName, Source, latitude, longitude, macroarea) %>% filter(missing.segment) %>% distinct(InventoryID)
+```
+
+``` r
+# How many inventories contain segments without features AND no Glottocode?
+table(is.na(missing.ids$Glottocode))
+```
+
+    ## 
+    ## FALSE  TRUE 
+    ##   609   116
+
+``` r
+# Which ones?
+missing.ids %>% filter(is.na(Glottocode))
+```
+
+    ## # A tibble: 116 x 7
+    ## # Groups:   InventoryID, Glottocode, LanguageName, Source, latitude,
+    ## #   longitude, macroarea [116]
+    ##    LanguageName Source InventoryID Glottocode macroarea latitude longitude
+    ##    <chr>        <chr>        <int> <chr>      <chr>        <dbl>     <dbl>
+    ##  1 !Xun         gm            1383 <NA>       <NA>            NA        NA
+    ##  2 Estonian     uz            2181 <NA>       <NA>            NA        NA
+    ##  3 Tod Tibetan  ea            2264 <NA>       <NA>            NA        NA
+    ##  4 Beserman     ea            2268 <NA>       <NA>            NA        NA
+    ##  5 Modern Aram… ea            2281 <NA>       <NA>            NA        NA
+    ##  6 Puxi         ea            2298 <NA>       <NA>            NA        NA
+    ##  7 Rgyalthang … ea            2327 <NA>       <NA>            NA        NA
+    ##  8 Northern Cu… ea            2350 <NA>       <NA>            NA        NA
+    ##  9 Lizu         ea            2352 <NA>       <NA>            NA        NA
+    ## 10 Zuberoan Ba… ea            2381 <NA>       <NA>            NA        NA
+    ## # ... with 106 more rows
+
+``` r
+# Of the inventories with missing segment feature vectors, where are they?
+ggplot(data=missing.ids, aes(x=longitude,y=latitude)) + borders("world", colour="gray50", fill="gray50") + geom_point()
+```
+
+    ## Warning: Removed 156 rows containing missing values (geom_point).
+
+![](missing_segments_files/figure-markdown_github/unnamed-chunk-8-1.png)
+
+``` r
+# Which sources do they belong to?
+table(missing.ids$Source)
+```
+
+    ## 
+    ##     ea     er     gm saphon  upsid     uz 
+    ##    265    381      2     16      2     59
+
+``` r
+# Total number of distinct segments
+nrow(df %>% select(Phoneme) %>% group_by(Phoneme) %>% unique())
+```
+
+    ## [1] 3220
+
+``` r
+# Total number of segments that need to be added... by hand? Argh!
+nrow(df %>% filter(missing.segment) %>% select(Phoneme) %>% group_by(Phoneme) %>% unique())
+```
+
+    ## [1] 1050
