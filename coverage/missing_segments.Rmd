@@ -60,22 +60,96 @@ missing.ids %>% filter(is.na(Glottocode))
 ```
 
 ```{r}
-# Of the inventories with missing segment feature vectors, where are they?
+# Of the inventories with missing segment feature vectors (that are not NA Glottocode), where are they?
 ggplot(data=missing.ids, aes(x=longitude,y=latitude)) + borders("world", colour="gray50", fill="gray50") + geom_point()
 ```
 
 ```{r}
-# Which sources do they belong to?
+# And which sources do they belong to?
 table(missing.ids$Source)
 ```
 
 ```{r}
-# Total number of distinct segments
+# And which areas do they belong to? This shows most are from Erich's Australian database or Dmitry's Eurasian.
+table(missing.ids$macroarea)
+```
+
+```{r}
+# Total number of distinct segments in PHOIBLE
 nrow(df %>% select(Phoneme) %>% group_by(Phoneme) %>% unique())
 ```
 
 ```{r}
-# Total number of segments that need to be added... by hand? Argh!
+# Total number of distinct segments without feature vectors. These need to be added... by hand? Argh!
 nrow(df %>% filter(missing.segment) %>% select(Phoneme) %>% group_by(Phoneme) %>% unique())
 ```
+
+```{r}
+# Sort languages by number of segments missing feature vectors.
+## Get phonemes per inventory counts
+phoneme.counts <- df %>% select(InventoryID, Phoneme) %>% group_by(InventoryID) %>% summarize(phoneme.counts = n())
+## Get phonemes per inventory counts where their feature vectors are NA
+phoneme.counts.missing <- df %>% filter(missing.segment) %>% select(InventoryID, Phoneme) %>% group_by(InventoryID) %>% summarize(phoneme.counts.missing = n())
+
+x <- left_join(phoneme.counts, phoneme.counts.missing)
+missing.ids <- left_join(missing.ids, x)
+rm(x, phoneme.counts, phoneme.counts.missing)
+
+# How many lanugages have how many missing segments with feature vectors?
+table(missing.ids$phoneme.counts.missing)
+```
+
+```{r}
+# What are the most frequently missing segments?
+missing.segment.frequency <- df %>% filter(missing.segment) %>% select(Phoneme) %>% group_by(Phoneme) %>% summarize(segment.frequency = n()) %>% arrange(desc(segment.frequency))
+head(missing.segment.frequency)
+```
+
+```{r}
+missing.segments <- df %>% filter(missing.segment) %>% select(InventoryID, Phoneme)
+head(missing.segments)
+```
+
+```{r}
+# No particular pattern for inventories missing 1 segment. 
+# /N/ is purposely under-described for features.
+# a-umlaut long knocks out 14 languages
+x <- missing.ids %>% filter(phoneme.counts.missing == 1)
+y <- left_join(x, missing.segments)
+table(y$Phoneme)
+```
+
+```{r}
+# Fixing 0235 (small letter n with curl) and 0236 (small letter t with curl)
+x <- missing.ids %>% filter(phoneme.counts.missing == 2)
+y <- left_join(x, missing.segments)
+table(y$Phoneme)
+```
+
+```{r}
+# Shows that once you get to three, there may be three distinct segments in particular languages (like the tones, probably, or the dipthongs with intervening length).
+x <- missing.ids %>% filter(phoneme.counts.missing == 3)
+y <- left_join(x, missing.segments)
+table(y$Phoneme)
+```
+
+```{r}
+# What's the distribution at the character level? This doesn't show much because it separates the base 
+# character(s) and diacritic(s) and it could be the diacritic that isn't specified in HayesPrime.
+missing.segment.frequency
+chars <- unlist(strsplit(missing.segment.frequency$Phoneme, ""))
+table(chars)
+chars <- unique(chars)
+```
+
+```{r}
+s <- read.table(url('https://raw.githubusercontent.com/bambooforest/features/master/segments.csv'), header=T, stringsAsFactors = FALSE, sep="\t")
+
+d <- read.table(url('https://raw.githubusercontent.com/bambooforest/features/master/diacritics.csv'), header=T, stringsAsFactors = FALSE, sep="\t")
+
+# Which characters are in the new input that are not in the HayesPrime features
+chars[which(!(chars %in% c(s$segment, d$diacritic)))]
+```
+
+
 
