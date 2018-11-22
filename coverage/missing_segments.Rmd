@@ -111,6 +111,11 @@ head(missing.segments)
 ```
 
 ```{r}
+missing.segments.wide <- missing.segments %>% group_by(InventoryID) %>% summarize(phonemes.missing = paste(Phoneme, collapse=(',')))
+missing.segments.wide
+```
+
+```{r}
 # No particular pattern for inventories missing 1 segment. 
 # /N/ is purposely under-described for features.
 # a-umlaut long knocks out 14 languages
@@ -150,6 +155,3 @@ d <- read.table(url('https://raw.githubusercontent.com/bambooforest/features/mas
 # Which characters are in the new input that are not in the HayesPrime features
 chars[which(!(chars %in% c(s$segment, d$diacritic)))]
 ```
-
-
-

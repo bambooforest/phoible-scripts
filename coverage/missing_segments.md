@@ -1,7 +1,7 @@
 Which languages and which segments in PHOIBLE are missing feature vectors?
 ================
 Steven Moran
-21 November, 2018
+23 November, 2018
 
 ``` r
 # PHOIBLE dev data that includes ER inventories
@@ -228,6 +228,26 @@ head(missing.segments)
     ## 4        1379     kǁh
     ## 5        1379   kǁkxʼ
     ## 6        1379     kǁʔ
+
+``` r
+missing.segments.wide <- missing.segments %>% group_by(InventoryID) %>% summarize(phonemes.missing = paste(Phoneme, collapse=(',')))
+missing.segments.wide
+```
+
+    ## # A tibble: 725 x 2
+    ##    InventoryID phonemes.missing                                           
+    ##          <int> <chr>                                                      
+    ##  1         340 ntɕ                                                        
+    ##  2         567 tɕʼ                                                        
+    ##  3        1379 kǀh,kǀkxʼ,kǀʔ,kǁh,kǁkxʼ,kǁʔ,kǂh,kǂkxʼ,kǂʔ,kǃh,kǃkxʼ,kǃʔ,kʘ…
+    ##  4        1383 d̠ʒʰ,ŋǀʱ,ŋ‼ʱ                                                
+    ##  5        1806 N                                                          
+    ##  6        1807 N                                                          
+    ##  7        1808 N                                                          
+    ##  8        1809 N                                                          
+    ##  9        1810 N                                                          
+    ## 10        1813 ʱn,ʱw                                                      
+    ## # ... with 715 more rows
 
 ``` r
 # No particular pattern for inventories missing 1 segment. 
