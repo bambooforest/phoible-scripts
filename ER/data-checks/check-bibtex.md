@@ -84,8 +84,8 @@ How many bibtex IDs not in the ER inventory data?
 expect_equal(nrow(bib[which(!(bib$BIBTEXKEY %in% er.inv.d$Source_ref)), ]), 0)
 ```
 
-Check out with PHOIBLE
-======================
+Check out PHOIBLE
+=================
 
 ``` r
 # How many unique er bibtex ids are there per language name?
@@ -97,14 +97,31 @@ expect_equal(nrow(er.inv %>% select(Variety_name, Source_ref) %>% distinct()), 3
 ph.refs <- read.table("/Users/stiv/Github/dev/mappings/InventoryID-Bibtex.tsv", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
 # OK to filter on source
 expect_equal(ph.refs %>% filter(Source=="er") %>% nrow(), 396)
-expect_equal(ph.refs %>% filter(Source=="er") %>% distinct() %>% nrow(), 396)
 # Filter
 ph.refs.er <- ph.refs %>% filter(Source=="er")
 expect_equal(nrow(ph.refs.er), 396)
 ```
 
 ``` r
-## Are more reference IDs in phoible than ER... but the names no longer match. Take the new Source_ref as ID.
+# 236 unique bibtex keys in phoible index
+expect_equal(nrow(ph.refs.er %>% select(BibtexKey) %>% distinct()), 236)
+
+# 232 unique bibtex keys in ER distinct inventories
+expect_equal(nrow(er.inv.d %>% select(Source_ref) %>% distinct()), 232)
+
+x <- ph.refs.er %>% select(BibtexKey) %>% distinct()
+y <- er.inv.d %>% select(Source_ref) %>% distinct()
+
+# None of the bibtex IDs match match
+table(x$BibtexKey %in% y$Source_ref)
+```
+
+    ## 
+    ## FALSE 
+    ##   236
+
+``` r
+# Names are diff
 head(er.inv.d)
 ```
 
