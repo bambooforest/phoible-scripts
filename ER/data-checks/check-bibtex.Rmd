@@ -1,5 +1,5 @@
 ---
-title: "Check bibtex files"
+title: "Check ER bibliography"
 author: "Steven Moran \\<steven.moran@uzh.ch\\>"
 output: github_document
 ---
@@ -7,46 +7,61 @@ output: github_document
 ```{r, message=F, warning=F}
 library(bib2df)
 library(dplyr)
+library(knitr)
+library(testthat)
 ```
+
+# Prepare data
 
 ```{r, message=F, warning=F}
-# ER bib
-path <- '/Users/stiv/Dropbox/Github/phoible-scripts/ER/data/raw2019/inventory_biblio.txt'
+# Get ER data.
+path <- '../data/raw2019/inventory_biblio.txt'
 bib <- bib2df(path)
+head(bib)
 ```
 
 ```{r}
-# ER inventories
-new <- read.table("../data/raw2019/Australian_phonemes_for_PHOIBLE_20180114.tsv", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
-new.ids <- new %>% select(Source_ref) %>% group_by(Source_ref) %>% distinct()
-nrow(new.ids) # 232
-head(new.ids)
+# Get ER inventories data. References are made distinct.
+er.inv <- read.table("../data/raw2019/Australian_phonemes_for_PHOIBLE_20180114.tsv", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
+er.inv.d <- er.inv %>% select(Source_ref) %>% group_by(Source_ref) %>% distinct()
+expect_equal(nrow(er.inv.d), 232)
+kable(head(er.inv.d))
+```
+
+# Compare datasets
+
+## How many ER inventory Source_ref's not in the bibtex file?
+```{r}
+expect_equal(nrow(er.inv.d[which(!(er.inv.d$Source_ref %in% bib$BIBTEXKEY)), ]), 7)
+kable(er.inv.d[which(!(er.inv.d$Source_ref %in% bib$BIBTEXKEY)), ])
+```
+
+## How many bibtex IDs not in the ER inventory data?
+```{r}
+# None
+expect_equal(nrow(bib[which(!(bib$BIBTEXKEY %in% er.inv.d$Source_ref)), ]), 0)
+```
 
 
-# Bibtex IDs in inventories missing in bibtex file (7)
-nrow(new.ids[which(!(new.ids$Source_ref %in% bib$BIBTEXKEY)), ]) # 7
-new.ids[which(!(new.ids$Source_ref %in% bib$BIBTEXKEY)), ]
-
-
-# No extra bibtex IDs in bib file (and not in the inventory file)
-bib[which(!(bib$BIBTEXKEY %in% new.ids$Source_ref)), ] # 0
+# Check out with PHOIBLE
+```{r}
+# How many unique er bibtex ids are there per language name?
+expect_equal(nrow(er.inv %>% select(Variety_name, Source_ref) %>% distinct()), 392)
 ```
 
 ```{r}
-# Get phoible bib
-pi.refs <- read.table("/Users/stiv/Github/dev/mappings/InventoryID-Bibtex.tsv", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
-pi.refs %>% filter(Source=="er") %>% nrow() # 396
-pi.refs %>% filter(Source=="er") %>% distinct() %>% nrow() # 396
-pi.refs.er <- pi.refs %>% filter(Source=="er")
-
-# Meld phoible
-# df <- left_join(pi.refs.er, x)
-# head(df)
+# phoible index data
+ph.refs <- read.table("/Users/stiv/Github/dev/mappings/InventoryID-Bibtex.tsv", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
+# OK to filter on source
+expect_equal(ph.refs %>% filter(Source=="er") %>% nrow(), 396)
+expect_equal(ph.refs %>% filter(Source=="er") %>% distinct() %>% nrow(), 396)
+# Filter
+ph.refs.er <- ph.refs %>% filter(Source=="er")
+expect_equal(nrow(ph.refs.er), 396)
 ```
 
 ```{r}
-# Now add ER's old data
-old <- read.table("../data/raw/Australian_phonemes_for_PHOIBLE_20170501.txt", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
-head(old)
-
+## Are more reference IDs in phoible than ER... but the names no longer match. Take the new Source_ref as ID.
+head(er.inv.d)
+head(ph.refs.er)
 ```

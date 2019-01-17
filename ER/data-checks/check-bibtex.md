@@ -1,29 +1,111 @@
-Check bibtex files
+Check ER bibliography
 ================
 Steven Moran &lt;<steven.moran@uzh.ch>&gt;
 
 ``` r
 library(bib2df)
 library(dplyr)
+library(knitr)
+library(testthat)
 ```
 
+Prepare data
+============
+
 ``` r
-# ER bib
-path <- '/Users/stiv/Dropbox/Github/phoible-scripts/ER/data/raw2019/inventory_biblio.txt'
+# Get ER data.
+path <- '../data/raw2019/inventory_biblio.txt'
 bib <- bib2df(path)
+head(bib)
+```
+
+    ## # A tibble: 6 x 44
+    ##   CATEGORY BIBTEXKEY ADDRESS ANNOTE AUTHOR BOOKTITLE CHAPTER CROSSREF
+    ##   <chr>    <chr>     <chr>   <chr>  <list> <chr>     <chr>   <chr>   
+    ## 1 THESIS   parish_a… <NA>    <NA>   <chr … <NA>      <NA>    <NA>    
+    ## 2 BOOK     lissarra… <NA>    <NA>   <chr … <NA>      <NA>    <NA>    
+    ## 3 BOOK     wangka_m… <NA>    <NA>   <chr … <NA>      <NA>    <NA>    
+    ## 4 BOOK     crowley_… <NA>    <NA>   <chr … <NA>      <NA>    <NA>    
+    ## 5 BOOK     lissarra… <NA>    <NA>   <chr … <NA>      <NA>    <NA>    
+    ## 6 BOOK     donaldso… <NA>    <NA>   <chr … <NA>      <NA>    <NA>    
+    ## # ... with 36 more variables: EDITION <chr>, EDITOR <list>,
+    ## #   HOWPUBLISHED <chr>, INSTITUTION <chr>, JOURNAL <chr>, KEY <chr>,
+    ## #   MONTH <chr>, NOTE <chr>, NUMBER <chr>, ORGANIZATION <chr>,
+    ## #   PAGES <chr>, PUBLISHER <chr>, SCHOOL <chr>, SERIES <chr>, TITLE <chr>,
+    ## #   TYPE <chr>, VOLUME <chr>, YEAR <chr>, LOCATION <chr>, DATE <chr>,
+    ## #   ISBN <chr>, PAGETOTAL <chr>, EDITORA <chr>, EDITORATYPE <chr>,
+    ## #   KEYWORDS <chr>, VOLUMES <chr>, RIGHTS <chr>, URL <chr>,
+    ## #   ABSTRACT <chr>, URLDATE <chr>, DOI <chr>, JOURNALTITLE <chr>,
+    ## #   EPRINT <chr>, SHORTTITLE <chr>, BOOKAUTHOR <chr>, TITLEADDON <chr>
+
+``` r
+# Get ER inventories data. References are made distinct.
+er.inv <- read.table("../data/raw2019/Australian_phonemes_for_PHOIBLE_20180114.tsv", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
+er.inv.d <- er.inv %>% select(Source_ref) %>% group_by(Source_ref) %>% distinct()
+expect_equal(nrow(er.inv.d), 232)
+kable(head(er.inv.d))
+```
+
+| Source\_ref                 |
+|:----------------------------|
+| reid\_ngangityemerri:\_1990 |
+| birk\_phonology\_1975       |
+| mushin\_grammar\_2012       |
+| breen\_barkly:\_2003        |
+| harvey\_ngoni\_1986         |
+| parish\_aspects\_1983       |
+
+Compare datasets
+================
+
+How many ER inventory Source\_ref's not in the bibtex file?
+-----------------------------------------------------------
+
+``` r
+expect_equal(nrow(er.inv.d[which(!(er.inv.d$Source_ref %in% bib$BIBTEXKEY)), ]), 7)
+kable(er.inv.d[which(!(er.inv.d$Source_ref %in% bib$BIBTEXKEY)), ])
+```
+
+| Source\_ref                                                          |
+|:---------------------------------------------------------------------|
+| breen\_barkly:\_2003                                                 |
+| bowern\_grammar\_2012                                                |
+| bowern\_nhirrpi\_2000                                                |
+| tsunoda\_djaru\_1981                                                 |
+| wangka\_maya\_pilbara\_aboriginal\_language\_centre\_bayungu\_2008   |
+| wangka\_maya\_pilbara\_aboriginal\_language\_centre\_thalanyji\_2008 |
+| kohn\_morphological\_2012                                            |
+
+How many bibtex IDs not in the ER inventory data?
+-------------------------------------------------
+
+``` r
+# None
+expect_equal(nrow(bib[which(!(bib$BIBTEXKEY %in% er.inv.d$Source_ref)), ]), 0)
+```
+
+Check out with PHOIBLE
+======================
+
+``` r
+# How many unique er bibtex ids are there per language name?
+expect_equal(nrow(er.inv %>% select(Variety_name, Source_ref) %>% distinct()), 392)
 ```
 
 ``` r
-# ER inventories
-new <- read.table("../data/raw2019/Australian_phonemes_for_PHOIBLE_20180114.tsv", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
-new.ids <- new %>% select(Source_ref) %>% group_by(Source_ref) %>% distinct()
-nrow(new.ids) # 232
+# phoible index data
+ph.refs <- read.table("/Users/stiv/Github/dev/mappings/InventoryID-Bibtex.tsv", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
+# OK to filter on source
+expect_equal(ph.refs %>% filter(Source=="er") %>% nrow(), 396)
+expect_equal(ph.refs %>% filter(Source=="er") %>% distinct() %>% nrow(), 396)
+# Filter
+ph.refs.er <- ph.refs %>% filter(Source=="er")
+expect_equal(nrow(ph.refs.er), 396)
 ```
 
-    ## [1] 232
-
 ``` r
-head(new.ids)
+## Are more reference IDs in phoible than ER... but the names no longer match. Take the new Source_ref as ID.
+head(er.inv.d)
 ```
 
     ## # A tibble: 6 x 1
@@ -38,92 +120,13 @@ head(new.ids)
     ## 6 parish_aspects_1983
 
 ``` r
-# Bibtex IDs in inventories missing in bibtex file (7)
-nrow(new.ids[which(!(new.ids$Source_ref %in% bib$BIBTEXKEY)), ]) # 7
+head(ph.refs.er)
 ```
 
-    ## [1] 7
-
-``` r
-new.ids[which(!(new.ids$Source_ref %in% bib$BIBTEXKEY)), ]
-```
-
-    ## # A tibble: 7 x 1
-    ## # Groups:   Source_ref [7]
-    ##   Source_ref                                                   
-    ##   <chr>                                                        
-    ## 1 breen_barkly:_2003                                           
-    ## 2 bowern_grammar_2012                                          
-    ## 3 bowern_nhirrpi_2000                                          
-    ## 4 tsunoda_djaru_1981                                           
-    ## 5 wangka_maya_pilbara_aboriginal_language_centre_bayungu_2008  
-    ## 6 wangka_maya_pilbara_aboriginal_language_centre_thalanyji_2008
-    ## 7 kohn_morphological_2012
-
-``` r
-# No extra bibtex IDs in bib file (and not in the inventory file)
-bib[which(!(bib$BIBTEXKEY %in% new.ids$Source_ref)), ] # 0
-```
-
-    ## # A tibble: 0 x 44
-    ## # ... with 44 variables: CATEGORY <chr>, BIBTEXKEY <chr>, ADDRESS <chr>,
-    ## #   ANNOTE <chr>, AUTHOR <list>, BOOKTITLE <chr>, CHAPTER <chr>,
-    ## #   CROSSREF <chr>, EDITION <chr>, EDITOR <list>, HOWPUBLISHED <chr>,
-    ## #   INSTITUTION <chr>, JOURNAL <chr>, KEY <chr>, MONTH <chr>, NOTE <chr>,
-    ## #   NUMBER <chr>, ORGANIZATION <chr>, PAGES <chr>, PUBLISHER <chr>,
-    ## #   SCHOOL <chr>, SERIES <chr>, TITLE <chr>, TYPE <chr>, VOLUME <chr>,
-    ## #   YEAR <chr>, LOCATION <chr>, DATE <chr>, ISBN <chr>, PAGETOTAL <chr>,
-    ## #   EDITORA <chr>, EDITORATYPE <chr>, KEYWORDS <chr>, VOLUMES <chr>,
-    ## #   RIGHTS <chr>, URL <chr>, ABSTRACT <chr>, URLDATE <chr>, DOI <chr>,
-    ## #   JOURNALTITLE <chr>, EPRINT <chr>, SHORTTITLE <chr>, BOOKAUTHOR <chr>,
-    ## #   TITLEADDON <chr>
-
-``` r
-# Get phoible bib
-pi.refs <- read.table("/Users/stiv/Github/dev/mappings/InventoryID-Bibtex.tsv", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
-pi.refs %>% filter(Source=="er") %>% nrow() # 396
-```
-
-    ## [1] 396
-
-``` r
-pi.refs %>% filter(Source=="er") %>% distinct() %>% nrow() # 396
-```
-
-    ## [1] 396
-
-``` r
-pi.refs.er <- pi.refs %>% filter(Source=="er")
-
-# Meld phoible
-# df <- left_join(pi.refs.er, x)
-# head(df)
-```
-
-``` r
-# Now add ER's old data
-old <- read.table("../data/raw/Australian_phonemes_for_PHOIBLE_20170501.txt", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
-head(old)
-```
-
-    ##   IPA_for_PHOIBLE Glottolog_code Glottolog_nearest Variety_name     Source
-    ## 1               t͉       bura1267              <NA>      Burarra Green 1987
-    ## 2               t͈       bura1267              <NA>      Burarra Green 1987
-    ## 3               ʈ͉       bura1267              <NA>      Burarra Green 1987
-    ## 4               ʈ͈       bura1267              <NA>      Burarra Green 1987
-    ## 5          \u0236͉       bura1267              <NA>      Burarra Green 1987
-    ## 6          \u0236͈       bura1267              <NA>      Burarra Green 1987
-    ##                                         Source_ref
-    ## 1 http://glottolog.org/resource/reference/id/25099
-    ## 2 http://glottolog.org/resource/reference/id/25099
-    ## 3 http://glottolog.org/resource/reference/id/25099
-    ## 4 http://glottolog.org/resource/reference/id/25099
-    ## 5 http://glottolog.org/resource/reference/id/25099
-    ## 6 http://glottolog.org/resource/reference/id/25099
-    ##                                                                   Comments
-    ## 1 Please see also the general comparative notes on Australian inventories.
-    ## 2 Please see also the general comparative notes on Australian inventories.
-    ## 3 Please see also the general comparative notes on Australian inventories.
-    ## 4 Please see also the general comparative notes on Australian inventories.
-    ## 5 Please see also the general comparative notes on Australian inventories.
-    ## 6 Please see also the general comparative notes on Australian inventories.
+    ##   InventoryID BibtexKey Source
+    ## 1        2629     25099     er
+    ## 2        2630     62949     er
+    ## 3        2631     98977     er
+    ## 4        2632    126849     er
+    ## 5        2633    161795     er
+    ## 6        2634    413034     er
