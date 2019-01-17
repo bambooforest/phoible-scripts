@@ -1,0 +1,52 @@
+---
+title: "Check bibtex files"
+author: "Steven Moran \\<steven.moran@uzh.ch\\>"
+output: github_document
+---
+
+```{r, message=F, warning=F}
+library(bib2df)
+library(dplyr)
+```
+
+```{r, message=F, warning=F}
+# ER bib
+path <- '/Users/stiv/Dropbox/Github/phoible-scripts/ER/data/raw2019/inventory_biblio.txt'
+bib <- bib2df(path)
+```
+
+```{r}
+# ER inventories
+new <- read.table("../data/raw2019/Australian_phonemes_for_PHOIBLE_20180114.tsv", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
+new.ids <- new %>% select(Source_ref) %>% group_by(Source_ref) %>% distinct()
+nrow(new.ids) # 232
+head(new.ids)
+
+
+# Bibtex IDs in inventories missing in bibtex file (7)
+nrow(new.ids[which(!(new.ids$Source_ref %in% bib$BIBTEXKEY)), ]) # 7
+new.ids[which(!(new.ids$Source_ref %in% bib$BIBTEXKEY)), ]
+
+
+# No extra bibtex IDs in bib file (and not in the inventory file)
+bib[which(!(bib$BIBTEXKEY %in% new.ids$Source_ref)), ] # 0
+```
+
+```{r}
+# Get phoible bib
+pi.refs <- read.table("/Users/stiv/Github/dev/mappings/InventoryID-Bibtex.tsv", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
+pi.refs %>% filter(Source=="er") %>% nrow() # 396
+pi.refs %>% filter(Source=="er") %>% distinct() %>% nrow() # 396
+pi.refs.er <- pi.refs %>% filter(Source=="er")
+
+# Meld phoible
+# df <- left_join(pi.refs.er, x)
+# head(df)
+```
+
+```{r}
+# Now add ER's old data
+old <- read.table("../data/raw/Australian_phonemes_for_PHOIBLE_20170501.txt", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
+head(old)
+
+```

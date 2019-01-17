@@ -1,0 +1,38 @@
+---
+title: "Compare ER inventory sizes"
+author: "Steven Moran \\<steven.moran@uzh.ch\\>"
+output: github_document
+---
+  
+```{r, message=F, warning=F}
+library(dplyr)
+library(knitr)
+```
+
+```{r}
+# Erich's data
+old <- read.table("../data/raw/Australian_phonemes_for_PHOIBLE_20170501.txt", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
+new <- read.table("../data/raw2019/Australian_phonemes_for_PHOIBLE_20180114.tsv", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
+```
+
+```{r}
+# Which inventories have changed in size?
+old.inv <- old %>% select(Variety_name, IPA_for_PHOIBLE) %>% group_by(Variety_name) %>% summarize(phoneme.count = n())
+new.inv <- new %>% select(Variety_name, IPA_for_PHOIBLE) %>% group_by(Variety_name) %>% summarize(phoneme.count = n())
+
+x <- full_join(old.inv, new.inv) # 421
+d <- x %>% group_by(Variety_name) %>% 
+  filter(n()>1) %>% arrange(Variety_name)
+dim(d)
+kable(d)
+```
+
+```{r}
+# Take random example
+old %>% filter(Variety_name=="Lower Southern Aranda") %>% select(IPA_for_PHOIBLE)
+new %>% filter(Variety_name=="Lower Southern Aranda") %>% select(IPA_for_PHOIBLE)
+```
+
+```{r}
+# Could do some more specific testing here, e.g. which segment are / aren't in each old / new inventory.
+```
