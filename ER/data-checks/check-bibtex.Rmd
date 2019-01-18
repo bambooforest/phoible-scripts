@@ -22,7 +22,7 @@ head(bib)
 
 ```{r}
 # Get ER inventories data. References are made distinct.
-er.inv <- read.table("../data/raw2019/Australian_phonemes_for_PHOIBLE_20180114.tsv", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
+er.inv <- read.table("../data/raw2019/Australian_phonemes_for_PHOIBLE_20190118.tsv", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
 er.inv.d <- er.inv %>% select(Source_ref) %>% group_by(Source_ref) %>% distinct()
 expect_equal(nrow(er.inv.d), 232)
 kable(head(er.inv.d))
@@ -32,8 +32,8 @@ kable(head(er.inv.d))
 
 ## How many ER inventory Source_ref's not in the bibtex file?
 ```{r}
-expect_equal(nrow(er.inv.d[which(!(er.inv.d$Source_ref %in% bib$BIBTEXKEY)), ]), 7)
-kable(er.inv.d[which(!(er.inv.d$Source_ref %in% bib$BIBTEXKEY)), ])
+expect_equal(nrow(er.inv.d[which(!(er.inv.d$Source_ref %in% bib$BIBTEXKEY)), ]), 0)
+# kable(er.inv.d[which(!(er.inv.d$Source_ref %in% bib$BIBTEXKEY)), ])
 ```
 
 ## How many bibtex IDs not in the ER inventory data?

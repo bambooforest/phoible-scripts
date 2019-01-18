@@ -40,7 +40,7 @@ head(bib)
 
 ``` r
 # Get ER inventories data. References are made distinct.
-er.inv <- read.table("../data/raw2019/Australian_phonemes_for_PHOIBLE_20180114.tsv", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
+er.inv <- read.table("../data/raw2019/Australian_phonemes_for_PHOIBLE_20190118.tsv", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
 er.inv.d <- er.inv %>% select(Source_ref) %>% group_by(Source_ref) %>% distinct()
 expect_equal(nrow(er.inv.d), 232)
 kable(head(er.inv.d))
@@ -51,7 +51,7 @@ kable(head(er.inv.d))
 | reid\_ngangityemerri:\_1990 |
 | birk\_phonology\_1975       |
 | mushin\_grammar\_2012       |
-| breen\_barkly:\_2003        |
+| breen\_wanyi\_2003          |
 | harvey\_ngoni\_1986         |
 | parish\_aspects\_1983       |
 
@@ -62,19 +62,9 @@ How many ER inventory Source\_ref's not in the bibtex file?
 -----------------------------------------------------------
 
 ``` r
-expect_equal(nrow(er.inv.d[which(!(er.inv.d$Source_ref %in% bib$BIBTEXKEY)), ]), 7)
-kable(er.inv.d[which(!(er.inv.d$Source_ref %in% bib$BIBTEXKEY)), ])
+expect_equal(nrow(er.inv.d[which(!(er.inv.d$Source_ref %in% bib$BIBTEXKEY)), ]), 0)
+# kable(er.inv.d[which(!(er.inv.d$Source_ref %in% bib$BIBTEXKEY)), ])
 ```
-
-| Source\_ref                                                          |
-|:---------------------------------------------------------------------|
-| breen\_barkly:\_2003                                                 |
-| bowern\_grammar\_2012                                                |
-| bowern\_nhirrpi\_2000                                                |
-| tsunoda\_djaru\_1981                                                 |
-| wangka\_maya\_pilbara\_aboriginal\_language\_centre\_bayungu\_2008   |
-| wangka\_maya\_pilbara\_aboriginal\_language\_centre\_thalanyji\_2008 |
-| kohn\_morphological\_2012                                            |
 
 How many bibtex IDs not in the ER inventory data?
 -------------------------------------------------
@@ -132,7 +122,7 @@ head(er.inv.d)
     ## 1 reid_ngangityemerri:_1990
     ## 2 birk_phonology_1975      
     ## 3 mushin_grammar_2012      
-    ## 4 breen_barkly:_2003       
+    ## 4 breen_wanyi_2003         
     ## 5 harvey_ngoni_1986        
     ## 6 parish_aspects_1983
 
