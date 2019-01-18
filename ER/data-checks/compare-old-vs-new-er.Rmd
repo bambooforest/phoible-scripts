@@ -5,14 +5,13 @@ output: github_document
 ---
   
 ```{r, message=F, warning=F}
-library(bib2df)
 library(dplyr)
 ```
 
 ```{r}
 # Erich's data
 old <- read.table("../data/raw/Australian_phonemes_for_PHOIBLE_20170501.txt", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
-new <- read.table("../data/raw2019/Australian_phonemes_for_PHOIBLE_20180114.tsv", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
+new <- read.table("../data/raw2019/Australian_phonemes_for_PHOIBLE_20190118.tsv", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
 ```
 
 # How many distinct things are there?
@@ -62,46 +61,13 @@ nrow(old %>% select(Comments) %>% group_by(Comments) %>% distinct()) # 59
 nrow(new %>% select(Comments) %>% group_by(Comments) %>% distinct()) # 59
 ```
 
-
-# Get phoible index for old inventories
-```{r}
-# Get phoible index for old inventories
-pi.index <- read.table("/Users/stiv/Github/dev/mappings/InventoryID-LanguageCodes.tsv", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
-pi.index %>% filter(Source=="er") %>% nrow() # 388
-pi.index.er <- pi.index %>% filter(Source=="er")
-head(pi.index.er)
-nrow(pi.index.er)
-```
-
-```{r}
-# Join in new ER data
-new <- read.table("../data/raw2019/Australian_phonemes_for_PHOIBLE_20180114.tsv", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
-head(new)
-
-# Distinct rows
-new.d <- new %>% select(Glottolog_code, Glottolog_nearest, Variety_name, Source_ref) %>% group_by(Glottolog_code, Glottolog_nearest, Variety_name, Source_ref) %>% distinct()
-nrow(new.d)
-head(new.d)
-```
-
-
 ```{r}
 # Get unique lists
 # old.d <- old %>% select(Glottolog_code, Variety_name) %>% group_by(Glottolog_code, Variety_name) %>% distinct()
 
+# old.d <- new %>% select(Glottolog_code, Variety_name) %>% group_by(Glottolog_code, Variety_name) %>% distinct()
+
 # Write to disk
 # write.csv(old.d, file='old.csv')
 # write.csv(new.d, file='new.csv')
-# write.csv(x, file='pi.csv')
-```
-
-
-# What's different?
-```{r}
-# These were in the old data but are not in the new
-pi.index.er[which(!(pi.index.er$LanguageName %in% new.d$Variety_name)),] %>% arrange(LanguageName)
-
-# There are in the new data and not in the old
-new.d[which(!(new.d$Variety_name %in% pi.index.er$LanguageName)),] %>% arrange(Variety_name)
-
 ```
