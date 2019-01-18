@@ -1,0 +1,55 @@
+---
+title: "Compare phoible index with Australian inventories from Erich Round"
+author: "Steven Moran \\<steven.moran@uzh.ch\\>"
+output: github_document
+---
+  
+```{r, message=F, warning=F}
+library(dplyr)
+library(testthat)
+```
+
+# Get phoible index for old inventories
+```{r}
+# Get phoible index for ER inventories
+pi.index <- read.table("/Users/stiv/Github/dev/mappings/InventoryID-LanguageCodes.tsv", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
+
+expect_equal(pi.index %>% filter(Source=="er") %>% nrow(), 392)
+pi.index.er <- pi.index %>% filter(Source=="er")
+
+# Identify any duplicate entries in phoible
+expect_equal(pi.index.er %>% group_by(LanguageName) %>% filter(n()>1) %>% nrow(), 0)
+```
+
+```{r}
+# Get ER data
+new <- read.table("../data/raw2019/Australian_phonemes_for_PHOIBLE_20190118.tsv", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
+head(new)
+```
+
+```{r}
+# Get distinct rows ER
+## By multivalues
+new.d <- new %>% select(Glottolog_code, Glottolog_nearest, Variety_name, Source_ref) %>% group_by(Glottolog_code, Glottolog_nearest, Variety_name, Source_ref) %>% distinct()
+
+## By language variety name
+new.d.langnames <- new %>% select(Variety_name) %>% distinct()
+
+## Do they have the same contents?
+expect_equal(nrow(new.d), 392)
+expect_equal(nrow(new.d.langnames), 392)
+expect_true(all(new.d$Variety_name %in% new.d.langnames$Variety_name))
+expect_true(all(new.d.langnames$Variety_name %in% new.d$Variety_name))
+```
+
+
+# What's different between phoible index and ER languages?
+```{r}
+# Are there phoible inventory IDs not in the new ER data?
+expect_equal(nrow(pi.index.er[which(!(pi.index.er$LanguageName %in% new.d$Variety_name)),] %>% arrange(LanguageName)), 0)
+pi.index.er[which(!(pi.index.er$LanguageName %in% new.d$Variety_name)),] %>% arrange(LanguageName)
+
+# Are there ER varieties not in the phoible index?
+expect_equal(nrow(new.d[which(!(new.d$Variety_name %in% pi.index.er$LanguageName)),] %>% arrange(Variety_name)), 0)
+new.d[which(!(new.d$Variety_name %in% pi.index.er$LanguageName)),] %>% arrange(Variety_name)
+```
