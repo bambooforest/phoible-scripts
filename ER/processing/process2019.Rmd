@@ -1,0 +1,91 @@
+---
+title: "Prepare Erich Round's Australian languages inventories for PHOIBLE"
+author: "Steven Moran \\<steven.moran@uzh.ch\\>"
+output: github_document
+---
+
+```{r}
+# Notes from the old script
+# gara1261 is not a real glottolog code
+# many of these gcodes are from dialects, so they don't match language codes
+# gara1261 --> gara1269
+# djiw1239 --> djiw1241
+# kani1267 --> kani1276
+# angu1240 --> angu1242
+# woro1255 --> woro1258
+```
+
+```{r, message=F, warning=F}
+library(dplyr)
+library(ggplot2)
+library(testthat)
+```
+
+```{r}
+# Get phoible index for ER inventories
+pi.index <- read.table("/Users/stiv/Github/dev/mappings/InventoryID-LanguageCodes.tsv", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
+
+expect_equal(pi.index %>% filter(Source=="er") %>% nrow(), 392)
+pi.index.er <- pi.index %>% filter(Source=="er")
+rm(pi.index)
+
+# Identify any duplicate entries in phoible
+expect_equal(pi.index.er %>% group_by(LanguageName) %>% filter(n()>1) %>% nrow(), 0)
+```
+
+```{r}
+# Data for release (no ISO codes!)
+df <- read.table("../data/raw2019/Australian_phonemes_for_PHOIBLE_20190118.tsv", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
+```
+
+```{r}
+er.names <- df %>% select(Variety_name, Glottolog_code) %>% distinct()
+expect_equal(nrow(er.names), 392)
+expect_equal(nrow(pi.index.er), 392)
+             
+x <- left_join(er.names, pi.index.er, by=c("Variety_name"="LanguageName"))
+expect_equal(nrow(x), 392)
+
+x$diff <- x$Glottolog_code == x$Glottocode
+table(x$diff)
+table(x$diff, exclude = F)
+
+x[which(x$diff==F),]
+```
+
+
+```{r}
+# Create PHOIBLE inventories data format for the phoible aggregation script
+m <- left_join(df, pi.index.er, by=c("Variety_name"="LanguageName"))
+out <- m %>% select(InventoryID, Glottocode, LanguageCode, Variety_name, IPA_for_PHOIBLE) %>% arrange(InventoryID)
+colnames(out) <- c("InventoryID", "Glottocode", "LanguageCode", "LanguageName", "Phoneme")
+```
+
+```{r}
+# A few data checks
+table(out$Phoneme)
+table(out$LanguageName)
+out %>% group_by(LanguageName) %>% filter(n()<10)
+```
+
+```{r}
+# Write the inventories to disk
+write.table(out, file="../data/formatted2019/ER_inventories.tsv", sep="\t", quote=FALSE, row.names=FALSE)
+```
+
+```{r}
+# Update the bibtex keys
+refs <- m %>% select(InventoryID, Source_ref) %>% distinct() %>% arrange(InventoryID)
+
+# Expect that there are the same number of bibtex keys as inventories
+expect_equal(nrow(refs), 392)
+expect_true(all(!is.na(refs$Source_ref)))
+
+refs$Source <- 'er'
+head(refs)
+tail(refs)
+```
+
+```{r}
+write.table(refs, file="../data/formatted2019/ER_InventoryID-Bibtex.tsv", sep="\t", quote=FALSE, row.names=FALSE)
+```

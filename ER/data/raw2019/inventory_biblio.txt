@@ -297,7 +297,7 @@
 	type = {phdthesis},
 	author = {Wilkinson, Melanie P.},
 	date = {1991},
-	keywords = {Arnhem Land, Australian}
+	keywords = {Australian, Arnhem Land}
 }
 @book{heath_functional_1984,
 	location = {Canberra},
@@ -309,7 +309,7 @@
 	publisher = {Australian Institute of Aboriginal Studies},
 	author = {Heath, Jeffrey},
 	date = {1984},
-	keywords = {Australia, Descriptive linguistics, Grammar}
+	keywords = {Australia, Grammar, Descriptive linguistics}
 }
 @book{mcdonald_study_2002,
 	location = {München},
@@ -574,6 +574,13 @@
 	author = {Nash, David G.},
 	date = {1986}
 }
+@book{deak_thalanyji_2008,
+	location = {South Hedland, {WA}, Australia},
+	title = {Thalanyji dictionary : English-Thalanyji wordlist and topical wordlists 2008},
+	publisher = {Wangka Maya Pilbara Aboriginal Language Centre},
+	author = {Deak, Eleonora and Deak, Eleonora},
+	date = {2008}
+}
 @book{waters_djinang_1989,
 	location = {Canberra},
 	edition = {3rd.},
@@ -726,6 +733,17 @@
 	date = {1982},
 	doi = {10.15144/PL-B67}
 }
+@book{bowern_grammar_2013,
+	location = {Berlin, Boston},
+	title = {A grammar of Bardi},
+	isbn = {978-3-11-027815-6},
+	series = {Mouton Grammar Library},
+	pagetotal = {820},
+	number = {57},
+	publisher = {Mouton de Gruyter},
+	author = {Bowern, Claire},
+	date = {2013}
+}
 @book{rumsey_intra-sentence_1982,
 	location = {Canberra},
 	title = {An intra-sentence grammar of Ungarinjin, north-western Australia},
@@ -843,7 +861,19 @@
 	author = {Oates, Lynette F.},
 	date = {1988},
 	doi = {10.15144/PL-C108},
-	keywords = {Australia, grammars, {OBOPamaNyungan}}
+	keywords = {grammars, Australia, {OBOPamaNyungan}}
+}
+@book{tsunoda_djaru_1981,
+	location = {Canberra},
+	title = {The Djaru Language of Kimberley, Western Australia},
+	isbn = {0-85883-252-6},
+	series = {Pacific Linguistics Series B},
+	pagetotal = {331},
+	number = {78},
+	publisher = {Pacific Linguistics},
+	author = {Tsunoda, Tasaku},
+	date = {1981},
+	doi = {10.15144/PL-B78}
 }
 @book{sharp_nyangumarta:_2004,
 	location = {Canberra},
@@ -876,6 +906,18 @@
 	publisher = {Wangka Maya Pilbara Aboriginal Language Centre},
 	author = {Burgman, Albert and Wangka Maya Pilbara Aboriginal Language Centre},
 	date = {2009}
+}
+@book{kohn_morphological_2011,
+	location = {South Hedland, Western Australia},
+	edition = {2},
+	title = {A morphological description of Ngarluma},
+	isbn = {978-1-921312-98-4},
+	pagetotal = {67},
+	publisher = {Wangka Maya, Pilbara Aboriginal Language Centre},
+	author = {Kohn, Allison},
+	editora = {Churnside, R. and Dale, Cobbin and Whalebone, Walybira and Wangka Maya Pilbara Aboriginal Language Centre},
+	editoratype = {collaborator},
+	date = {2011}
 }
 @unpublished{nash_preliminary_1979,
 	location = {Cambridge, {MA}},
@@ -945,6 +987,13 @@
 	type = {{HonoursThesis}},
 	author = {Campbell, Lauren},
 	date = {2006}
+}
+@book{deak_bayungu_2008,
+	location = {South Hedland, {WA}, Australia},
+	title = {Bayungu sketch grammar : 2008},
+	publisher = {Wangka Maya Pilbara Aboriginal Language Centre},
+	author = {Deak, Eleonora and Deak, Eleonora},
+	date = {2008}
 }
 @incollection{crowley_mpakwithi_1981,
 	location = {Canberra},
@@ -1484,7 +1533,7 @@
 	type = {phdthesis},
 	author = {Schultze-Berndt, Eva},
 	date = {2000},
-	keywords = {Australian, {OBOPny}-{VRD}, {OBOsyn}-fun}
+	keywords = {Australian, {OBOsyn}-fun, {OBOPny}-{VRD}}
 }
 @incollection{hercus_note_1978,
 	location = {Canberra},
@@ -1737,7 +1786,7 @@
 	author = {Mushin, Ilana},
 	date = {2012},
 	doi = {10.1515/9781614512417},
-	keywords = {Australian Aboriginal Languages, Garrwa, Grammar}
+	keywords = {Garrwa, Australian Aboriginal Languages, Grammar}
 }
 @book{meakins_gurindji_2013,
 	location = {Batchelor, {NT}, Australia},
@@ -1873,6 +1922,20 @@
 	author = {Blake, Barry J.},
 	date = {2011},
 	doi = {10.15144/PL-628}
+}
+@incollection{breen_wanyi_2003,
+	location = {Canberra},
+	title = {Wanyi and  Garrwa comparative data},
+	isbn = {0-85883-538-X},
+	series = {Pacific Linguistics},
+	pages = {425--462},
+	number = {552},
+	booktitle = {The non-Pama-Nyungan languages of northern Australia: comparative studies of the continent's most linguistically complex region},
+	publisher = {Pacific Linguistics},
+	author = {Breen, Gavan},
+	editor = {Evans, Nicholas},
+	date = {2003},
+	doi = {10.15144/PL-552.425}
 }
 @book{fletcher_thanakupis_2007,
 	location = {North Sydney, {NSW}, Australia},
@@ -2139,6 +2202,18 @@
 	editor = {Sutton, Peter},
 	date = {1976}
 }
+@unpublished{bowern_nhirrpi_2002,
+	location = {Canberra},
+	title = {Nhirrpi vocabulary and sketch grammar},
+	url = {http://web.archive.org/web/20110423050724/http://www.ruf.rice.edu/~bowern/nhirrpi.htm},
+	type = {word list \& sketch grammar},
+	howpublished = {word list \& sketch grammar},
+	institution = {Australian Institute of Aboriginal and Torres Strait Islander Studies, Australian Indigenous Languages Collection},
+	eprint = {{ASEDA} 0786},
+	author = {Bowern, Claire and Hercus, Luise A. and Wurm, Stephen A.},
+	urldate = {2018-07-16},
+	date = {2002}
+}
 @article{troy_sydney_1992,
 	title = {The Sydney language notebooks and responses to language contact in early colonial {NSW}},
 	volume = {12},
@@ -2290,7 +2365,7 @@
 	publisher = {{IAD} Press},
 	editor = {Turpin, Myfany and Ross, Alison},
 	date = {2012},
-	keywords = {Australian, Dictionaries, English, English language, Kaytetye, Kaytetye / Kaytej language (C13) ({NT} {SF}53-06), Kaytetye language, Language - Vocabulary - Dictionaries and glossaries}
+	keywords = {Australian, English, Dictionaries, English language, Kaytetye, Kaytetye / Kaytej language (C13) ({NT} {SF}53-06), Kaytetye language, Language - Vocabulary - Dictionaries and glossaries}
 }
 @incollection{breen_taps_1997,
 	location = {Canberra},
