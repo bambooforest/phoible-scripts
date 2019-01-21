@@ -1,0 +1,46 @@
+---
+title: "Update phoible index"
+author: "Steven Moran \\<steven.moran@uzh.ch\\>"
+output: github_document
+---
+
+```{r, message=F, warning=F}
+library(dplyr)
+library(testthat)
+library(knitr)
+```  
+
+```{r}
+# TODOS:
+## update the phoible index with the most up-to-date ISO codes (requires dialect-parent-language lookup)
+## do we want to add in the canonical Glottolog language names as well?
+## add in level, family, geography, etc., metadata
+```
+
+```{r}
+# Get phoible index (TODO: update this to a CSV file)
+index <- read.table('https://raw.githubusercontent.com/phoible/dev/australian-data-update/mappings/InventoryID-LanguageCodes.tsv', sep="\t", quote="\"", header=T, stringsAsFactors=F)
+expect_equal(nrow(index), 3020)
+head(index)
+```
+
+
+```{r}
+# Glottolog dialects and geo data (v 3.3)
+glottolog <- read.csv('https://cdstar.shh.mpg.de/bitstreams/EAEA0-F088-DE0E-0712-0/languages_and_dialects_geo.csv')
+head(glottolog)
+```
+
+```{r}
+glottolog.cut <- glottolog %>% select(glottocode, name, level, macroarea, latitude, longitude, isocodes)
+index <- left_join(index, glottolog.cut, by=c("Glottocode"="glottocode"))
+```
+
+```{r}
+# Here the PHOIBLE and Glottocode ISO codes don't match up
+kable(index[which(!(index$LanguageCode == index$isocodes)),] %>% select(InventoryID, LanguageCode, isocodes, Glottocode, LanguageName, name))
+```
+
+```{r}
+kable(index[which(!(index$LanguageCode == index$isocodes)),] %>% filter(isocodes!="") %>% select(InventoryID, LanguageCode, Glottocode, LanguageName, name, level, isocodes))
+```
