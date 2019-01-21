@@ -12,6 +12,8 @@ library(digest)
 
 ``` r
 # PHOIBLE aggregated data
+## TODO: update once the aggregation script is finished (and tag the version)
+## read.csv('https://raw.githubusercontent.com/phoible/dev/refactor-agg/data/phoible-by-phoneme.csv')
 load('phoible-by-phoneme.RData')
 phoible$InventoryID <- as.integer(phoible$InventoryID)
 ```
@@ -42,8 +44,8 @@ languages.csv
 
 languages <- phoible %>% group_by(InventoryID, LanguageName, Glottocode, LanguageCode) %>% select(InventoryID, LanguageName, Glottocode, LanguageCode) %>% distinct() %>% arrange(InventoryID)
 
-# Merge in Glottolog data
-glottolog <- read.csv('languages_and_dialects_geo.csv')
+# Merge in Glottolog data (v 3.3)
+glottolog <- read.csv('https://cdstar.shh.mpg.de/bitstreams/EAEA0-F088-DE0E-0712-0/languages_and_dialects_geo.csv')
 glottolog.cut <- glottolog %>% select(glottocode, name, macroarea, latitude, longitude, isocodes)
 # TODO: Join seems to drop digits in dbl
 languages <- left_join(languages, glottolog.cut, by=c("Glottocode"="glottocode"))
@@ -57,8 +59,8 @@ languages <- left_join(languages, glottolog.cut, by=c("Glottocode"="glottocode")
 languages[which(!(languages$LanguageName == languages$name)),]
 ```
 
-    ## # A tibble: 1,525 x 9
-    ## # Groups:   InventoryID, LanguageName, Glottocode, LanguageCode [1,525]
+    ## # A tibble: 1,526 x 9
+    ## # Groups:   InventoryID, LanguageName, Glottocode, LanguageCode [1,526]
     ##    InventoryID LanguageName Glottocode LanguageCode name  macroarea
     ##          <int> <chr>        <chr>      <chr>        <fct> <fct>    
     ##  1           9 Kota         kota1263   kfe          Kota… Eurasia  
@@ -71,7 +73,7 @@ languages[which(!(languages$LanguageName == languages$name)),]
     ##  8          25 Karen        sgaw1245   ksw          S'ga… Eurasia  
     ##  9          28 Yay          bouy1240   pcc          Bouy… Eurasia  
     ## 10          29 Cham         west2650   cja          West… Eurasia  
-    ## # ... with 1,515 more rows, and 3 more variables: latitude <dbl>,
+    ## # ... with 1,516 more rows, and 3 more variables: latitude <dbl>,
     ## #   longitude <dbl>, isocodes <fct>
 
 ``` r
@@ -79,8 +81,8 @@ languages[which(!(languages$LanguageName == languages$name)),]
 languages[which(!(languages$LanguageCode == languages$isocodes)),]
 ```
 
-    ## # A tibble: 48 x 9
-    ## # Groups:   InventoryID, LanguageName, Glottocode, LanguageCode [48]
+    ## # A tibble: 49 x 9
+    ## # Groups:   InventoryID, LanguageName, Glottocode, LanguageCode [49]
     ##    InventoryID LanguageName Glottocode LanguageCode name  macroarea
     ##          <int> <chr>        <chr>      <chr>        <fct> <fct>    
     ##  1          40 Kaliai       kali1299   khl          Kali… Papunesia
@@ -93,7 +95,7 @@ languages[which(!(languages$LanguageCode == languages$isocodes)),]
     ##  8         875 Endo         endo1242   enb          Endo  Africa   
     ##  9         885 Huron        huro1249   wya          Huron North Am…
     ## 10         916 Kuay         kuay1244   kdt          Kuay  Eurasia  
-    ## # ... with 38 more rows, and 3 more variables: latitude <dbl>,
+    ## # ... with 39 more rows, and 3 more variables: latitude <dbl>,
     ## #   longitude <dbl>, isocodes <fct>
 
 ``` r
