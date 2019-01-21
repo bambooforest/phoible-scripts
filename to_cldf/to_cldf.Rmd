@@ -1,0 +1,205 @@
+---
+title: "PHOIBLE data dump to CLDF 1.0"
+author: "Steven Moran \\<steven.moran@uzh.ch\\>"
+output: github_document
+---
+
+```{r, message=F, warning=F}
+library(stringi)
+library(Unicode)
+library(tidyverse)
+library(testthat)
+library(digest)
+```
+
+```{r}
+# PHOIBLE aggregated data
+load('phoible-by-phoneme.RData')
+phoible$InventoryID <- as.integer(phoible$InventoryID)
+```
+
+```{r}
+# TODO: Problems to address! 
+# 1. spaces in LanguageName
+# 2. PHOIBLE ISO != Glottolog ISO 
+
+# Groups:   InventoryID, LanguageName, Glottocode, LanguageCode [3]
+# InventoryID LanguageName Glottocode LanguageCode name  macroarea latitude longitude isocodes
+# <int> <chr>        <chr>      <chr>        <fct> <fct>        <dbl>     <dbl> <fct>   
+# 1         298 DAN          dann1241   lda          Dan   Africa        7.23     -8.25 daf     
+# 2         691 "dan "       dann1241   dnj          Dan   Africa        7.23     -8.25 daf     
+# 3        1393 Dan          dann1241   lda          Dan   Africa        7.23     -8.25 daf  
+
+# phoible %>% filter(InventoryID %in% c(691,298,1393))
+```
+
+# languages.csv
+
+```{r}
+# languages.csv:
+## ID,Name,Macroarea,Latitude,Longitude,Glottocode,ISO639P3code
+## kor,Korean,,37.5,128.0,kore1280,kor
+## ket,Ket,,63.7551,87.5466,kett1243,ket
+
+languages <- phoible %>% group_by(InventoryID, LanguageName, Glottocode, LanguageCode) %>% select(InventoryID, LanguageName, Glottocode, LanguageCode) %>% distinct() %>% arrange(InventoryID)
+
+# Merge in Glottolog data
+glottolog <- read.csv('languages_and_dialects_geo.csv')
+glottolog.cut <- glottolog %>% select(glottocode, name, macroarea, latitude, longitude, isocodes)
+# TODO: Join seems to drop digits in dbl
+languages <- left_join(languages, glottolog.cut, by=c("Glottocode"="glottocode"))
+```
+
+```{r}
+# Note here that the `Name` column is from the Glottolog data and not from PHOIBLE
+languages[which(!(languages$LanguageName == languages$name)),]
+```
+
+```{r}
+# TODO: Here the PHOIBLE and Glottocode ISO codes don't match up
+languages[which(!(languages$LanguageCode == languages$isocodes)),]
+languages[which(!(languages$LanguageCode == languages$isocodes)),] %>% filter(isocodes!="")
+```
+
+```{r}
+# Create languages.csv
+languages.csv <- ungroup(languages)
+languages.csv <- languages.csv %>% select(isocodes, name, macroarea, latitude, longitude, Glottocode)
+languages.csv$ISO639P3code <- languages.csv$isocodes
+colnames(languages.csv) <- c("ID","Name","Macroarea","Latitude","Longitude","Glottocode","ISO639P3code")
+write.csv(languages.csv, file="cldf/languages.csv", row.names=FALSE)
+```
+
+# parameters.csv
+
+```{r}
+# parameters.csv
+## ID,Name,Description
+## 9C6117430968F42700ACD02E4E7442F7,t̠ʃʰ,LATIN SMALL LETTER T - COMBINING MINUS SIGN BELOW - LATIN SMALL LETTER ESH - MODIFIER LETTER SMALL H
+## 41D8827BB943E1FB9055A7487293BA79,pˀ,LATIN SMALL LETTER P - MODIFIER LETTER GLOTTAL STOP
+
+parameters <- phoible %>% select(Phoneme) %>% distinct(Phoneme) %>% arrange(Phoneme)
+names <- sapply(parameters$Phoneme, function(x) u_char_name(as.u_char(utf8ToInt(x))))
+parameters <- mutate(parameters, name = stri_join_list(names, sep = " - "))
+rm(names)
+
+# Get the segment name IDs
+library(digest)
+parameters$ID <- sapply(parameters$name, digest, algo="md5")
+
+# But how to get the b16 encoding?
+# https://github.com/clld/phoible/blob/73d140ae4c3377140fe3678b1997d0c13d42ad41/phoible/scripts/initializedb.py#L353-L357
+# library(caTools)
+# base64encode(x)
+# library(hashids)
+# hashids::encode_hex(x)
+
+# Create parameters.csv
+parameters.csv <- parameters %>% select(ID, Phoneme, name)
+colnames(parameters.csv) <- c("ID","Name","Description")
+write.csv(parameters.csv, file="cldf/parameters.csv", row.names=FALSE)
+```
+
+# contributions.csv
+
+```{r}
+# contributions.csv:
+## ID,Name,Description,Contributors
+## 1,Korean (SPA),Korean,Stanford Phonology Archive
+
+# The `Name` column contents is a conglomeraton of name in phoible and the uppercased Source field (contributions if this tuff spelled out)
+contributions <- phoible %>% group_by(InventoryID, LanguageName, Source) %>% select(InventoryID, LanguageName, Source) %>% distinct() %>% arrange(InventoryID)
+contributions$Name <- paste0(contributions$LanguageName, ' (', toupper(contributions$Source), ')')
+contributions$Description <- contributions$LanguageName
+
+glimpse(contributions)
+
+# Add the ontributors
+contributions$Source[contributions$Source=="spa"] <- "Stanford Phonology Archive"
+contributions$Source[contributions$Source=="saphon"] <- "UCLA Phonological Segment Inventory Database"
+contributions$Source[contributions$Source=="aa"] <- "Christian Chanard and Rhonda L. Hartell"
+contributions$Source[contributions$Source=="ph"] <- "PHOIBLE"
+contributions$Source[contributions$Source=="ra"] <- "Ramaswami N."
+contributions$Source[contributions$Source=="gm"] <- "Christopher Green and Steven Moran"
+contributions$Source[contributions$Source=="uz"] <- "Steven Moran"
+contributions$Source[contributions$Source=="saphon"] <- "South American Phonological Inventory Database"
+contributions$Source[contributions$Source=="ea"] <- "Dmitry Nikolaev"
+contributions$Source[contributions$Source=="er"] <- "Erich Round"
+
+# Create contributions.csv
+contributions <- ungroup(contributions)
+contributions.csv <- contributions %>% select(InventoryID, Name, Description, Source)
+colnames(contributions.csv) <- c("ID","Name","Description","Contributors")
+write.csv(contributions.csv, file="cldf/contributions.csv", row.names=FALSE)
+```
+
+# values.csv
+
+```{r}
+# values.csv
+## ID,Language_ID,Parameter_ID,Value,Code_ID,Comment,Source,Contribution_ID
+## 1,kor,9C6117430968F42700ACD02E4E7442F7,t̠ʃʰ Korean (SPA),,,cho1967;kim1972;martin1954;martinlee1969;martin1951;kim1968,1
+## 14564,kor,9C6117430968F42700ACD02E4E7442F7,t̠ʃʰ Korean (UPSID),,,kim1986;martin1951;martinlee1969;martin1954;cho1967;kim1972,423
+
+# Note the fields Code_ID, Comment are always empty
+# temp <- read.csv('/Users/stiv/Downloads/phoible_dataset.cldf/values.csv', header=T, stringsAsFactors=F)
+# expect_true(all(is.na(temp$Code_ID)))
+# expect_true(all(is.na(temp$Comment)))
+# rm(temp)
+```
+
+```{r}
+# Get values by phoneme per row -- note the ID is dependent on the order of phoible input, so it doesn't match previous CLDF 1.0 values.csv file
+values <- phoible %>% select(InventoryID, Phoneme)
+values$ROWID <- rownames(values)
+head(values)
+```
+
+```{r}
+# Get parameter ID
+parameter_id <- parameters.csv %>% select(Name, ID)
+values <- left_join(values, parameter_id, by=c("Phoneme"="Name"))
+head(values)
+```
+
+
+```{r}
+# Get bibtex keys in semi-colon delimited list
+refs <- read.table('https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-Bibtex.tsv', sep="\t", header=T, stringsAsFactors=F)
+citations <- refs %>% group_by(InventoryID) %>% summarize(Contribution_ID=tolower(paste(BibtexKey, collapse=";")))
+head(citations)
+```
+
+```{r}
+values <- left_join(values, citations)
+head(values)
+```
+
+```{r}
+# Add in the languages.csv IDs
+languages <- ungroup(languages)
+language_id <- languages %>% select(InventoryID, isocodes)
+head(language_id)
+values <- left_join(values, language_id)
+head(values)
+```
+
+```{r}
+contributions_id <- contributions %>% select(InventoryID, Name)
+head(contributions_id)
+values <- left_join(values, contributions_id)
+head(values)
+```
+
+```{r}
+# Create value.csv
+values$Value <- paste0(values$Phoneme, " ", values$Name)
+# These are blank for the time being (TODO revist)
+values$Code_ID <- NA
+values$Comment <- NA
+# Rename and write to disk
+values.csv <- values %>% select(ROWID, isocodes, ID, Value, Code_ID, Comment, Contribution_ID, InventoryID)
+colnames(values.csv) <- c("ID","Language_ID","Parameter_ID","Value","Code_ID","Comment","Source","Contribution_ID")
+write.csv(values.csv, file="cldf/values.csv", row.names=FALSE)
+```
+
