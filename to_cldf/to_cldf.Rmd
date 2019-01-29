@@ -82,8 +82,9 @@ phoible$ROWID <- seq.int(nrow(phoible))
 ## 14564,kor,9C6117430968F42700ACD02E4E7442F7,t̠ʃʰ Korean (UPSID),,,kim1986;martin1951;martinlee1969;martin1954;cho1967;kim1972,423
 
 # "ID","Language_ID","Parameter_ID","Value","Code_ID","Comment","Source","Contribution_ID"
-values <- phoible %>% select(ROWID, LanguageCode, Glottocode, Parameter_ID, Phoneme, Allophones, Source, InventoryID)
-colnames(values) <- c("ID", "ISO639P3code", "Language_ID", "Parameter_ID", "Name", "Allophones", "Source", "Contribution_ID")
+glimpse(phoible)
+values <- phoible %>% select(ROWID, LanguageCode, Glottocode, Parameter_ID, Phoneme, Marginal, Allophones, Source, InventoryID)
+colnames(values) <- c("ID", "ISO639P3code", "Language_ID", "Parameter_ID", "Name", "Marginal", "Allophones", "Source", "Contribution_ID")
 expect_equal(nrow(phoible), nrow(values))
 glimpse(values)
 write.csv(values, file="cldf/values.csv", row.names=FALSE)
