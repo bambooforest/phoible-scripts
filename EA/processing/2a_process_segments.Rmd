@@ -1,0 +1,294 @@
+---
+title: "Get EA inventories-IPA correspondences data for PHOIBLE"
+author: "Steven Moran \\<steven.moran@uzh.ch>"
+date: "8 Juli 2017"
+output: html_document
+---
+
+```{r packages, echo=F, message=F}
+library(stringi)
+library(dplyr)
+```
+
+
+## Functions for cleaning up IPA ##
+
+```{r functions}
+# Denormalize strings
+denorm <- function(x) stri_trans_general(x, "Any-NFD")
+
+# Re-normalize just the c-cedilla after denormalizing
+fix_c_cedilla <- function(strings) {
+  c_cedilla <- "\u00E7"
+  c_cedilla_denormed <- "\u0063\u0327"
+  stri_replace_all_fixed(strings, pattern=c_cedilla_denormed,
+                         replacement=c_cedilla)
+}
+
+# Remove brackets
+removeBrackets <- function (x, type="square") {
+  brak <- switch(type, square=c("[", "]"), angle=c("<", ">"))
+  x <- stri_replace_first_fixed(x, pattern=brak[1], replacement="")
+  x <- stri_replace_first_fixed(x, pattern=brak[2], replacement="")
+}
+
+# Convert strings to plus-separated codepoints
+codepoints <- function(strings) {
+  cps <- stri_trans_general(strings, "Any-Hex/Unicode")
+  cps <- stri_replace_all_fixed(cps, replacement="", pattern = "U")
+  cps <- stri_replace_first_fixed(cps, replacement="", pattern = "+")
+  cps
+}
+
+## Impose canonical ordering of codepoints
+## (gets applied in the "CleanUp" function)
+orderIPA <- function(strings, lang=NA, source=NA) {
+  ## DEFINITION OF GLYPH TYPES
+  ## Tones are not internally reordered so the order here is arbitrary.
+  tones <- c("˩", "˨", "˧", "˦", "˥", "↓")
+  ## Order of elements in "diacritics" and "modifiers" sets canonical order!!
+  modifiers <- c(
+    "˞",  # rhotic wing
+    "ː",  # long
+    "ˑ",  # half-long
+    "ᴱ",  # epilaryngeal source
+    "ⁿ",  # nasal release
+    "ˡ",  # lateral release
+    "ʱ",  # breathy aspirated
+    "ʰ",  # aspirated
+    "˭",  # unaspirated
+    "ˀ",  # glottalized
+    "ˤ",  # pharyngealized
+    "ˠ",  # velarized
+    "ʲ",  # palatalized
+    "ʷ",  # labialized
+    "ᶣ",  # labial-palatalized  # TODO: should use labial+palatal?
+    "ᵊ",  # schwa-like release # TODO: check what this really is
+    "ʼ"  # ejective
+  )
+  diacritics <- c(
+    "̴",  # velarized/pharyngealized (combining tilde overlay)
+    "̃",  # nasalized (combining tilde)
+    "͊",  # denasalized (combining not tilde above)
+    "͋",  # nasal emission (combining homothetic)
+    "̮",  # derhoticized (combining breve below)
+    "̤",  # breathy (combining diaresis below)
+    "̰",  # creaky (combining tilde below)
+    "̬",  # stiff (combining caron below)
+    "͓",  # frictionalized (combining x below)
+    "̼",  # linguolabial (combining seagull below)
+    "̪",  # dental (combining bridge below)
+    "̺",  # apical (combining inverted bridge below)
+    "̻",  # laminal (combining square below)
+    "͇",  # non-sibilant (combining equals sign below)
+    "͈",  # fortis (combining double vertical line below)
+    "͉",  # lenis (combining left angle below)
+    "̙",  # retracted tongue root (combining right tack below)
+    "̘",  # advanced tongue root (combining left tack below)
+    "̞",  # lowered (combining down tack below)
+    "̝",  # raised (combining up tack below)
+    "̟",  # advanced (combining plus sign below)
+    "̠",  # retracted (combining minus sign below)
+    "̈",  # centralized (combining diaresis)
+    "̽",  # mid-centralized (combining x above)
+    "̹",  # more round (combining right half ring)
+    "̜",  # less round (combining left half ring)
+    "̩",  # syllabic (combining vertical line below)
+    "̯",  # non-syllabic (combining inverted breve below)
+    "̆",  # short (combining breve)
+    "̥",  # devoiced (combining ring below)
+    "̊",  # devoiced (combining ring above)
+    "̚"   # unreleased (combining left angle above)
+  )
+  ## The base glyphs are broken up into types for convenience only; at present
+  ## their order does not matter.
+  vowels <- c("i", "y", "ɨ", "ʉ", "ɯ", "u", "ɪ", "ʏ", "ʊ", "e", "ø", "ɘ", "ɵ",
+              "ɤ", "o", "ə", "ɛ", "œ", "ɜ", "ɞ", "ʌ", "ɔ", "æ", "ɐ", "a", "ɶ",
+              "ɑ", "ɒ", "ɚ", "ɝ")
+  stops <- c("p", "b", "t", "d", "ʈ", "ɖ", "c", "ɟ", "k", "ɡ", "q", "ɢ", "ʡ",
+             "ʔ")
+  nasals <- c("m", "ɱ", "n", "ɳ", "ɲ", "ŋ", "ɴ")
+  fricatives <- c("ɸ", "β", "f", "v", "θ", "ð", "s", "z", "ɕ", "ʑ", "ʃ", "ʒ",
+                  "ʂ", "ʐ", "ç", "ʝ", "x", "ɣ", "χ", "ʁ", "ħ", "ʕ", "ʜ", "ʢ",
+                  "h", "ɦ", "ɬ", "ɮ", "ɧ", "ʍ")
+  flaps <- c("ʙ", "ⱱ", "r", "ɾ", "ᴅ", "ɽ", "ʀ", "ɺ")  
+  affricates <- c("ʦ", "ʣ", "ʧ", "ʤ")
+  implosives <- c("ƥ", "ɓ", "ƭ", "ɗ", "ᶑ", "ƈ", "ʄ", "ƙ", "ɠ", "ʠ", "ʛ")
+  approximants <- c("ʋ", "ɹ", "ɻ", "j", "ɥ", "ɰ", "l", "ɭ", "ʎ", "ʟ", "ɫ", "w")
+  clicks <- c("ʘ", "ǀ", "ǁ", "ǃ", "ǂ", "‼")
+  archephonemes <- c("R", "N")  # R = tap/trill; N = placeless nasal
+  base.glyphs <- c(stops, nasals, fricatives, flaps, affricates, implosives,
+                   approximants, clicks, vowels, archephonemes)
+  ## start by denormalizing
+  strings <- denorm(strings)
+  ## re-normalize c-cedilla
+  strings <- fix_c_cedilla(strings)
+  ## replace *R/*N with R/N
+  strings <- stri_replace_all_fixed(strings, pattern="*R", replacement="R")
+  strings <- stri_replace_all_fixed(strings, pattern="*N", replacement="N")
+  ## remove whitespace, tiebars, & square brackets
+  strings <- removeBrackets(strings)
+  strings <- stri_trim(strings)
+  strings <- stri_replace_all_fixed(strings, replacement="", pattern="͡")
+  strings <- stri_replace_all_fixed(strings, replacement="", pattern="͜")
+  ## construct parallel string showing character classes
+  df <- data.frame(phone=strings, lang=lang, source=source, stringsAsFactors = F)
+  chars <- sapply(seq_len(nrow(df)), function(x) {
+    i <- df[x, "phone"]
+    if (is.na(i)) return(NA)
+    iso <- df[x, "lang"]
+    src <- df[x, "source"]
+    chr <- strsplit(i, "")[[1]]
+    typ <- codepoints(chr)
+    typ[typ %in% codepoints("|")] <- "|"  # restore upsid disjuncts
+    typ[typ %in% codepoints(base.glyphs)] <- "B"
+    typ[typ %in% codepoints(modifiers)] <- "M"
+    typ[typ %in% codepoints(diacritics)] <- "D"
+    typ[typ %in% codepoints(tones)] <- "T"
+    if (!all(typ %in% c("B", "M", "D", "T", "|"))) {
+      #			debug <<- rbind(debug, data.frame(phone=i, codepoints=codepoints(i),
+      #			                                  iso=iso, src=src))
+      #            sink(phone.validity.log)
+      #            print(debug)
+      #            sink()
+      ## replace typestring codepoints with orig. glyphs to avoid
+      ## indexing errors below
+      missing <- !typ %in% c("B", "M", "D", "T", "|")
+      typ[missing] <- chr[missing]
+      warning(paste("Unfamiliar glyph components.", "Phone:", i,
+                    "Codepoint:", codepoints(typ[missing])),
+              call.=FALSE, immediate.=TRUE)
+    }
+    typstr <- paste(typ, collapse="")
+    ## move tones to end
+    if (stringi::stri_detect_fixed(typstr, "T")) {
+      ix <- stringi::stri_locate_first_fixed(typstr, "T")[1]
+      rightedge <- typ[ix:length(typ)]
+      while (ix < length(chr) && !all(rightedge %in% "T")) {
+        if (ix == 1) neworder <- c(2:length(typ), 1)
+        else if (ix < length(typ)) neworder <- c(1:(ix-1),
+                                                 (ix+1):length(typ), ix)
+        chr <- chr[neworder]
+        typ <- typ[neworder]
+        typstr <- paste(typ, collapse="")
+        ix <- stringi::stri_locate_first_fixed(typstr, "T")[1]
+        rightedge <- typ[ix:length(typ)]
+      }
+    }
+    ## If a diacritic comes right after a modifier letter, swap their order
+    while (stringi::stri_detect_fixed(typstr, "MD")) {
+      ix <- stringi::stri_locate_first_fixed(typstr, "MD")[1]
+      if (ix == 1) neworder <- c(2, 1, 3:length(chr))
+      else if (ix == length(chr)-1) neworder <- c(1:(ix-1), ix+1, ix)
+      else neworder <- c(1:(ix-1), ix+1, ix, (ix+2):length(chr))
+      chr <- chr[neworder]
+      typ <- typ[neworder]
+      typstr <- paste(typ, collapse="")
+    }
+    ## Put sequences of modifier letters in canonical order
+    if (stringi::stri_detect_fixed(typstr, "MM")) {
+      ixs <- stringi::stri_locate_all_regex(typstr, "M+")[[1]]
+      for (row in seq_len(dim(ixs)[1])) {
+        span <- ixs[row,1]:ixs[row,2]
+        mods <- chr[span]
+        chr[span] <- modifiers[modifiers %in% mods]
+      }   }
+    ## Put sequences of diacritics in canonical order
+    if (stringi::stri_detect_fixed(typstr, "DD")) {
+      ixs <- stringi::stri_locate_all_regex(typstr, "D+")[[1]]
+      for (row in seq_len(dim(ixs)[1])) {
+        span <- ixs[row,1]:ixs[row,2]
+        dcrs <- chr[span]
+        chr[span] <- diacritics[diacritics %in% dcrs]
+      }   }
+    paste(chr, collapse="")
+  }, USE.NAMES=FALSE)
+  ## restore asterisks
+  chars <- stringi::stri_replace_all_fixed(chars, pattern="R",
+                                           replacement="*R")
+  chars <- stringi::stri_replace_all_fixed(chars, pattern="N",
+                                           replacement="*N")
+  chars
+}
+```
+
+## Conventionalize the Eurasian database's segment types and write a EA-IPA correspondences file for PHOIBLE aggregation
+
+```{r loading}
+# Load the EA CSV data and get a unique list of segments
+ea <- read.csv("../data/raw/phono_dbase.csv", stringsAsFactors=FALSE, strip.white = T)
+df <- distinct(select(ea, Segment))
+colnames(df) <- c("Segment")
+df$Segment <- sort(df$Segment)
+glimpse(df)
+```
+
+```{r}
+# Populate phoneme column and do replacements
+df$Phoneme <- df$Segment
+```
+
+```{r}
+# Apply the rule-specific replacements
+ea.ipa <- read.table("../data/formatted/Handmade-EA_IPA_correspondences.tsv", sep="\t", header=T, stringsAsFactors=FALSE)
+glimpse(ea.ipa)
+# ea.ipa$Segment %in% df$Segment
+df <- merge(df, ea.ipa, by="Segment", all.x=TRUE)
+glimpse(df)
+df <- within(df, Phoneme <- ifelse(!is.na(IPA), IPA, Phoneme))
+df$IPA <- NULL
+```
+
+```{r}
+# Apply the general replacements
+df$Phoneme <- sub(" ", "", df$Phoneme)
+df$Phoneme <- sub("\\(", "\\<", df$Phoneme)
+df$Phoneme <- sub("\\)", "\\>", df$Phoneme)
+# df$Phoneme <- sub("<", "", df$Phoneme)
+# df$Phoneme <- sub(">", "", df$Phoneme)
+df$Phoneme <- sub("g", "ɡ", df$Phoneme)
+df$Phoneme <- sub("tʃ", "t̠ʃ", df$Phoneme)
+df$Phoneme <- sub("dʒ", "d̠ʒ", df$Phoneme)
+df$Phoneme <- sub("dʒ", "d̠ʒ", df$Phoneme)
+df$Phoneme <- sub("dʒ", "d̠ʒ", df$Phoneme)
+df$Phoneme <- sub("ɿ", "z̩", df$Phoneme)
+df$Phoneme <- sub("ʅ", "ʐ̩", df$Phoneme)
+df$Phoneme <- sub("ŝ", "ɕ", df$Phoneme)
+df$Phoneme <- sub("ẑ", "ʑ", df$Phoneme)
+glimpse(df)
+```
+
+```{r}
+# Order the IPA (make sure to order the IPA in the phoible feature matrix above)
+df$Phoneme <- stri_trans_general(df$Phoneme, "nfd")
+df$Phoneme <- orderIPA(df$Phoneme)
+df$Phoneme <- trimws(df$Phoneme)
+```
+
+```{r}
+# Load phoible segment-feature matrix and order IPA
+features <- read.csv("https://raw.githubusercontent.com/phoible/dev/master/raw-data/FEATURES/phoible-segments-features.tsv", sep="\t", stringsAsFactors=FALSE)
+features$segment
+features$segment <- orderIPA(features$segment)
+glimpse(features)
+```
+
+```{r}
+# Check for EA segments already defined in phoible segment-feature matrix ##
+df$in.phoible <- df$Phoneme %in% features$segment
+head(df)
+# which trues
+length(which(df$in.phoible))
+# which falses
+length(which(!df$in.phoible))
+# Populate the OK phoible segments
+# df$Phoneme <- ifelse(df$in.phoible==TRUE, df$Segment, NA)
+# head(df)
+```
+
+
+```{r}
+# Write the output to a table
+rownames(df) <- NULL
+write.table(df, "../data/formatted/EA_IPA_correspondences.tsv", quote=F, row.names=F, sep="\t")
+```
