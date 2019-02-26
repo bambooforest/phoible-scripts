@@ -1,0 +1,28 @@
+---
+title: "Check for errors in PHOIBLE segment conventions"
+author: "Steven Moran \\<steven.moran@uzh.ch\\>"
+output: github_document
+---
+  
+```{r, message=F, warning=F}
+library(testthat)
+```
+
+
+```{r}
+load('../../dev/data/phoible-by-phoneme.RData')
+phoible$InventoryID <- as.integer(phoible$InventoryID)
+expect_equal(nrow(phoible), 95993)
+```
+
+```{r}
+# Get a list of unique segments and which sources they appear in
+phoneme.source <- phoible %>% select(Phoneme, Source) %>% group_by(Phoneme, Source) %>% distinct()
+distinct.segments <- phoneme.source %>% group_by(Phoneme) %>% summarize(Sources=tolower(paste(Source, collapse=";"))) %>% arrange(Phoneme)
+expect_equal(nrow(distinct.segments), 3205)
+head(distinct.segments)
+```
+
+```{r}
+write.csv(distinct.segments, file="distinct-segments.csv", row.names = F)
+```
