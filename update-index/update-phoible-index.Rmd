@@ -1,5 +1,5 @@
 ---
-title: "Update phoible index"
+title: "Update phoible index with Glottolog data"
 author: "Steven Moran \\<steven.moran@uzh.ch\\>"
 output: github_document
 ---
@@ -18,8 +18,8 @@ library(knitr)
 ```
 
 ```{r}
-# Get phoible index (TODO: update this to a CSV file)
-index <- read.table('https://raw.githubusercontent.com/phoible/dev/australian-data-update/mappings/InventoryID-LanguageCodes.tsv', sep="\t", quote="\"", header=T, stringsAsFactors=F)
+# Get phoible index (TODO: update this to a CSV file; update link to master branch when merged)
+index <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-LanguageCodes.csv', header=T, stringsAsFactors=F)
 expect_equal(nrow(index), 3020)
 head(index)
 ```
@@ -38,9 +38,47 @@ index <- left_join(index, glottolog.cut, by=c("Glottocode"="glottocode"))
 
 ```{r}
 # Here the PHOIBLE and Glottocode ISO codes don't match up
-kable(index[which(!(index$LanguageCode == index$isocodes)),] %>% select(InventoryID, LanguageCode, isocodes, Glottocode, LanguageName, name))
+kable(index[which(!(index$LanguageCode == index$isocodes)),] %>% select(InventoryID, LanguageCode, isocodes, Glottocode, LanguageName, Source, level))
 ```
 
 ```{r}
 kable(index[which(!(index$LanguageCode == index$isocodes)),] %>% filter(isocodes!="") %>% select(InventoryID, LanguageCode, Glottocode, LanguageName, name, level, isocodes))
+```
+
+```{r}
+# Identify the parent languages of dialects
+# https://cdstar.shh.mpg.de/bitstreams/EAEA0-E7DE-FA06-8817-0/glottolog_languoid.csv.zip
+languoids <- read.csv('glottolog_languoid.csv/languoid.csv', header=T, stringsAsFactors=F)
+head(languoids)
+```
+
+```{r}
+# First check that all present phoible Glottocodes are valid 
+table(index$Glottocode %in% languoids$id)
+index[which(!(index$Glottocode %in% languoids$id)),]
+```
+
+
+```{r}
+# How many levels do we have in the index?
+table(index$level)
+```
+
+```{r}
+# These are the dialects in the phoible index
+dialects <- index %>% filter(level=="dialect") %>% select(InventoryID, LanguageName, Glottocode, LanguageCode, isocodes)
+nrow(dialects)
+```
+
+```{r}
+# All missing isocodes -- TODO
+index %>% select(InventoryID, LanguageName, Glottocode, LanguageCode, isocodes, level) %>% filter(is.na(isocodes))
+```
+
+```{r}
+# Get parent language data to get ISO code
+nrow(dialects)
+
+nrow(languoids %>% filter(id %in% dialects$Glottocode))
+head(languoids)
 ```
