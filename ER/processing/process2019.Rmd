@@ -70,6 +70,7 @@ out %>% group_by(LanguageName) %>% filter(n()<10)
 
 ```{r}
 # Write the inventories to disk
+head(out)
 write.table(out, file="../data/formatted2019/ER_inventories.tsv", sep="\t", quote=FALSE, row.names=FALSE)
 ```
 
