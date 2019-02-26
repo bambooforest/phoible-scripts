@@ -15,7 +15,8 @@ library(digest)
 ```{r}
 # PHOIBLE aggregated data
 ## TODO: update once the aggregation script is finished (and tag the version)
-load(url('https://raw.githubusercontent.com/phoible/dev/refactor-agg/data/phoible-by-phoneme.RData'))
+## load(url('https://raw.githubusercontent.com/phoible/dev/refactor-agg/data/phoible-by-phoneme.RData'))
+load('../../dev/data/phoible-by-phoneme.RData')
 phoible$InventoryID <- as.integer(phoible$InventoryID)
 expect_equal(nrow(phoible), 95993)
 ```
@@ -43,7 +44,7 @@ contributors <- read.csv("contributors.csv")
 phoible <- left_join(phoible, contributors, by=c("Source"="ID"))
 
 # Get bibtex keys in semi-colon delimited list
-refs <- read.table('https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-Bibtex.tsv', sep="\t", header=T, stringsAsFactors=F)
+refs <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-Bibtex.csv', header=T, stringsAsFactors=F)
 citations <- refs %>% group_by(InventoryID) %>% summarize(Contribution_ID=tolower(paste(BibtexKey, collapse=";")))
 phoible <- left_join(phoible, citations)
 rm(refs, citations)
