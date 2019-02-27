@@ -13,9 +13,10 @@ library(digest)
 ``` r
 # PHOIBLE aggregated data
 ## TODO: update once the aggregation script is finished (and tag the version)
-load(url('https://raw.githubusercontent.com/phoible/dev/refactor-agg/data/phoible-by-phoneme.RData'))
+## load(url('https://raw.githubusercontent.com/phoible/dev/refactor-agg/data/phoible-by-phoneme.RData'))
+load('../../dev/data/phoible-by-phoneme.RData')
 phoible$InventoryID <- as.integer(phoible$InventoryID)
-expect_equal(nrow(phoible), 95993)
+# expect_equal(nrow(phoible), 95993)
 ```
 
 ``` r
@@ -36,7 +37,7 @@ phoible %>% filter(InventoryID %in% c(691,298,1393)) %>% distinct(InventoryID, L
     ##   InventoryID LanguageCode LanguageName
     ## 1        1393          lda          Dan
     ## 2         298          lda          DAN
-    ## 3         691          dnj         dan
+    ## 3         691          dnj          dan
 
 Create one large table
 ======================
@@ -52,7 +53,7 @@ phoible <- left_join(phoible, contributors, by=c("Source"="ID"))
 
 ``` r
 # Get bibtex keys in semi-colon delimited list
-refs <- read.table('https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-Bibtex.tsv', sep="\t", header=T, stringsAsFactors=F)
+refs <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-Bibtex.csv', header=T, stringsAsFactors=F)
 citations <- refs %>% group_by(InventoryID) %>% summarize(Contribution_ID=tolower(paste(BibtexKey, collapse=";")))
 phoible <- left_join(phoible, citations)
 ```
@@ -107,7 +108,7 @@ values.csv
 glimpse(phoible)
 ```
 
-    ## Observations: 95,993
+    ## Observations: 105,481
     ## Variables: 21
     ## $ InventoryID         <int> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
     ## $ Glottocode          <chr> "kore1280", "kore1280", "kore1280", "kore1...
@@ -117,7 +118,7 @@ glimpse(phoible)
     ## $ GlyphID             <chr> "0061", "0061+02D0", "00E6", "00E6+02D0", ...
     ## $ Phoneme             <chr> "a", "aː", "æ", "æː", "e", "eː", "ɤ", "ɤː"...
     ## $ Allophones          <chr> "a", "aː", "ɛ æ", "æː", "e", "eː", "ɤ", "ɤ...
-    ## $ Marginal            <lgl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA...
+    ## $ Marginal            <chr> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA...
     ## $ Source              <chr> "spa", "spa", "spa", "spa", "spa", "spa", ...
     ## $ Name                <fct> SPA, SPA, SPA, SPA, SPA, SPA, SPA, SPA, SP...
     ## $ Contributor         <fct> Stanford Phonology Archive, Stanford Phono...
@@ -138,14 +139,14 @@ expect_equal(nrow(phoible), nrow(values))
 glimpse(values)
 ```
 
-    ## Observations: 95,993
+    ## Observations: 105,481
     ## Variables: 9
     ## $ ID              <int> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,...
     ## $ ISO639P3code    <chr> "kor", "kor", "kor", "kor", "kor", "kor", "kor...
     ## $ Language_ID     <chr> "kore1280", "kore1280", "kore1280", "kore1280"...
     ## $ Parameter_ID    <chr> "3bff843fa918065aa88e47217358c573", "eb735919b...
     ## $ Name            <chr> "a", "aː", "æ", "æː", "e", "eː", "ɤ", "ɤː", "h...
-    ## $ Marginal        <lgl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA...
+    ## $ Marginal        <chr> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA...
     ## $ Allophones      <chr> "a", "aː", "ɛ æ", "æː", "e", "eː", "ɤ", "ɤː", ...
     ## $ Source          <chr> "spa", "spa", "spa", "spa", "spa", "spa", "spa...
     ## $ Contribution_ID <int> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1...
@@ -168,7 +169,7 @@ colnames(parameters) <- c("ID", "Name", "Description")
 glimpse(parameters)
 ```
 
-    ## Observations: 3,205
+    ## Observations: 3,209
     ## Variables: 3
     ## $ ID          <chr> "3bff843fa918065aa88e47217358c573", "eb735919b725c...
     ## $ Name        <chr> "a", "aː", "æ", "æː", "e", "eː", "ɤ", "ɤː", "h", "...
@@ -192,7 +193,7 @@ colnames(contributions) <- c("ID", "Contributor_ID", "Name", "Contributors", "Re
 glimpse(contributions)
 ```
 
-    ## Observations: 2,628
+    ## Observations: 3,020
     ## Variables: 5
     ## $ ID             <int> 1, 10, 100, 1000, 1001, 1002, 1003, 1004, 1005,...
     ## $ Contributor_ID <chr> "spa", "spa", "spa", "ph", "ph", "ph", "ph", "p...
