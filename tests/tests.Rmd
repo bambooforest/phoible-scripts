@@ -1,0 +1,34 @@
+---
+title: "PHOIBLE data tests"
+author: "Steven Moran \\<steven.moran@uzh.ch\\>"
+output: github_document
+---
+  
+```{r, message=F, warning=F}
+library(bib2df)
+library(dplyr)
+library(knitr)
+library(testthat)
+```
+
+```{r, message=F, warning=F}
+# Get the bibtex data
+path <- 'https://raw.githubusercontent.com/phoible/dev/master/data/phoible-references.bib'
+# path <- '../data/raw2019/inventory_biblio.txt'
+bib <- bib2df(path)
+head(bib)
+```
+
+```{r}
+index.bibtex <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-Bibtex.csv', header=T, stringsAsFactors = F)
+head(index.bibtex)
+```
+
+```{r}
+# Which bibtex keys are in the phoible bibtex index and NOT in the bibtex file
+index.bibtex[which(!(index.bibtex$BibtexKey %in% bib$BIBTEXKEY)), ]
+```
+
+<!--
+## load(url('https://raw.githubusercontent.com/phoible/dev/refactor-agg/data/phoible-by-phoneme.RData'))
+-->
