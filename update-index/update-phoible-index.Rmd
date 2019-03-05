@@ -1,5 +1,5 @@
 ---
-title: "Update phoible index with Glottolog data"
+title: "Update phoible index with ISO codes from Glottolog data"
 author: "Steven Moran \\<steven.moran@uzh.ch\\>"
 output: github_document
 ---
@@ -10,54 +10,75 @@ library(testthat)
 library(knitr)
 ```  
 
-```{r}
-# TODOS:
-## update the phoible index with the most up-to-date ISO codes (requires dialect-parent-language lookup)
-## do we want to add in the canonical Glottolog language names as well?
-## add in level, family, geography, etc., metadata
-```
+
+# Check and assign ISO codes
 
 ```{r}
-# Get phoible index (TODO: update this to a CSV file; update link to master branch when merged)
-index <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-LanguageCodes.csv', header=T, stringsAsFactors=F)
+# Get phoible index (TODO: update to online version when recent PRs are merged)
+# index <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-LanguageCodes.csv', header=T, stringsAsFactors=F)
+index <- read.csv('../../phoible/mappings/InventoryID-LanguageCodes.csv', header=T, stringsAsFactors = F)
 expect_equal(nrow(index), 3020)
 head(index)
-```
-
-
-```{r}
-# Glottolog dialects and geo data (v 3.3)
-glottolog <- read.csv('https://cdstar.shh.mpg.de/bitstreams/EAEA0-F088-DE0E-0712-0/languages_and_dialects_geo.csv')
-head(glottolog)
-```
-
-```{r}
-glottolog.cut <- glottolog %>% select(glottocode, name, level, macroarea, latitude, longitude, isocodes)
-index <- left_join(index, glottolog.cut, by=c("Glottocode"="glottocode"))
-```
-
-```{r}
-# Here the PHOIBLE and Glottocode ISO codes don't match up
-kable(index[which(!(index$LanguageCode == index$isocodes)),] %>% select(InventoryID, LanguageCode, isocodes, Glottocode, LanguageName, Source, level))
-```
-
-```{r}
-kable(index[which(!(index$LanguageCode == index$isocodes)),] %>% filter(isocodes!="") %>% select(InventoryID, LanguageCode, Glottocode, LanguageName, name, level, isocodes))
 ```
 
 ```{r}
 # Identify the parent languages of dialects
 # https://cdstar.shh.mpg.de/bitstreams/EAEA0-E7DE-FA06-8817-0/glottolog_languoid.csv.zip
 languoids <- read.csv('glottolog_languoid.csv/languoid.csv', header=T, stringsAsFactors=F)
-head(languoids)
+languoids <- languoids %>% select(id, family_id, parent_id, name, level, status, iso639P3code)
 ```
 
 ```{r}
-# First check that all present phoible Glottocodes are valid 
+# Merge in the languiods data for our Glottolog codes
+index <- left_join(index, languoids, by=c("Glottocode"="id"))
+```
+
+```{r}
+# First check that all present phoible Glottocodes are valid -- currently 2 <NA>s
 table(index$Glottocode %in% languoids$id)
 index[which(!(index$Glottocode %in% languoids$id)),]
 ```
 
+```{r}
+# These are phoible inventories where our ISO codes don't match Glottolog codes (14 mismatches)
+expect_equal(nrow(index %>% filter(LanguageCode != iso639P3code) %>% filter(iso639P3code != "")), 0)
+index %>% filter(LanguageCode != iso639P3code) %>% filter(iso639P3code != "")
+```
+
+# Which inventories don't have a Glottocode? Assign them from Glottolog
+
+```{r}
+missing.iso <- index %>% filter(iso639P3code == "")
+dim(missing.iso) # 123 missing
+head(missing.iso)
+```
+
+```{r}
+# Merge in the parents and their glottocodes
+parent.index <- left_join(missing.iso, languoids, by=c("parent_id"="id"))
+head(parent.index)
+```
+
+```{r}
+# Which phoible NAs can get assign when we merge in the parents and their ISO codes
+parent.index %>% filter(is.na(LanguageCode)) %>% filter(iso639P3code.y != "")
+
+# Which codes don't match because we've added them by hand -- 2689 Gudanji was purposedly given [wmb] for Wambaya (two nodes up in the Glottolog 3.3 tree)
+parent.index[which(parent.index$LanguageCode != parent.index$iso639P3code.y), ] %>% select(InventoryID, LanguageCode, Glottocode, iso639P3code.y, LanguageName)
+
+# No phoible language codes should be blank
+expect_equal(nrow(parent.index %>% filter(LanguageCode=="")), 0)
+```
+
+```{r}
+# Which phoible language codes are NA (35)
+parent.index %>% filter(is.na(LanguageCode)) %>% select(InventoryID, LanguageCode, Glottocode, iso639P3code.y, LanguageName, level.x, level.y)
+
+# What can be assigned by look up? I.e., what's NA as phoible ISO code but there exists something one level up in Glottolo
+parent.index %>% filter(is.na(LanguageCode)) %>% filter(iso639P3code.y != "") %>% select(InventoryID, LanguageCode, Glottocode, iso639P3code.y, LanguageName)
+```
+
+# Looking at general categories
 
 ```{r}
 # How many levels do we have in the index?
@@ -65,20 +86,19 @@ table(index$level)
 ```
 
 ```{r}
+# These are the family level glottolog codes in the phoible index. TODO: check and update if ncessary
+families <- index %>% filter(level=="family") %>% select(InventoryID, LanguageName, Glottocode, LanguageCode, iso639P3code, Source)
+nrow(families)
+families
+```
+
+
+```{r}
 # These are the dialects in the phoible index
-dialects <- index %>% filter(level=="dialect") %>% select(InventoryID, LanguageName, Glottocode, LanguageCode, isocodes)
+dialects <- index %>% filter(level=="dialect") %>% select(InventoryID, LanguageName, Glottocode, LanguageCode, iso639P3code, Source)
 nrow(dialects)
+head(dialects)
+# This should be only iso639P3code that are empty
+dialects %>% filter(LanguageCode!=iso639P3code)
 ```
 
-```{r}
-# All missing isocodes -- TODO
-index %>% select(InventoryID, LanguageName, Glottocode, LanguageCode, isocodes, level) %>% filter(is.na(isocodes))
-```
-
-```{r}
-# Get parent language data to get ISO code
-nrow(dialects)
-
-nrow(languoids %>% filter(id %in% dialects$Glottocode))
-head(languoids)
-```

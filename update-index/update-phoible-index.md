@@ -1,4 +1,4 @@
-Update phoible index with Glottolog data
+Update phoible index with ISO codes from Glottolog data
 ================
 Steven Moran &lt;<steven.moran@uzh.ch>&gt;
 
@@ -8,16 +8,13 @@ library(testthat)
 library(knitr)
 ```
 
-``` r
-# TODOS:
-## update the phoible index with the most up-to-date ISO codes (requires dialect-parent-language lookup)
-## do we want to add in the canonical Glottolog language names as well?
-## add in level, family, geography, etc., metadata
-```
+Check and assign ISO codes
+==========================
 
 ``` r
-# Get phoible index (TODO: update this to a CSV file; update link to master branch when merged)
-index <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-LanguageCodes.csv', header=T, stringsAsFactors=F)
+# Get phoible index (TODO: update to online version when recent PRs are merged)
+# index <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-LanguageCodes.csv', header=T, stringsAsFactors=F)
+index <- read.csv('../../phoible/mappings/InventoryID-LanguageCodes.csv', header=T, stringsAsFactors = F)
 expect_equal(nrow(index), 3020)
 head(index)
 ```
@@ -31,212 +28,219 @@ head(index)
     ## 6           6          bsk   buru1296   Burushaski    spa
 
 ``` r
-# Glottolog dialects and geo data (v 3.3)
-glottolog <- read.csv('https://cdstar.shh.mpg.de/bitstreams/EAEA0-F088-DE0E-0712-0/languages_and_dialects_geo.csv')
-head(glottolog)
-```
-
-    ##   glottocode       name isocodes    level macroarea latitude longitude
-    ## 1   aala1237     Aalawa           dialect Papunesia       NA        NA
-    ## 2   aant1238 Aantantara           dialect Papunesia       NA        NA
-    ## 3   aari1239       Aari      aiw language    Africa  5.95034   36.5721
-    ## 4   aari1240     Aariya      aay language   Eurasia       NA        NA
-    ## 5   aasa1238      Aasax      aas language    Africa -4.00679   36.8648
-    ## 6   aata1238  Aatasaara           dialect Papunesia       NA        NA
-
-``` r
-glottolog.cut <- glottolog %>% select(glottocode, name, level, macroarea, latitude, longitude, isocodes)
-index <- left_join(index, glottolog.cut, by=c("Glottocode"="glottocode"))
-```
-
-    ## Warning: Column `Glottocode`/`glottocode` joining character vector and
-    ## factor, coercing into character vector
-
-``` r
-# Here the PHOIBLE and Glottocode ISO codes don't match up
-kable(index[which(!(index$LanguageCode == index$isocodes)),] %>% select(InventoryID, LanguageCode, isocodes, Glottocode, LanguageName, Source, level))
-```
-
-|      |  InventoryID| LanguageCode | isocodes | Glottocode | LanguageName        | Source | level    |
-|------|------------:|:-------------|:---------|:-----------|:--------------------|:-------|:---------|
-| 40   |           40| khl          |          | kali1299   | Kaliai              | spa    | dialect  |
-| 136  |          136| xtc          |          | katc1250   | Katcha              | spa    | dialect  |
-| 155  |          155| naq          |          | nama1265   | Nama                | spa    | dialect  |
-| 298  |          298| lda          | daf      | dann1241   | DAN                 | upsid  | language |
-| 613  |          613| wnw          | wit      | wint1259   | WINTU               | upsid  | language |
-| 691  |          691| dnj          | daf      | dann1241   | dan                 | aa     | language |
-| 871  |          871| kpr          |          | kora1295   | Korafe              | ph     | dialect  |
-| 875  |          875| enb          |          | endo1242   | Endo                | ph     | dialect  |
-| 885  |          885| wya          |          | huro1249   | Huron               | ph     | dialect  |
-| 916  |          916| kdt          |          | kuay1244   | Kuay                | ph     | dialect  |
-| 947  |          947| nmg          |          | mvum1238   | Mvumbo              | ph     | dialect  |
-| 973  |          973| mpt          |          | mian1257   | Mianmin             | ph     | dialect  |
-| 996  |          996| str          |          | saan1246   | Saanich             | ph     | dialect  |
-| 1097 |         1097| arr          |          | karo1306   | Karo                | ph     | dialect  |
-| 1102 |         1102| biw          |          | bike1242   | Bikele              | ph     | dialect  |
-| 1192 |         1192| nbj          |          | bili1250   | Bilinara            | ph     | dialect  |
-| 1276 |         1276| kck          |          | ikal1242   | Ikalanga            | gm     | dialect  |
-| 1318 |         1318| cce          |          | copi1238   | Copi                | gm     | dialect  |
-| 1322 |         1322| buy          |          | mman1238   | Mmani               | gm     | dialect  |
-| 1325 |         1325| gur          |          | fraf1238   | Frafra              | gm     | dialect  |
-| 1382 |         1382| oks          |          | okoo1245   | Oko                 | gm     | dialect  |
-| 1393 |         1393| lda          | daf      | dann1241   | Dan                 | gm     | language |
-| 1401 |         1401| hna          |          | besl1239   | Besleri             | gm     | dialect  |
-| 1455 |         1455| nko          |          | nkon1248   | Nkonya              | gm     | dialect  |
-| 1456 |         1456| gru          |          | sodd1242   | Soddo               | gm     | dialect  |
-| 1460 |         1460| sgw          |          | ezha1238   | Ezha                | gm     | dialect  |
-| 1461 |         1461| sgw          |          | chah1248   | Chaha               | gm     | dialect  |
-| 1462 |         1462| sgw          |          | gume1239   | Gumer               | gm     | dialect  |
-| 1480 |         1480| zay          |          | zays1236   | Zayse               | gm     | dialect  |
-| 1523 |         1523| afu          |          | efut1241   | Efutu               | gm     | dialect  |
-| 1591 |         1591| nyf          |          | kamb1298   | Kambe               | gm     | dialect  |
-| 1592 |         1592| nyf          |          | kaum1238   | Kauma               | gm     | dialect  |
-| 1625 |         1625| mgo          |          | mogh1246   | Moghamo             | gm     | dialect  |
-| 1633 |         1633| pnz          |          | pana1294   | Pana                | gm     | dialect  |
-| 1701 |         1701| mrr          |          | abuj1237   | Abujmaria           | ra     | dialect  |
-| 1768 |         1768| mrg          |          | miny1240   | Mising              | ra     | dialect  |
-| 1771 |         1771| nit          |          | naik1250   | Naiki               | ra     | dialect  |
-| 1772 |         1772| nep          | npi      | nepa1254   | Nepali              | ra     | language |
-| 1858 |         1858| boa          |          | mira1254   | Miraña              | saphon | dialect  |
-| 1994 |         1994| nab          |          | khit1238   | Kithaulhu           | saphon | dialect  |
-| 2015 |         2015| shp          |          | ship1255   | Shipibo             | saphon | dialect  |
-| 2092 |         2092| arr          |          | karo1306   | Karo                | saphon | dialect  |
-| 2204 |         2204| nep          | npi      | nepa1254   | Nepali              | uz     | language |
-| 2225 |         2225| kxd          |          | keda1250   | Kedayan             | uz     | dialect  |
-| 2268 |         2268| udm          |          | bese1243   | Beserman            | ea     | dialect  |
-| 2298 |         2298| jih          |          | puxi1242   | Puxi                | ea     | dialect  |
-| 2332 |         2332| pbu          |          | nort2647   | Northwestern Pashto | ea     | dialect  |
-| 2381 |         2381| eus          |          | basq1250   | Zuberoan Basque     | ea     | dialect  |
-| 2384 |         2384| kom          |          | komi1277   | Yodzyak Komi        | ea     | language |
-| 2491 |         2491| tvn          |          | merg1238   | Myeik Burmese       | ea     | dialect  |
-| 2519 |         2519| kpt          | khg      | kham1282   | Soghpo Tibetan      | ea     | language |
-| 2537 |         2537| tks          |          | khal1271   | Khalkhal            | ea     | dialect  |
-| 2586 |         2586| pbt          |          | sout2436   | Southwestern Pashto | ea     | dialect  |
-| 2590 |         2590| oss          |          | digo1242   | Digor Ossetic       | ea     | dialect  |
-| 2634 |         2634| mwf          |          | murr1259   | Murrinh-patha       | er     | dialect  |
-| 2656 |         2656| gup          |          | gund1246   | Gun-Dedjnjenghmi    | er     | dialect  |
-| 2657 |         2657| gup          |          | gund1246   | Gun-Djeihmi         | er     | dialect  |
-| 2658 |         2658| gup          |          | gune1238   | Kune                | er     | dialect  |
-| 2659 |         2659| gup          |          | mura1269   | Kuninjku            | er     | dialect  |
-| 2660 |         2660| gup          |          | guma1252   | Kunwinjku           | er     | dialect  |
-| 2661 |         2661| gup          |          | naia1238   | Mayali              | er     | dialect  |
-| 2670 |         2670| ilg          |          | gari1254   | Garig               | er     | dialect  |
-| 2671 |         2671| ilg          |          | ilga1238   | Ilgar               | er     | dialect  |
-| 2684 |         2684| nug          |          | ngal1294   | Ngaliwurru          | er     | dialect  |
-| 2688 |         2688| wmb          |          | binb1242   | Binbinka            | er     | dialect  |
-| 2689 |         2689| wmb          |          | guda1243   | Gudanji             | er     | dialect  |
-| 2703 |         2703| amx          |          | east2380   | Eastern Anmatyerre  | er     | dialect  |
-| 2704 |         2704| amx          |          | west2442   | Western Anmatyerre  | er     | dialect  |
-| 2706 |         2706| aer          |          | mpar1238   | Central Arrernte    | er     | dialect  |
-| 2707 |         2707| adg          | axe      | ayer1246   | Ayerrerenge         | er     | dialect  |
-| 2712 |         2712| bdy          |          | yugu1249   | Bundjalung          | er     | dialect  |
-| 2713 |         2713| gih          |          | gida1240   | Gidabal             | er     | dialect  |
-| 2714 |         2714| bdy          |          | guwa1244   | Guwar               | er     | language |
-| 2718 |         2718| xbg          |          | warr1257   | Warrnambool         | er     | language |
-| 2722 |         2722| wyb          |          | wayi1238   | Wayilwan            | er     | dialect  |
-| 2724 |         2724| kld          |          | wirr1237   | Wiriyaraay          | er     | dialect  |
-| 2725 |         2725| kld          |          | yuwa1242   | Yuwaalaraay         | er     | dialect  |
-| 2726 |         2726| kld          |          | yuwa1243   | Yuwaliyaay          | er     | dialect  |
-| 2727 |         2727| xyy          |          | dhud1236   | Dhudhuroa           | er     | language |
-| 2751 |         2751| nmv          |          | kara1508   | Karangura           | er     | dialect  |
-| 2752 |         2752| nmv          |          | ngam1284   | Ngamini             | er     | dialect  |
-| 2755 |         2755| ynd          | hrp      | nhir1234   | Nhirrpi             | er     | dialect  |
-| 2774 |         2774| wyi          | dgw      | daun1234   | Daungwurrung        | er     | dialect  |
-| 2781 |         2781| tbh          | xwd      | wadi1260   | Wathi Wathi         | er     | dialect  |
-| 2792 |         2792| nay          |          | nort2756   | Keramin             | er     | language |
-| 2829 |         2829| mnt          | xyk      | mayi1236   | Mayi-Kulan          | er     | dialect  |
-| 2832 |         2832| mnt          | xyj      | mayi1235   | Mayi-Yapi           | er     | dialect  |
-| 2851 |         2851| nbj          |          | bili1250   | Bilinarra           | er     | dialect  |
-| 2852 |         2852| gue          |          | wany1244   | Wanyjirra           | er     | dialect  |
-| 2855 |         2855| gue          |          | maln1239   | Malngin             | er     | dialect  |
-| 2867 |         2867| nys          |          | kani1276   | Kaniyang            | er     | dialect  |
-| 2918 |         2918| amz          |          | angg1238   | Angkamuthi          | er     | language |
-| 2920 |         2920| amz          |          | yadh1237   | Yadhaykenu          | er     | language |
-| 2924 |         2924| kjn          |          | ulku1238   | Olkol               | er     | dialect  |
-| 2930 |         2930| kjn          |          | oyka1239   | Oykangand           | er     | dialect  |
-| 2941 |         2941| gbw          |          | gabi1248   | Gabi-Gabi           | er     | dialect  |
-| 2943 |         2943| wkw          |          | duun1241   | Duungidjawu         | er     | dialect  |
-| 2952 |         2952| mpj          |          | kart1247   | Kartujarra          | er     | dialect  |
-| 2953 |         2953| mpj          |          | many1256   | Manjiljarra         | er     | dialect  |
-| 2954 |         2954| mpj          |          | pudi1238   | Putijarra           | er     | dialect  |
-| 2955 |         2955| mpj          |          | wang1288   | Wangkajunga         | er     | dialect  |
-| 2966 |         2966| mwp          |          | kala1378   | Kala Kawaw Ya       | er     | dialect  |
-| 2973 |         2973| dax          |          | dhal1246   | Dhay'yi             | er     | dialect  |
-| 2992 |         2992| duj          |          | djap1238   | Djapu               | er     | dialect  |
-| 3018 |         3018| wbp          |          | west2437   | Ngardily            | er     | dialect  |
-
-``` r
-kable(index[which(!(index$LanguageCode == index$isocodes)),] %>% filter(isocodes!="") %>% select(InventoryID, LanguageCode, Glottocode, LanguageName, name, level, isocodes))
-```
-
-|  InventoryID| LanguageCode | Glottocode | LanguageName   | name          | level    | isocodes |
-|------------:|:-------------|:-----------|:---------------|:--------------|:---------|:---------|
-|          298| lda          | dann1241   | DAN            | Dan           | language | daf      |
-|          613| wnw          | wint1259   | WINTU          | Wintu         | language | wit      |
-|          691| dnj          | dann1241   | dan            | Dan           | language | daf      |
-|         1393| lda          | dann1241   | Dan            | Dan           | language | daf      |
-|         1772| nep          | nepa1254   | Nepali         | Nepali        | language | npi      |
-|         2204| nep          | nepa1254   | Nepali         | Nepali        | language | npi      |
-|         2519| kpt          | kham1282   | Soghpo Tibetan | Khams Tibetan | language | khg      |
-|         2707| adg          | ayer1246   | Ayerrerenge    | Ayerrerenge   | dialect  | axe      |
-|         2755| ynd          | nhir1234   | Nhirrpi        | Nhirrpi       | dialect  | hrp      |
-|         2774| wyi          | daun1234   | Daungwurrung   | Daungwurrung  | dialect  | dgw      |
-|         2781| tbh          | wadi1260   | Wathi Wathi    | Wadi Wadi     | dialect  | xwd      |
-|         2829| mnt          | mayi1236   | Mayi-Kulan     | Mayi-Kulan    | dialect  | xyk      |
-|         2832| mnt          | mayi1235   | Mayi-Yapi      | Mayi-Yapi     | dialect  | xyj      |
-
-``` r
 # Identify the parent languages of dialects
 # https://cdstar.shh.mpg.de/bitstreams/EAEA0-E7DE-FA06-8817-0/glottolog_languoid.csv.zip
 languoids <- read.csv('glottolog_languoid.csv/languoid.csv', header=T, stringsAsFactors=F)
-head(languoids)
+languoids <- languoids %>% select(id, family_id, parent_id, name, level, status, iso639P3code)
 ```
 
-    ##         id family_id parent_id       name bookkeeping    level  status
-    ## 1 aala1237  aust1307  ramo1244     Aalawa       False  dialect    safe
-    ## 2 aant1238  nucl1709  nort2920 Aantantara       False  dialect    safe
-    ## 3 aari1238  sout2845  ahkk1235 Aari-Gayil       False   family    safe
-    ## 4 aari1239  sout2845  aari1238       Aari       False language    safe
-    ## 5 aari1240  book1242  book1242     Aariya        True language    safe
-    ## 6 aasa1238  afro1255  unun9872      Aasax       False language extinct
-    ##   latitude longitude iso639P3code description markup_description
-    ## 1       NA        NA                       NA                 NA
-    ## 2       NA        NA                       NA                 NA
-    ## 3       NA        NA          aiz          NA                 NA
-    ## 4  5.95034   36.5721          aiw          NA                 NA
-    ## 5       NA        NA          aay          NA                 NA
-    ## 6 -4.00679   36.8648          aas          NA                 NA
-    ##   child_family_count child_language_count child_dialect_count country_ids
-    ## 1                  0                    0                   0            
-    ## 2                  0                    0                   0            
-    ## 3                  0                    2                   0            
-    ## 4                  0                    0                   0          ET
-    ## 5                  0                    0                   0          IN
-    ## 6                  0                    0                   0          TZ
+``` r
+# Merge in the languiods data for our Glottolog codes
+index <- left_join(index, languoids, by=c("Glottocode"="id"))
+```
 
 ``` r
-# First check that all present phoible Glottocodes are valid 
+# First check that all present phoible Glottocodes are valid -- currently 2 <NA>s
 table(index$Glottocode %in% languoids$id)
 ```
 
     ## 
     ## FALSE  TRUE 
-    ##     4  3016
+    ##     2  3018
 
 ``` r
 index[which(!(index$Glottocode %in% languoids$id)),]
 ```
 
-    ##      InventoryID LanguageCode Glottocode   LanguageName Source name level
-    ## 2281        2281         <NA>       <NA> Modern Aramaic     ea <NA>  <NA>
-    ## 2715        2715          xjb    wee1234     Minjungbal     er <NA>  <NA>
-    ## 2729        2729         <NA>       <NA>      Djindewal     er <NA>  <NA>
-    ## 2961        2961         <NA>       <NA>   Ngarlawangka     er <NA>  <NA>
-    ##      macroarea latitude longitude isocodes
-    ## 2281      <NA>       NA        NA     <NA>
-    ## 2715      <NA>       NA        NA     <NA>
-    ## 2729      <NA>       NA        NA     <NA>
-    ## 2961      <NA>       NA        NA     <NA>
+    ##      InventoryID LanguageCode Glottocode                  LanguageName
+    ## 2281        2281         <NA>       <NA> Modern Aramaic (Northeastern)
+    ## 2729        2729         <NA>       <NA>                     Djindewal
+    ##      Source family_id parent_id name level status iso639P3code
+    ## 2281     ea      <NA>      <NA> <NA>  <NA>   <NA>         <NA>
+    ## 2729     er      <NA>      <NA> <NA>  <NA>   <NA>         <NA>
+
+``` r
+# These are phoible inventories where our ISO codes don't match Glottolog codes (14 mismatches)
+expect_equal(nrow(index %>% filter(LanguageCode != iso639P3code) %>% filter(iso639P3code != "")), 0)
+index %>% filter(LanguageCode != iso639P3code) %>% filter(iso639P3code != "")
+```
+
+    ##  [1] InventoryID  LanguageCode Glottocode   LanguageName Source      
+    ##  [6] family_id    parent_id    name         level        status      
+    ## [11] iso639P3code
+    ## <0 rows> (or 0-length row.names)
+
+Which inventories don't have a Glottocode? Assign them from Glottolog
+=====================================================================
+
+``` r
+missing.iso <- index %>% filter(iso639P3code == "")
+dim(missing.iso) # 123 missing
+```
+
+    ## [1] 123  11
+
+``` r
+head(missing.iso)
+```
+
+    ##   InventoryID LanguageCode Glottocode LanguageName Source family_id
+    ## 1          40          khl   kali1299       Kaliai    spa  aust1307
+    ## 2         136          xtc   katc1250       Katcha    spa  kadu1256
+    ## 3         155          naq   nama1265         Nama    spa  khoe1240
+    ## 4         871          kpr   kora1295       Korafe     ph  nucl1709
+    ## 5         875          enb   endo1242         Endo     ph  nilo1247
+    ## 6         885          wya   huro1249        Huron     ph  iroq1247
+    ##   parent_id   name   level status iso639P3code
+    ## 1  lusi1240 Kaliai dialect   safe             
+    ## 2  katc1249 Katcha dialect   safe             
+    ## 3  nama1264   Nama dialect   safe             
+    ## 4  kora1294 Korafe dialect   safe             
+    ## 5  mark1255   Endo dialect   safe             
+    ## 6  wyan1247  Huron dialect   safe
+
+``` r
+# Merge in the parents and their glottocodes
+parent.index <- left_join(missing.iso, languoids, by=c("parent_id"="id"))
+head(parent.index)
+```
+
+    ##   InventoryID LanguageCode Glottocode LanguageName Source family_id.x
+    ## 1          40          khl   kali1299       Kaliai    spa    aust1307
+    ## 2         136          xtc   katc1250       Katcha    spa    kadu1256
+    ## 3         155          naq   nama1265         Nama    spa    khoe1240
+    ## 4         871          kpr   kora1295       Korafe     ph    nucl1709
+    ## 5         875          enb   endo1242         Endo     ph    nilo1247
+    ## 6         885          wya   huro1249        Huron     ph    iroq1247
+    ##   parent_id name.x level.x status.x iso639P3code.x family_id.y parent_id.y
+    ## 1  lusi1240 Kaliai dialect     safe                   aust1307    kali1298
+    ## 2  katc1249 Katcha dialect     safe                   kadu1256    katc1251
+    ## 3  nama1264   Nama dialect     safe                   khoe1240    nort3245
+    ## 4  kora1294 Korafe dialect     safe                   nucl1709    gaen1235
+    ## 5  mark1255   Endo dialect     safe                   nilo1247    nort3239
+    ## 6  wyan1247  Huron dialect     safe                   iroq1247    nort2947
+    ##                name.y  level.y              status.y iso639P3code.y
+    ## 1                Lusi language                  safe            khl
+    ## 2 Katcha-Kadugli-Miri language            vulnerable            xtc
+    ## 3      Nama (Namibia) language            vulnerable            naq
+    ## 4        Korafe-Yegha language                  safe            kpr
+    ## 5           Markweeta language definitely endangered            enb
+    ## 6             Wyandot language critically endangered            wya
+
+``` r
+# Which phoible NAs can get assign when we merge in the parents and their ISO codes
+parent.index %>% filter(is.na(LanguageCode)) %>% filter(iso639P3code.y != "")
+```
+
+    ##  [1] InventoryID    LanguageCode   Glottocode     LanguageName  
+    ##  [5] Source         family_id.x    parent_id      name.x        
+    ##  [9] level.x        status.x       iso639P3code.x family_id.y   
+    ## [13] parent_id.y    name.y         level.y        status.y      
+    ## [17] iso639P3code.y
+    ## <0 rows> (or 0-length row.names)
+
+``` r
+# Which codes don't match because we've added them by hand -- 2689 Gudanji was purposedly given [wmb] for Wambaya (two nodes up in the Glottolog 3.3 tree)
+parent.index[which(parent.index$LanguageCode != parent.index$iso639P3code.y), ] %>% select(InventoryID, LanguageCode, Glottocode, iso639P3code.y, LanguageName)
+```
+
+    ##    InventoryID LanguageCode Glottocode iso639P3code.y LanguageName
+    ## 66        2689          wmb   guda1243                     Gudanji
+
+``` r
+# No phoible language codes should be blank
+expect_equal(nrow(parent.index %>% filter(LanguageCode=="")), 0)
+```
+
+``` r
+# Which phoible language codes are NA (35)
+parent.index %>% filter(is.na(LanguageCode)) %>% select(InventoryID, LanguageCode, Glottocode, iso639P3code.y, LanguageName, level.x, level.y)
+```
+
+    ##    InventoryID LanguageCode Glottocode iso639P3code.y
+    ## 1         2143         <NA>   pisa1245               
+    ## 2         2352         <NA>   lizu1234               
+    ## 3         2388         <NA>   east2773               
+    ## 4         2420         <NA>   zhon1235               
+    ## 5         2434         <NA>   vach1239               
+    ## 6         2450         <NA>   fore1274               
+    ## 7         2544         <NA>   nucl1729               
+    ## 8         2691         <NA>   mink1237           <NA>
+    ## 9         2692         <NA>   ngum1253               
+    ## 10        2714         <NA>   guwa1244               
+    ## 11        2718         <NA>   warr1257               
+    ## 12        2727         <NA>   dhud1236               
+    ## 13        2748         <NA>   mith1236               
+    ## 14        2773         <NA>   cola1237               
+    ## 15        2778         <NA>   yari1243               
+    ## 16        2782         <NA>   west2443               
+    ## 17        2783         <NA>   djad1246               
+    ## 18        2792         <NA>   kera1256               
+    ## 19        2793         <NA>   lowe1402               
+    ## 20        2794         <NA>   ngin1247               
+    ## 21        2818         <NA>   gudj1237               
+    ## 22        2877         <NA>   pall1243               
+    ## 23        2882         <NA>   kawa1290               
+    ## 24        2883         <NA>   kawa1290               
+    ## 25        2907         <NA>   wala1263               
+    ## 26        2911         <NA>   tyan1235               
+    ## 27        2913         <NA>   luth1234               
+    ## 28        2914         <NA>   mbiy1238               
+    ## 29        2916         <NA>   ngko1236               
+    ## 30        2920         <NA>   yadh1237               
+    ## 31        2921         <NA>   yinw1236               
+    ## 32        2946         <NA>   bula1255               
+    ## 33        2956         <NA>   yulp1239               
+    ## 34        2988         <NA>   west2443               
+    ## 35        2999         <NA>   sout2770               
+    ##             LanguageName  level.x  level.y
+    ## 1               Pisamira language   family
+    ## 2                   Lizu language   family
+    ## 3          Dolakha Newar language   family
+    ## 4         Zhongu Tibetan language   family
+    ## 5  Eastern Khanty (Vakh)  dialect language
+    ## 6          Forest Nenets language   family
+    ## 7      Tamang (Dhankuta)   family   family
+    ## 8                 Minkin language     <NA>
+    ## 9               Ngumbarl language   family
+    ## 10                 Guwar language   family
+    ## 11           Warrnambool language   family
+    ## 12             Dhudhuroa language   family
+    ## 13               Mithaka language   family
+    ## 14             Kolakngat language   family
+    ## 15             Yari-Yari  dialect language
+    ## 16     East Djadjawurung language   family
+    ## 17           Jardwadjali  dialect language
+    ## 18               Keramin  dialect language
+    ## 19             Ngayawang language   family
+    ## 20              Ngintait  dialect language
+    ## 21                Gudjal language   family
+    ## 22      Pallanganmiddang language   family
+    ## 23         Ogh Awarrangg language   family
+    ## 24            Ogh Unyjan language   family
+    ## 25             Walangama language   family
+    ## 26          Thaynakwithi language   family
+    ## 27               Luthigh  dialect language
+    ## 28               Mbiywom language   family
+    ## 29                Ngkoth language   family
+    ## 30            Yadhaykenu language   family
+    ## 31                Yinwum language   family
+    ## 32               Bularnu language   family
+    ## 33             Yulparija language   family
+    ## 34     West Djadjawurung language   family
+    ## 35              Ngunawal language   family
+
+``` r
+# What can be assigned by look up? I.e., what's NA as phoible ISO code but there exists something one level up in Glottolo
+parent.index %>% filter(is.na(LanguageCode)) %>% filter(iso639P3code.y != "") %>% select(InventoryID, LanguageCode, Glottocode, iso639P3code.y, LanguageName)
+```
+
+    ## [1] InventoryID    LanguageCode   Glottocode     iso639P3code.y
+    ## [5] LanguageName  
+    ## <0 rows> (or 0-length row.names)
+
+Looking at general categories
+=============================
 
 ``` r
 # How many levels do we have in the index?
@@ -244,74 +248,232 @@ table(index$level)
 ```
 
     ## 
-    ##  dialect language 
-    ##      140     2865
+    ##  dialect   family language 
+    ##      146        6     2866
+
+``` r
+# These are the family level glottolog codes in the phoible index. TODO: check and update if ncessary
+families <- index %>% filter(level=="family") %>% select(InventoryID, LanguageName, Glottocode, LanguageCode, iso639P3code, Source)
+nrow(families)
+```
+
+    ## [1] 6
+
+``` r
+families
+```
+
+    ##   InventoryID        LanguageName Glottocode LanguageCode iso639P3code
+    ## 1         488              NEPALI   east1436          nep          nep
+    ## 2        1208             Jiarong   jiar1240          jya          jya
+    ## 3        1398               Dinka   dink1262          din          din
+    ## 4        2257   Caodeng rGyalrong   jiar1240          jya          jya
+    ## 5        2464 Mongolian (Khalkha)   mong1331          mon          mon
+    ## 6        2544   Tamang (Dhankuta)   nucl1729         <NA>             
+    ##   Source
+    ## 1  upsid
+    ## 2     ph
+    ## 3     gm
+    ## 4     ea
+    ## 5     ea
+    ## 6     ea
 
 ``` r
 # These are the dialects in the phoible index
-dialects <- index %>% filter(level=="dialect") %>% select(InventoryID, LanguageName, Glottocode, LanguageCode, isocodes)
+dialects <- index %>% filter(level=="dialect") %>% select(InventoryID, LanguageName, Glottocode, LanguageCode, iso639P3code, Source)
 nrow(dialects)
 ```
 
-    ## [1] 140
+    ## [1] 146
 
 ``` r
-# All missing isocodes -- TODO
-index %>% select(InventoryID, LanguageName, Glottocode, LanguageCode, isocodes, level) %>% filter(is.na(isocodes))
+head(dialects)
 ```
 
-    ##    InventoryID      LanguageName Glottocode LanguageCode isocodes level
-    ## 1          248        BANDJALANG   band1339          bdy     <NA>  <NA>
-    ## 2          488            NEPALI   east1436          nep     <NA>  <NA>
-    ## 3         1208           Jiarong   jiar1240          jya     <NA>  <NA>
-    ## 4         1398             Dinka   dink1262          din     <NA>  <NA>
-    ## 5         2257 Caodeng rGyalrong   jiar1240          jya     <NA>  <NA>
-    ## 6         2281    Modern Aramaic       <NA>         <NA>     <NA>  <NA>
-    ## 7         2464         Mongolian   mong1331          mon     <NA>  <NA>
-    ## 8         2544            Tamang   nucl1729         <NA>     <NA>  <NA>
-    ## 9         2715        Minjungbal    wee1234          xjb     <NA>  <NA>
-    ## 10        2716          Waalubal   band1339          bdy     <NA>  <NA>
-    ## 11        2729         Djindewal       <NA>         <NA>     <NA>  <NA>
-    ## 12        2778         Yari-Yari   yari1243         <NA>     <NA>  <NA>
-    ## 13        2794          Ngintait   ngin1247         <NA>     <NA>  <NA>
-    ## 14        2917            Uradhi   urad1238          amz     <NA>  <NA>
-    ## 15        2961      Ngarlawangka       <NA>         <NA>     <NA>  <NA>
+    ##   InventoryID LanguageName Glottocode LanguageCode iso639P3code Source
+    ## 1          40       Kaliai   kali1299          khl                 spa
+    ## 2         136       Katcha   katc1250          xtc                 spa
+    ## 3         155         Nama   nama1265          naq                 spa
+    ## 4         159    Norwegian   norw1259          nob          nob    spa
+    ## 5         499    NORWEGIAN   norw1259          nob          nob  upsid
+    ## 6         705         ẹzaa   ezaa1238          eza          eza     aa
 
 ``` r
-# Get parent language data to get ISO code
-nrow(dialects)
+# This should be only iso639P3code that are empty
+dialects %>% filter(LanguageCode!=iso639P3code)
 ```
 
-    ## [1] 140
-
-``` r
-nrow(languoids %>% filter(id %in% dialects$Glottocode))
-```
-
-    ## [1] 132
-
-``` r
-head(languoids)
-```
-
-    ##         id family_id parent_id       name bookkeeping    level  status
-    ## 1 aala1237  aust1307  ramo1244     Aalawa       False  dialect    safe
-    ## 2 aant1238  nucl1709  nort2920 Aantantara       False  dialect    safe
-    ## 3 aari1238  sout2845  ahkk1235 Aari-Gayil       False   family    safe
-    ## 4 aari1239  sout2845  aari1238       Aari       False language    safe
-    ## 5 aari1240  book1242  book1242     Aariya        True language    safe
-    ## 6 aasa1238  afro1255  unun9872      Aasax       False language extinct
-    ##   latitude longitude iso639P3code description markup_description
-    ## 1       NA        NA                       NA                 NA
-    ## 2       NA        NA                       NA                 NA
-    ## 3       NA        NA          aiz          NA                 NA
-    ## 4  5.95034   36.5721          aiw          NA                 NA
-    ## 5       NA        NA          aay          NA                 NA
-    ## 6 -4.00679   36.8648          aas          NA                 NA
-    ##   child_family_count child_language_count child_dialect_count country_ids
-    ## 1                  0                    0                   0            
-    ## 2                  0                    0                   0            
-    ## 3                  0                    2                   0            
-    ## 4                  0                    0                   0          ET
-    ## 5                  0                    0                   0          IN
-    ## 6                  0                    0                   0          TZ
+    ##    InventoryID                   LanguageName Glottocode LanguageCode
+    ## 1           40                         Kaliai   kali1299          khl
+    ## 2          136                         Katcha   katc1250          xtc
+    ## 3          155                           Nama   nama1265          naq
+    ## 4          871                         Korafe   kora1295          kpr
+    ## 5          875                           Endo   endo1242          enb
+    ## 6          885                          Huron   huro1249          wya
+    ## 7          916                           Kuay   kuay1244          kdt
+    ## 8          947                         Mvumbo   mvum1238          nmg
+    ## 9          973                        Mianmin   mian1257          mpt
+    ## 10         996                        Saanich   saan1246          str
+    ## 11        1097                           Karo   karo1306          arr
+    ## 12        1102                         Bikele   bike1242          biw
+    ## 13        1192                       Bilinara   bili1250          nbj
+    ## 14        1276                       Ikalanga   ikal1242          kck
+    ## 15        1318                           Copi   copi1238          cce
+    ## 16        1322                          Mmani   mman1238          buy
+    ## 17        1325                         Frafra   fraf1238          gur
+    ## 18        1382                            Oko   okoo1245          oks
+    ## 19        1401                        Besleri   besl1239          hna
+    ## 20        1456                          Soddo   sodd1242          gru
+    ## 21        1460                           Ezha   ezha1238          sgw
+    ## 22        1461                          Chaha   chah1248          sgw
+    ## 23        1462                          Gumer   gume1239          sgw
+    ## 24        1480                          Zayse   zays1236          zay
+    ## 25        1523                          Efutu   efut1241          afu
+    ## 26        1591                          Kambe   kamb1298          nyf
+    ## 27        1592                          Kauma   kaum1238          nyf
+    ## 28        1625                        Moghamo   mogh1246          mgo
+    ## 29        1633                           Pana   pana1294          pnz
+    ## 30        1701                      Abujmaria   abuj1237          mrr
+    ## 31        1768                         Mising   miny1240          mrg
+    ## 32        1771                          Naiki   naik1250          nit
+    ## 33        1858                         Miraña   mira1254          boa
+    ## 34        1994                      Kithaulhu   khit1238          nab
+    ## 35        2015                        Shipibo   ship1255          shp
+    ## 36        2092                           Karo   karo1306          arr
+    ## 37        2225                        Kedayan   keda1250          kxd
+    ## 38        2268            Beserman (Šamardan)   bese1243          udm
+    ## 39        2298                           Puxi   puxi1242          jih
+    ## 40        2332            Northwestern Pashto   nort2647          pbu
+    ## 41        2381                Zuberoan Basque   basq1250          eus
+    ## 42        2491                  Myeik Burmese   merg1238          tvn
+    ## 43        2537                       Khalkhal   khal1271          tks
+    ## 44        2586 Southwestern Pashto (Kandahar)   sout2436          pbt
+    ## 45        2590                  Digor Ossetic   digo1242          oss
+    ## 46        2634                  Murrinh-patha   murr1259          mwf
+    ## 47        2656               Gun-Dedjnjenghmi   gund1246          gup
+    ## 48        2657                    Gun-Djeihmi   gund1246          gup
+    ## 49        2658                           Kune   gune1238          gup
+    ## 50        2659                       Kuninjku   mura1269          gup
+    ## 51        2660                      Kunwinjku   guma1252          gup
+    ## 52        2661                         Mayali   naia1238          gup
+    ## 53        2670                          Garig   gari1254          ilg
+    ## 54        2671                          Ilgar   ilga1238          ilg
+    ## 55        2684                     Ngaliwurru   ngal1294          djd
+    ## 56        2688                       Binbinka   binb1242          wmb
+    ## 57        2689                        Gudanji   guda1243          wmb
+    ## 58        2703             Eastern Anmatyerre   east2380          amx
+    ## 59        2704             Western Anmatyerre   west2442          amx
+    ## 60        2706               Central Arrernte   mpar1238          aer
+    ## 61        2712                     Bundjalung   yugu1249          xjb
+    ## 62        2713                        Gidabal   gida1240          gih
+    ## 63        2715                     Minjungbal   minj1242          xjb
+    ## 64        2716                       Waalubal   waal1238          bdy
+    ## 65        2722                       Wayilwan   wayi1238          wyb
+    ## 66        2724                     Wiriyaraay   wirr1237          kld
+    ## 67        2725                    Yuwaalaraay   yuwa1242          kld
+    ## 68        2726                     Yuwaliyaay   yuwa1243          kld
+    ## 69        2751                      Karangura   kara1508          nmv
+    ## 70        2752                        Ngamini   ngam1284          nmv
+    ## 71        2851                      Bilinarra   bili1250          nbj
+    ## 72        2852                      Wanyjirra   wany1244          gue
+    ## 73        2855                        Malngin   maln1239          gue
+    ## 74        2867                       Kaniyang   kani1276          nys
+    ## 75        2924                          Olkol   ulku1238          kjn
+    ## 76        2930                      Oykangand   oyka1239          kjn
+    ## 77        2941                      Gabi-Gabi   gabi1248          gbw
+    ## 78        2943                    Duungidjawu   duun1241          wkw
+    ## 79        2952                     Kartujarra   kart1247          mpj
+    ## 80        2953                    Manjiljarra   many1256          mpj
+    ## 81        2954                      Putijarra   pudi1238          mpj
+    ## 82        2955                    Wangkajunga   wang1288          mpj
+    ## 83        2966                  Kala Kawaw Ya   kala1378          mwp
+    ## 84        2973                        Dhay'yi   dhal1246          dax
+    ## 85        2992                          Djapu   djap1238          duj
+    ## 86        3018                       Ngardily   west2437          wbp
+    ##    iso639P3code Source
+    ## 1                  spa
+    ## 2                  spa
+    ## 3                  spa
+    ## 4                   ph
+    ## 5                   ph
+    ## 6                   ph
+    ## 7                   ph
+    ## 8                   ph
+    ## 9                   ph
+    ## 10                  ph
+    ## 11                  ph
+    ## 12                  ph
+    ## 13                  ph
+    ## 14                  gm
+    ## 15                  gm
+    ## 16                  gm
+    ## 17                  gm
+    ## 18                  gm
+    ## 19                  gm
+    ## 20                  gm
+    ## 21                  gm
+    ## 22                  gm
+    ## 23                  gm
+    ## 24                  gm
+    ## 25                  gm
+    ## 26                  gm
+    ## 27                  gm
+    ## 28                  gm
+    ## 29                  gm
+    ## 30                  ra
+    ## 31                  ra
+    ## 32                  ra
+    ## 33              saphon
+    ## 34              saphon
+    ## 35              saphon
+    ## 36              saphon
+    ## 37                  uz
+    ## 38                  ea
+    ## 39                  ea
+    ## 40                  ea
+    ## 41                  ea
+    ## 42                  ea
+    ## 43                  ea
+    ## 44                  ea
+    ## 45                  ea
+    ## 46                  er
+    ## 47                  er
+    ## 48                  er
+    ## 49                  er
+    ## 50                  er
+    ## 51                  er
+    ## 52                  er
+    ## 53                  er
+    ## 54                  er
+    ## 55                  er
+    ## 56                  er
+    ## 57                  er
+    ## 58                  er
+    ## 59                  er
+    ## 60                  er
+    ## 61                  er
+    ## 62                  er
+    ## 63                  er
+    ## 64                  er
+    ## 65                  er
+    ## 66                  er
+    ## 67                  er
+    ## 68                  er
+    ## 69                  er
+    ## 70                  er
+    ## 71                  er
+    ## 72                  er
+    ## 73                  er
+    ## 74                  er
+    ## 75                  er
+    ## 76                  er
+    ## 77                  er
+    ## 78                  er
+    ## 79                  er
+    ## 80                  er
+    ## 81                  er
+    ## 82                  er
+    ## 83                  er
+    ## 84                  er
+    ## 85                  er
+    ## 86                  er
