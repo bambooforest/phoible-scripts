@@ -1,0 +1,46 @@
+---
+title: "Check PHOIBLE references"
+author: "Steven Moran \\<steven.moran@uzh.ch\\>"
+output: github_document
+---
+  
+```{r, message=F, warning=F}
+library(bib2df)
+library(dplyr)
+library(knitr)
+library(testthat)
+```
+
+# Data
+
+```{r}
+# phoible bibtex references
+ph.refs <- read.table("/Users/stiv/Github/dev/mappings/InventoryID-Bibtex.tsv", sep="\t", quote="\"", header=T, na.strings=c("","NA"), stringsAsFactors = FALSE)
+expect_equal(nrow(ph.refs), 3831)
+head(ph.refs)
+```
+
+
+```{r}
+# phoible bib file
+path <- 'https://raw.githubusercontent.com/phoible/dev/master/data/phoible-references.bib'
+ph.bib <- bib2df(path)
+# Strange that these aren't equal.
+expect_equal(nrow(ph.bib), 2835)
+expect_equal(nrow(ph.bib %>% select(BIBTEXKEY) %>% distinct()), 2834)
+```
+
+
+# Everything in everything?
+
+```{r}
+# Which InventoryID-Bibtex.tsv bibtex keys not in phoible-references.bib?
+ph.refs[which(!(ph.refs$BibtexKey %in% ph.bib$BIBTEXKEY)),]
+```
+
+```{r}
+# Which phoible-references.bib bibtex keys not in InventoryID-Bibtex.tsv?
+ph.bib[which(!(ph.bib$BIBTEXKEY %in% ph.refs$BibtexKey)),] %>% select(BIBTEXKEY)
+# TODO: Needs some fixing, especially in `ra` inventories! But doesn't necesarily mean we need to remove the non-mapping bibtex keys from the phoible bib file.
+```
+

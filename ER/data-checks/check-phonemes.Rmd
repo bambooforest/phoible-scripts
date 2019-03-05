@@ -1,0 +1,16 @@
+---
+title: "Check phonemes"
+author: "Steven Moran \\<steven.moran@uzh.ch\\>"
+output: github_document
+---
+  
+```{r, message=F, warning=F}
+library(bib2df)
+library(dplyr)
+library(knitr)
+library(testthat)
+```
+
+# Load PHOIBLE ER
+# Load new ER
+# Check diff
