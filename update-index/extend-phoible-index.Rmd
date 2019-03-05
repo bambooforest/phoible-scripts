@@ -1,0 +1,42 @@
+---
+title: "Extend the phoible index with Glottolog data"
+author: "Steven Moran \\<steven.moran@uzh.ch\\>"
+output: github_document
+---
+
+```{r, message=F, warning=F}
+library(dplyr)
+library(testthat)
+library(knitr)
+```
+
+```{r}
+# Get phoible index (TODO: update to online version when recent PRs are merged)
+# index <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-LanguageCodes.csv', header=T, stringsAsFactors=F)
+index <- read.csv('../../phoible/mappings/InventoryID-LanguageCodes.csv', header=T, stringsAsFactors = F)
+expect_equal(nrow(index), 3020)
+head(index)
+```
+
+```{r}
+# Glottolog dialects and geo data (v 3.3)
+glottolog <- read.csv('https://cdstar.shh.mpg.de/bitstreams/EAEA0-F088-DE0E-0712-0/languages_and_dialects_geo.csv')
+head(glottolog)
+```
+
+```{r}
+index <- left_join(index, glottolog, by=c("Glottocode"="glottocode"))
+expect_equal(nrow(index), 3020)
+```
+
+```{r}
+languoids <- read.csv('glottolog_languoid.csv/languoid.csv', header=T, stringsAsFactors=F)
+languoids <- languoids %>% select(id, family_id, parent_id, status,  country_ids, iso639P3code)
+```
+
+```{r}
+index <- left_join(index, languoids, by=c("Glottocode"="id"))
+expect_equal(nrow(index), 3020)
+glimpse(index)
+```
+
