@@ -16,25 +16,12 @@ library(digest)
 # PHOIBLE aggregated data
 ## TODO: update once the aggregation script is finished (and tag the version)
 ## load(url('https://raw.githubusercontent.com/phoible/dev/refactor-agg/data/phoible-by-phoneme.RData'))
-load('../../dev/data/phoible-by-phoneme.RData')
-phoible$InventoryID <- as.integer(phoible$InventoryID)
+load('../../phoible/data/phoible.RData')
+
 # expect_equal(nrow(phoible), 95993)
+expect_equal(nrow(phoible), 105481)
 ```
 
-```{r}
-# TODO: Problems to address! Submited to phoible/dev issues / aggregation PR.
-# 1. spaces in LanguageName
-# 2. PHOIBLE ISO != Glottolog ISO 
-
-# Groups:   InventoryID, LanguageName, Glottocode, LanguageCode [3]
-# InventoryID LanguageName Glottocode LanguageCode name  macroarea latitude longitude isocodes
-# <int> <chr>        <chr>      <chr>        <fct> <fct>        <dbl>     <dbl> <fct>   
-# 1         298 DAN          dann1241   lda          Dan   Africa        7.23     -8.25 daf     
-# 2         691 "dan "       dann1241   dnj          Dan   Africa        7.23     -8.25 daf     
-# 3        1393 Dan          dann1241   lda          Dan   Africa        7.23     -8.25 daf  
-
-phoible %>% filter(InventoryID %in% c(691,298,1393)) %>% distinct(InventoryID, LanguageCode, LanguageName)
-```
 
 # Create one large table
 
@@ -84,7 +71,7 @@ phoible$ROWID <- seq.int(nrow(phoible))
 
 # "ID","Language_ID","Parameter_ID","Value","Code_ID","Comment","Source","Contribution_ID"
 glimpse(phoible)
-values <- phoible %>% select(ROWID, LanguageCode, Glottocode, Parameter_ID, Phoneme, Marginal, Allophones, Source, InventoryID)
+values <- phoible %>% select(ROWID, ISO6393, Glottocode, Parameter_ID, Phoneme, Marginal, Allophones, Source, InventoryID)
 colnames(values) <- c("ID", "ISO639P3code", "Language_ID", "Parameter_ID", "Name", "Marginal", "Allophones", "Source", "Contribution_ID")
 expect_equal(nrow(phoible), nrow(values))
 glimpse(values)
