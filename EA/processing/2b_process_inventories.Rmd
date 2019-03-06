@@ -1,8 +1,7 @@
 ---
 title: "Process EA inventory data for PHOIBLE"
 author: "Steven Moran \\<steven.moran@uzh.ch>"
-date: "8 Juli 2017"
-output: html_document
+output: github_document
 ---
 
 ```{r}
