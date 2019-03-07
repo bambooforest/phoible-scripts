@@ -86,8 +86,13 @@ rm(values)
 ## ID,Name,Description
 ## 9C6117430968F42700ACD02E4E7442F7,t̠ʃʰ,LATIN SMALL LETTER T - COMBINING MINUS SIGN BELOW - LATIN SMALL LETTER ESH - MODIFIER LETTER SMALL H
 ## 41D8827BB943E1FB9055A7487293BA79,pˀ,LATIN SMALL LETTER P - MODIFIER LETTER GLOTTAL STOP
-parameters <- phoible %>% select(Parameter_ID, Phoneme, Phoneme_description) %>% distinct()
-colnames(parameters) <- c("ID", "Name", "Description")
+# parameters <- phoible %>% select(Parameter_ID, Phoneme, Phoneme_description, SegmentClass) %>% distinct()
+# colnames(parameters) <- c("ID", "Name", "Description", "SegmentClass")
+
+parameters <- phoible %>% select(Parameter_ID, Phoneme, Phoneme_description, SegmentClass, tone, stress, syllabic, short, long, consonantal, sonorant, continuant, delayedRelease, approximant, tap, trill, nasal, lateral, labial, round, labiodental, coronal, anterior, distributed, strident, dorsal, high, low, front, back, tense, retractedTongueRoot, advancedTongueRoot, periodicGlottalSource, epilaryngealSource, spreadGlottis, constrictedGlottis, fortis, raisedLarynxEjective, loweredLarynxImplosive, click) %>% distinct()
+
+colnames(parameters) <- c("ID", "Name", "Description", "SegmentClass", "tone", "stress", "syllabic", "short", "long", "consonantal", "sonorant", "continuant", "delayedRelease", "approximant", "tap", "trill", "nasal", "lateral", "labial", "round", "labiodental", "coronal", "anterior", "distributed", "strident", "dorsal", "high", "low", "front", "back", "tense", "retractedTongueRoot", "advancedTongueRoot", "periodicGlottalSource", "epilaryngealSource", "spreadGlottis", "constrictedGlottis", "fortis", "raisedLarynxEjective", "loweredLarynxImplosive", "click")
+
 glimpse(parameters)
 write.csv(parameters, file="cldf/parameters.csv", row.names=FALSE)
 rm(parameters)
