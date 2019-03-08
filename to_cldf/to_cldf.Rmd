@@ -18,6 +18,7 @@ library(digest)
 ## load(url('https://raw.githubusercontent.com/phoible/dev/refactor-agg/data/phoible-by-phoneme.RData'))
 load('../../phoible/data/phoible.RData')
 
+# 2.0 has more rows
 # expect_equal(nrow(phoible), 95993)
 expect_equal(nrow(phoible), 105481)
 ```
@@ -30,9 +31,10 @@ expect_equal(nrow(phoible), 105481)
 contributors <- read.csv("contributors.csv")
 phoible <- left_join(phoible, contributors, by=c("Source"="ID"))
 
-# Get bibtex keys in semi-colon delimited list
-refs <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-Bibtex.csv', header=T, stringsAsFactors=F)
-citations <- refs %>% group_by(InventoryID) %>% summarize(Contribution_ID=tolower(paste(BibtexKey, collapse=";")))
+# Get bibtex keys in semi-colon delimited list (TODO: update this link when merged)
+# refs <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-Bibtex.csv', header=T, stringsAsFactors=F)
+refs <- read.csv('InventoryID-Bibtex.csv', header=T, stringsAsFactors=F)
+citations <- refs %>% group_by(InventoryID, URI) %>% summarize(Contribution_ID=tolower(paste(BibtexKey, collapse=";")))
 phoible <- left_join(phoible, citations)
 rm(refs, citations)
 
@@ -70,7 +72,6 @@ phoible$ROWID <- seq.int(nrow(phoible))
 ## 14564,kor,9C6117430968F42700ACD02E4E7442F7,t̠ʃʰ Korean (UPSID),,,kim1986;martin1951;martinlee1969;martin1954;cho1967;kim1972,423
 
 # "ID","Language_ID","Parameter_ID","Value","Code_ID","Comment","Source","Contribution_ID"
-glimpse(phoible)
 values <- phoible %>% select(ROWID, ISO6393, Glottocode, Parameter_ID, Phoneme, Marginal, Allophones, Source, InventoryID)
 colnames(values) <- c("ID", "ISO639P3code", "Language_ID", "Parameter_ID", "Name", "Marginal", "Allophones", "Source", "Contribution_ID")
 expect_equal(nrow(phoible), nrow(values))
@@ -105,8 +106,8 @@ rm(parameters)
 ## ID,Name,Description,Contributors
 ## 1,Korean (SPA),Korean,Stanford Phonology Archive
 
-contributions <- phoible %>% select(InventoryID, Source, LanguageName, Contributor, Contribution_ID) %>% distinct()
-colnames(contributions) <- c("ID", "Contributor_ID", "Name", "Contributors", "References")
+contributions <- phoible %>% select(InventoryID, Source, LanguageName, Contributor, Contribution_ID, URI) %>% distinct()
+colnames(contributions) <- c("ID", "Contributor_ID", "Name", "Contributors", "References", "URI")
 glimpse(contributions)
 write.csv(contributions, file="cldf/contributions.csv", row.names=FALSE)
 rm(contributions)
