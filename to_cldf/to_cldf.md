@@ -35,8 +35,7 @@ phoible <- left_join(phoible, contributors, by=c("Source"="ID"))
 
 ``` r
 # Get bibtex keys in semi-colon delimited list (TODO: update this link when merged)
-# refs <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-Bibtex.csv', header=T, stringsAsFactors=F)
-refs <- read.csv('InventoryID-Bibtex.csv', header=T, stringsAsFactors=F)
+refs <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-Bibtex.csv', header=T, stringsAsFactors=F)
 citations <- refs %>% group_by(InventoryID, URI) %>% summarize(Contribution_ID=tolower(paste(BibtexKey, collapse=";")))
 phoible <- left_join(phoible, citations)
 ```
