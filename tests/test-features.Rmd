@@ -15,14 +15,12 @@ load('/Users/stiv/Github/phoible/data/phoible.RData')
 
 # How many distinct feature vectors are there?
 ```{r}
-
 distinct.segments <- phoible %>% select(-InventoryID, -Glottocode, -ISO6393, -LanguageName, -SpecificDialect, -GlyphID, -Allophones, -Marginal, -SegmentClass, -Source) %>% distinct()
+head(distinct.segments)
 ```
 
 
-# 
-
-# Look at the different features
+# Look at the different features' compoents
 
 ```{r}
 table(phoible$tone)
@@ -180,11 +178,32 @@ table(phoible$click)
 
 ## Compare features to phoible 2104
 
-```{r]
+```{r}
 old <- read.delim("phoible-segments-features.tsv", header=T)
 glimpse(old)
 
 x <- phoible %>% filter(Phoneme %in% old$segment) %>% select(-InventoryID, -Glottocode, -ISO6393, -LanguageName, -SpecificDialect, -GlyphID, -Allophones, -Marginal, -SegmentClass, -Source) %>% distinct()
 glimpse(x)
+```
+
+
+# Individual spacing modifier letters and where they occur
+```{r}
+# epilaryngeal source (only occurs in 1379, !Xoo)
+phoible %>% filter(grepl("ᴱ", Phoneme)) %>% select(InventoryID, LanguageName, Phoneme)
+```
+
+```{r}
+# unaspirated
+phoible %>% filter(grepl("˭", Allophones)) %>% select(InventoryID, LanguageName, Phoneme)
+```
+```{r}
+# labial-palatalized  # TODO: should use labial+palatal?
+phoible %>% filter(grepl("ᶣ", Phoneme)) %>% select(InventoryID, LanguageName, Phoneme)
+```
+
+```{r}
+# schwa-like release # TODO: check what this really is
+phoible %>% filter(grepl("ᵊ", Allophones)) %>% select(InventoryID, LanguageName, Phoneme, Allophones)
 ```
 
