@@ -13,15 +13,12 @@ library(testthat)
 
 ```{r, message=F, warning=F}
 # Get the bibtex data
-# path <- 'https://raw.githubusercontent.com/phoible/dev/master/data/phoible-references.bib'
-
-path <- '../../phoible/data/phoible-references.bib'
+path <- 'https://raw.githubusercontent.com/phoible/dev/master/data/phoible-references.bib'
 bib <- bib2df(path)
 ```
 
 ```{r}
-# index.bibtex <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-Bibtex.csv', header=T, stringsAsFactors = F)
-index.bibtex <- read.csv('../../phoible/mappings/InventoryID-Bibtex.csv', header=T, stringsAsFactors = F)
+index.bibtex <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-Bibtex.csv', header=T, stringsAsFactors = F)
 ```
 
 ```{r}
@@ -29,6 +26,11 @@ index.bibtex <- read.csv('../../phoible/mappings/InventoryID-Bibtex.csv', header
 ## We expect one missing reference:
 expect_equal(1, length(which(!(index.bibtex$BibtexKey %in% bib$BIBTEXKEY))))
 index.bibtex[which(!(index.bibtex$BibtexKey %in% bib$BIBTEXKEY)), ]
+```
+
+```{r}
+# phoible bibex file has more (legacy) entries than in the phoible index
+bib[which(!(bib$BIBTEXKEY %in% index.bibtex$BibtexKey)), ]
 ```
 
 ```{r}

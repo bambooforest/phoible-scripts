@@ -11,15 +11,12 @@ library(testthat)
 
 ``` r
 # Get the bibtex data
-# path <- 'https://raw.githubusercontent.com/phoible/dev/master/data/phoible-references.bib'
-
-path <- '../../phoible/data/phoible-references.bib'
+path <- 'https://raw.githubusercontent.com/phoible/dev/master/data/phoible-references.bib'
 bib <- bib2df(path)
 ```
 
 ``` r
-# index.bibtex <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-Bibtex.csv', header=T, stringsAsFactors = F)
-index.bibtex <- read.csv('../../phoible/mappings/InventoryID-Bibtex.csv', header=T, stringsAsFactors = F)
+index.bibtex <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-Bibtex.csv', header=T, stringsAsFactors = F)
 ```
 
 ``` r
@@ -29,10 +26,57 @@ expect_equal(1, length(which(!(index.bibtex$BibtexKey %in% bib$BIBTEXKEY))))
 index.bibtex[which(!(index.bibtex$BibtexKey %in% bib$BIBTEXKEY)), ]
 ```
 
-    ##     InventoryID       BibtexKey Source
-    ## 353         201 NO SOURCE GIVEN  upsid
-    ##                                              Filename
+    ##     InventoryID       BibtexKey Source Filename
+    ## 353         201 NO SOURCE GIVEN  upsid     <NA>
+    ##                                                   URI
     ## 353 http://web.phonetik.uni-frankfurt.de/L/L8362.html
+
+``` r
+# phoible bibex file has more (legacy) entries than in the phoible index
+bib[which(!(bib$BIBTEXKEY %in% index.bibtex$BibtexKey)), ]
+```
+
+    ## # A tibble: 247 x 130
+    ##    CATEGORY BIBTEXKEY ADDRESS ANNOTE AUTHOR BOOKTITLE CHAPTER CROSSREF
+    ##    <chr>    <chr>     <chr>   <chr>  <list> <chr>     <chr>   <chr>   
+    ##  1 ARTICLE  Schadebe… <NA>    <NA>   <chr … <NA>      <NA>    <NA>    
+    ##  2 MISC     Round2019 <NA>    <NA>   <chr … <NA>      <NA>    <NA>    
+    ##  3 MISC     Nikolaev… <NA>    <NA>   <chr … <NA>      <NA>    <NA>    
+    ##  4 MISC     saphon    <NA>    <NA>   <chr … <NA>      <NA>    <NA>    
+    ##  5 MISC     spa1979   <NA>    <NA>   <chr … <NA>      <NA>    <NA>    
+    ##  6 BOOK     maddieso… Cambri… <NA>   <chr … <NA>      <NA>    <NA>    
+    ##  7 INCOLLE… maddieso… <NA>    <NA>   <chr … UCLA Wor… <NA>    <NA>    
+    ##  8 BOOK     ramaswam… <NA>    <NA>   <chr … <NA>      <NA>    <NA>    
+    ##  9 PHDTHES… Moran2012 <NA>    <NA>   <chr … <NA>      <NA>    <NA>    
+    ## 10 BOOK     Moran_et… Leipzig <NA>   <chr … <NA>      <NA>    <NA>    
+    ## # ... with 237 more rows, and 122 more variables: EDITION <chr>,
+    ## #   EDITOR <list>, HOWPUBLISHED <chr>, INSTITUTION <chr>, JOURNAL <chr>,
+    ## #   KEY <chr>, MONTH <chr>, NOTE <chr>, NUMBER <chr>, ORGANIZATION <chr>,
+    ## #   PAGES <chr>, PUBLISHER <chr>, SCHOOL <chr>, SERIES <chr>, TITLE <chr>,
+    ## #   TYPE <chr>, VOLUME <chr>, YEAR <chr>, DATE.ADDED <chr>,
+    ## #   DATE.MODIFIED <chr>, BDSK.URL.1 <chr>, URL <chr>, CATALOGUE.URL <chr>,
+    ## #   ISBN <chr>, AIATSIS_CALLNUMBER <chr>, AIATSIS_CODE <chr>,
+    ## #   AIATSIS_REFERENCE_LANGUAGE <chr>, CLASS_LOC <chr>,
+    ## #   DOCUMENT_TYPE <chr>, FN <chr>, HHTYPE <chr>, INLG <chr>, LGCODE <chr>,
+    ## #   MACRO_AREA <chr>, MPI_EVA_LIBRARY_SHELF <chr>, MPIFN <chr>,
+    ## #   OCLC <chr>, OZBIB_ID <chr>, OZBIBREFTYPE <chr>, SRC <chr>,
+    ## #   SUBJECT_HEADINGS <chr>, DOI <chr>, OZBIBNOTE <chr>, BDSK.URL.2 <chr>,
+    ## #   THESISTYPE <chr>, CALL_NUMBER <chr>, FNNOTE <chr>, ADDED <chr>,
+    ## #   ASJP_NAME <chr>, ISO_CODE <chr>, KEYWORDS <chr>, MODIFIED <chr>,
+    ## #   OLAC_FIELD <chr>, REFDB_ID <chr>, WALS_CODE <chr>, COUNTRY <chr>,
+    ## #   SIL_ID <chr>, SUBJECT <chr>, LOCATION <chr>, OWNER <chr>,
+    ## #   TIMESTAMP <chr>, SHORTTITLE <chr>, LANGNOTE <chr>, LGFAMILY <chr>,
+    ## #   BWONOTE <chr>, ZURICHCODE <chr>, NOSHAREFN <chr>, LAST_CHANGED <chr>,
+    ## #   GULDEMANN_LOCATION <chr>, MED <chr>, EXTRA_HASH <chr>, VARIETY <chr>,
+    ## #   OTHER_EDITIONS <chr>, FILENAMES <chr>, ABSTRACT <chr>,
+    ## #   SHELF_LOCATION <chr>, INLG_CODE <chr>, INTERNETARCHIVE_ID <chr>,
+    ## #   SRCTRICKLE <chr>, LAPOLLANOTE <chr>, SEANOTE <chr>,
+    ## #   TITLE_ENGLISH <chr>, ADVISER <chr>, DEGREE <chr>,
+    ## #   DIGITAL_FORMATS <chr>, SOURCE <chr>, UMI_ID <chr>,
+    ## #   AUTHOR_STATEMENT <chr>, REVIEW <chr>, PERMISSION <chr>, HAL_ID <chr>,
+    ## #   HAL_VERSION <chr>, PDF <chr>, INVENTORYID <chr>, LANGUAGECODE <chr>,
+    ## #   LANGUAGENAME <chr>, LANGUAGEVARIANTCODE <chr>, SQUIB <chr>,
+    ## #   NOTES <chr>, CONFERENCE <chr>, …
 
 ``` r
 # Which Glottolog codes are in valid input strings?
