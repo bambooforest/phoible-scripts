@@ -18,7 +18,7 @@ load('../../phoible/data/phoible.RData')
 
 # 2.0 has more rows
 # expect_equal(nrow(phoible), 95993)
-expect_equal(nrow(phoible), 105481)
+expect_equal(nrow(phoible), 105477)
 ```
 
 Create one large table
@@ -93,7 +93,7 @@ expect_equal(nrow(phoible), nrow(values))
 glimpse(values)
 ```
 
-    ## Observations: 105,481
+    ## Observations: 105,477
     ## Variables: 9
     ## $ ID              <int> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,...
     ## $ ISO639P3code    <chr> "kor", "kor", "kor", "kor", "kor", "kor", "kor...
@@ -128,7 +128,7 @@ colnames(parameters) <- c("ID", "Name", "Description", "SegmentClass", "tone", "
 glimpse(parameters)
 ```
 
-    ## Observations: 3,177
+    ## Observations: 3,175
     ## Variables: 41
     ## $ ID                     <chr> "3bff843fa918065aa88e47217358c573", "eb...
     ## $ Name                   <chr> "a", "aː", "æ", "æː", "e", "eː", "ɤ", "...

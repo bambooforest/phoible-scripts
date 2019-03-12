@@ -20,7 +20,7 @@ load('../../phoible/data/phoible.RData')
 
 # 2.0 has more rows
 # expect_equal(nrow(phoible), 95993)
-expect_equal(nrow(phoible), 105481)
+expect_equal(nrow(phoible), 105477)
 ```
 
 
