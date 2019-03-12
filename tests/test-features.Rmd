@@ -17,10 +17,11 @@ load('/Users/stiv/Github/phoible/data/phoible.RData')
 ```{r}
 distinct.segments <- phoible %>% select(-InventoryID, -Glottocode, -ISO6393, -LanguageName, -SpecificDialect, -GlyphID, -Allophones, -Marginal, -SegmentClass, -Source) %>% distinct()
 head(distinct.segments)
+dim(distinct.segments)
 ```
 
 
-# Look at the different features' compoents
+# Look at the different features' components and check out weird stuff
 
 ```{r}
 table(phoible$tone)
@@ -176,7 +177,7 @@ table(phoible$loweredLarynxImplosive)
 table(phoible$click)
 ```
 
-## Compare features to phoible 2104
+## Compare features to phoible 2104 (WIP)
 
 ```{r}
 old <- read.delim("phoible-segments-features.tsv", header=T)
@@ -195,8 +196,9 @@ phoible %>% filter(grepl("ᴱ", Phoneme)) %>% select(InventoryID, LanguageName, 
 
 ```{r}
 # unaspirated
-phoible %>% filter(grepl("˭", Allophones)) %>% select(InventoryID, LanguageName, Phoneme)
+phoible %>% filter(grepl("˭", Phoneme)) %>% select(InventoryID, LanguageName, Phoneme)
 ```
+
 ```{r}
 # labial-palatalized  # TODO: should use labial+palatal?
 phoible %>% filter(grepl("ᶣ", Phoneme)) %>% select(InventoryID, LanguageName, Phoneme)
@@ -207,3 +209,175 @@ phoible %>% filter(grepl("ᶣ", Phoneme)) %>% select(InventoryID, LanguageName, 
 phoible %>% filter(grepl("ᵊ", Allophones)) %>% select(InventoryID, LanguageName, Phoneme, Allophones)
 ```
 
+```{r}
+# unreleased (combining left angle above)
+phoible %>% filter(grepl("̚", Phoneme)) %>% select(InventoryID, LanguageName, Phoneme)
+```
+
+# Combining diacritics and where they occur
+
+```{r}
+# velarized/pharyngealized (combining tilde overlay)
+phoible %>% filter(grepl("̴", Phoneme)) %>% select(Phoneme) %>% distinct()
+phoible %>% filter(grepl("̴", Allophones)) %>% select(Allophones) %>% distinct()
+```
+
+```{r}
+# nasalized (combining tilde)
+phoible %>% filter(grepl("̃", Phoneme)) %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# denasalized (combining not tilde above)
+phoible %>% filter(grepl("͊", Phoneme)) %>% select(Phoneme) %>% distinct()
+phoible %>% filter(grepl("͊", Allophones)) %>% select(Allophones) %>% distinct()
+```
+
+```{r}
+# nasal emission (combining homothetic)
+phoible %>% filter(grepl("͋", Phoneme)) %>% select(Phoneme) %>% distinct()
+phoible %>% filter(grepl("͋", Allophones)) %>% select(Allophones) %>% distinct()
+```
+
+```{r}
+# derhoticized (combining breve below)
+phoible %>% filter(grepl("̮", Phoneme)) %>% select(Phoneme) %>% distinct()
+phoible %>% filter(grepl("̮", Allophones)) %>% select(Allophones) %>% distinct()
+```
+
+```{r}
+# breathy (combining diaresis below)
+phoible %>% filter(grepl("̤", Phoneme)) %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# creaky (combining tilde below)
+phoible %>% filter(grepl("̰", Phoneme)) %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# stiff (combining caron below)
+phoible %>% filter(grepl("̬", Phoneme)) %>% select(Phoneme) %>% distinct()
+phoible %>% filter(grepl("̬", Phoneme)) %>% select(InventoryID, LanguageName, Phoneme)
+```
+
+```{r}
+# frictionalized (combining x below)
+phoible %>% filter(grepl("͓", Phoneme)) %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# linguolabial (combining seagull below)
+phoible %>% filter(grepl("̼", Phoneme)) %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# dental (combining bridge below)
+phoible %>% filter(grepl("̪", Phoneme)) %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# apical (combining inverted bridge below)
+phoible %>% filter(grepl("̺", Phoneme)) %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# laminal (combining square below)
+phoible %>% filter(grepl("̻", Phoneme)) %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# non-sibilant (combining equals sign below)
+phoible %>% filter(grepl("͇", Phoneme)) %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# fortis (combining double vertical line below)
+phoible %>% filter(grepl("͈", Phoneme)) %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# lenis (combining left angle below)
+phoible %>% filter(grepl("͉", Phoneme)) %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# retracted tongue root (combining right tack below)
+phoible %>% filter(grepl("̙", Phoneme)) %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# advanced tongue root (combining left tack below)
+phoible %>% filter(grepl("̘", Phoneme)) %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# lowered (combining down tack below)
+phoible %>% filter(grepl("̞", Phoneme)) %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# raised (combining up tack below)
+phoible %>% filter(grepl("̝", Phoneme)) %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# advanced (combining plus sign below)
+phoible %>% filter(grepl("̟", Phoneme)) %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# retracted (combining minus sign below)
+phoible %>% filter(grepl("̠", Phoneme)) %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# centralized (combining diaresis)
+phoible %>% filter(grepl("̈", Phoneme)) %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# mid-centralized (combining x above)
+phoible %>% filter(grepl("̽", Phoneme)) %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# more round (combining right half ring)
+phoible %>% filter(grepl("̹", Phoneme)) %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# less round (combining left half ring)
+phoible %>% filter(grepl("̜", Phoneme)) %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# syllabic (combining vertical line below)
+phoible %>% filter(grepl("̩", Phoneme)) %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# non-syllabic (combining inverted breve below)
+phoible %>% filter(grepl("̯", Phoneme)) %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# short (combining breve)
+phoible %>% filter(grepl("̆", Phoneme)) %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# devoiced (combining ring below)
+phoible %>% filter(grepl("̥", Phoneme)) %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# devoiced (combining ring above)
+phoible %>% filter(grepl("̊", Phoneme)) %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# unreleased (combining left angle above)
+phoible %>% filter(grepl("̚", Phoneme)) %>% select(Phoneme) %>% distinct()
+phoible %>% filter(grepl("̚", Phoneme)) %>% select(InventoryID, LanguageName, Phoneme)
+```
