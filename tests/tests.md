@@ -114,3 +114,26 @@ index[which(!(index$Glottocode %in% glottolog$id)), ]
 <!--
 ## load(url('https://raw.githubusercontent.com/phoible/dev/refactor-agg/data/phoible-by-phoneme.RData'))
 -->
+Are there any duplicate phoneme rows?
+=====================================
+
+``` r
+# phoible <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/data/phoible.csv', header=T, stringsAsFactors = F)
+phoible <- read.csv('../../phoible/data/phoible.csv', header=T, stringsAsFactors = F)
+phoible %>% group_by(InventoryID, Phoneme) %>% filter(n()>1) %>% select(InventoryID, Glottocode, Phoneme, Source)
+```
+
+    ## # A tibble: 10 x 4
+    ## # Groups:   InventoryID, Phoneme [5]
+    ##    InventoryID Glottocode Phoneme Source
+    ##          <int> <chr>      <chr>   <chr> 
+    ##  1        2349 adyg1241   ɕ       ea    
+    ##  2        2349 adyg1241   ɕ       ea    
+    ##  3        2349 adyg1241   ʑ       ea    
+    ##  4        2349 adyg1241   ʑ       ea    
+    ##  5        2401 kaba1278   ɕ       ea    
+    ##  6        2401 kaba1278   ɕ       ea    
+    ##  7        2401 kaba1278   ʑ       ea    
+    ##  8        2401 kaba1278   ʑ       ea    
+    ##  9        2478 occi1239   i̯ɔ      ea    
+    ## 10        2478 occi1239   i̯ɔ      ea
