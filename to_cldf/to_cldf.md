@@ -12,13 +12,10 @@ library(digest)
 
 ``` r
 # PHOIBLE aggregated data
-## TODO: update once the aggregation script is finished (and tag the version)
 ## load(url('https://raw.githubusercontent.com/phoible/dev/refactor-agg/data/phoible-by-phoneme.RData'))
 load('../../phoible/data/phoible.RData')
-
-# 2.0 has more rows
-# expect_equal(nrow(phoible), 95993)
-expect_equal(nrow(phoible), 105477)
+#
+expect_equal(nrow(phoible), 105467)
 ```
 
 Create one large table
@@ -70,6 +67,18 @@ rm(names, parameters)
 # library(hashids)
 # hashids::encode_hex(x)
 
+# Add in language names from the phoible index
+index <- read.csv('../../phoible/mappings/InventoryID-LanguageCodes.csv', header=T, stringsAsFactors=F)
+index <- index %>% select(InventoryID, LanguageName)
+colnames(index) <- c("InventoryID", "FullLanguageName")
+phoible <- left_join(phoible, index)
+```
+
+    ## Joining, by = "InventoryID"
+
+``` r
+rm(index)
+
 # Add in row "ID"s
 phoible$ROWID <- seq.int(nrow(phoible))
 ```
@@ -93,7 +102,7 @@ expect_equal(nrow(phoible), nrow(values))
 glimpse(values)
 ```
 
-    ## Observations: 105,477
+    ## Observations: 105,467
     ## Variables: 9
     ## $ ID              <int> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,...
     ## $ ISO639P3code    <chr> "kor", "kor", "kor", "kor", "kor", "kor", "kor...
@@ -185,7 +194,7 @@ contributions.csv
 ## ID,Name,Description,Contributors
 ## 1,Korean (SPA),Korean,Stanford Phonology Archive
 
-contributions <- phoible %>% select(InventoryID, Source, LanguageName, Contributor, Contribution_ID, URI) %>% distinct()
+contributions <- phoible %>% select(InventoryID, Source, FullLanguageName, Contributor, Contribution_ID, URI) %>% distinct()
 colnames(contributions) <- c("ID", "Contributor_ID", "Name", "Contributors", "References", "URI")
 glimpse(contributions)
 ```
