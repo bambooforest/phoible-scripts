@@ -1,0 +1,91 @@
+---
+title: "Compare PHOIBLE 2014 to 2019"
+author: "Steven Moran \\<steven.moran@uzh.ch\\>"
+output: github_document
+---
+  
+```{r, message=F, warning=F}
+library(dplyr)
+library(ggplot2)
+# library(tidyr)
+# library(testthat)
+```
+
+```{r}
+# 2014
+p14 <- read.delim('https://raw.githubusercontent.com/clld/phoible/v2014/data/phoible-phonemes.tsv', header=T, sep = "\t", stringsAsFactors = F)
+metadata <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-LanguageCodes.csv', stringsAsFactors = F)
+metadata <- metadata %>% select(InventoryID, Glottocode)
+p14 <- left_join(p14, metadata, by=c("InventoryID"="InventoryID"))
+head(p14)
+```
+
+
+```{r}
+#2019
+p19 <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/data/phoible.csv', stringsAsFactors = F)
+head(p19)
+```
+
+```{r}
+# Number of segments
+p14.segments <- p14 %>% group_by(Phoneme) %>% summarize(count=n())
+p19.segments <- p19 %>% group_by(Phoneme) %>% summarize(count=n())
+p14.segments$coverage <- p14.segments$count / nrow(p14.segments)
+p19.segments$coverage <- p19.segments$count / nrow(p19.segments)
+p14.segments <- p14.segments %>% arrange(desc(coverage))
+p19.segments <- p19.segments %>% arrange(desc(coverage))
+p14.segments$Rank <- seq.int(nrow(p14.segments))
+p19.segments$Rank <- seq.int(nrow(p19.segments))
+head(p14.segments)
+head(p19.segments)
+```
+
+```{r}
+# Plot the rank group
+qplot(data=p14.segments, y=count, x=Rank)
+```
+
+```{r}
+# Plot the rank group
+qplot(data=p19.segments, y=count, x=Rank)
+```
+
+```{r}
+# Plot the coverage
+p <- ggplot(aes(y=coverage, x=reorder(Phoneme, -coverage)), data=p14.segments) +
+  geom_bar(stat="identity", width = 0.3, color = "black") +
+  xlab("Phonemes") +
+  ylab("Percentage of data points")
+p
+```
+
+```{r}
+# Plot the coverage
+p <- ggplot(aes(y=coverage, x=reorder(Phoneme, -coverage)), data=p19.segments) +
+  geom_bar(stat="identity", width = 0.3, color = "black") +
+  xlab("Phonemes") +
+  ylab("Percentage of data points")
+p
+```
+
+```{r}
+# Which phonemes arent in the other?
+p14.segments[which(!(p14.segments$Phoneme %in% p19.segments$Phoneme)),]
+p19.segments[which(!(p19.segments$Phoneme %in% p14.segments$Phoneme)),]
+```
+
+```{r}
+# Get the intersection
+p.all <- inner_join(p14.segments, p19.segments, by=c("Phoneme"="Phoneme"))
+colnames(p.all) <- c("Phoneme", "Count2014", "Coverage2014", "Rank2014", "Count2019", "Coverage2019", "Rank2019")
+head(p.all)
+```
+```{r}
+p.test <- p.all %>% head(n=75)
+p.test$Phoneme <- factor(p.test$Phoneme, levels = p.test$Phoneme)
+
+ggplot(p.test, aes(Phoneme, group = 1)) + 
+  geom_line(aes(y = Coverage2014, colour = "Coverage2014")) + 
+  geom_line(aes(y = Coverage2019, colour = "Coverage2019"))
+```
