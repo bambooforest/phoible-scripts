@@ -1,0 +1,56 @@
+---
+title: "PHOIBLE phoneme frequencies"
+author: "Steven Moran \\<steven.moran@uzh.ch\\>"
+output: github_document
+---
+  
+```{r, message=F, warning=F}
+library(dplyr)
+library(ggplot2)
+```
+
+```{r}
+# Get data
+phoible <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/data/phoible.csv', stringsAsFactors = F)
+
+```
+
+```{r}
+# Get cross-linguistic phoneme counts from all inventories
+phonemes <- phoible %>% group_by(Phoneme) %>% summarize(count=n())
+phonemes$coverage <- phonemes$count/nrow(phonemes)
+phonemes.sorted <- phonemes %>% arrange(desc(coverage))
+# phonemes.sorted <- phonemes.sorted %>% head(n=25)
+head(phonemes.sorted)
+```
+
+```{r}
+# All phonemes
+temp <- head(phonemes.sorted, n=35)
+p <- ggplot(aes(y=coverage, x=reorder(Phoneme, -coverage)), data=temp) +
+  geom_bar(stat="identity", width = 0.3, color = "black") +
+  xlab("Phonemes") +
+  ylab("Percentage of data points")
+p
+```
+
+```{r}
+# Get cross-linguistic phoneme counts by grouping all ISO codes
+phonemes.per.iso <- phoible %>% group_by(ISO6393, Phoneme) %>% summarize(count=n())
+distinct.isos <- phonemes.per.iso %>% select(ISO6393) %>% distinct()
+phonemes <- phonemes.per.iso %>% group_by(Phoneme) %>% summarize(count=n())
+phonemes$coverage <- phonemes$count/nrow(distinct.isos)
+phonemes.sorted <- phonemes %>% arrange(desc(coverage))
+# phonemes.sorted <- phonemes.sorted %>% head(n=25)
+head(phonemes.sorted)
+```
+
+```{r}
+# All phonemes across all ISOs
+temp <- head(phonemes.sorted, n=35)
+p <- ggplot(aes(y=coverage, x=reorder(Phoneme, -coverage)), data=temp) +
+  geom_bar(stat="identity", width = 0.3, color = "black") +
+  xlab("Phonemes") +
+  ylab("Percentage of data points")
+p
+```
