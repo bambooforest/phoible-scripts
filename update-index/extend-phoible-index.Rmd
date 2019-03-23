@@ -11,27 +11,17 @@ library(knitr)
 ```
 
 ```{r}
-# Get phoible index (TODO: update to online version when recent PRs are merged)
-# index <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-LanguageCodes.csv', header=T, stringsAsFactors=F)
-index <- read.csv('../../phoible/mappings/InventoryID-LanguageCodes.csv', header=T, stringsAsFactors = F)
+# Get phoible index
+index <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-LanguageCodes.csv', header=T, stringsAsFactors=F)
 expect_equal(nrow(index), 3020)
 head(index)
 ```
 
 ```{r}
-# Glottolog dialects and geo data (v 3.3)
-glottolog <- read.csv('https://cdstar.shh.mpg.de/bitstreams/EAEA0-F088-DE0E-0712-0/languages_and_dialects_geo.csv')
-head(glottolog)
-```
-
-```{r}
-index <- left_join(index, glottolog, by=c("Glottocode"="glottocode"))
-expect_equal(nrow(index), 3020)
-```
-
-```{r}
+# Glottolog languiods data (v 3.3)
+# https://cdstar.shh.mpg.de/bitstreams/EAEA0-E7DE-FA06-8817-0/glottolog_languoid.csv.zip
 languoids <- read.csv('glottolog_languoid.csv/languoid.csv', header=T, stringsAsFactors=F)
-languoids <- languoids %>% select(id, family_id, parent_id, status,  country_ids, iso639P3code)
+# languoids <- languoids %>% select(id, family_id, parent_id, status,  country_ids, iso639P3code)
 ```
 
 ```{r}
@@ -40,3 +30,57 @@ expect_equal(nrow(index), 3020)
 glimpse(index)
 ```
 
+```{r}
+# Glottolog geo data (v 3.3)
+geo <- read.csv('https://cdstar.shh.mpg.de/bitstreams/EAEA0-F088-DE0E-0712-0/languages_and_dialects_geo.csv')
+kable(head(geo))
+```
+
+```{r}
+index <- left_join(index, geo)
+expect_equal(nrow(index), 3020)
+kable(head(index))
+```
+
+```{r}
+# Which inventories don't have Glottocodes?
+index %>% filter(Glottocode=="")
+kable(index %>% filter(is.na(Glottocode)))
+```
+
+```{r}
+# Missing geo data?
+index %>% filter(latitude=="")
+nrow(index %>% filter(is.na(latitude)) %>% select(InventoryID, ISO6393, Glottocode, LanguageName, Source, latitude, longitude))
+kable(index %>% filter(is.na(latitude)) %>% select(InventoryID, ISO6393, Glottocode, LanguageName, Source, latitude, longitude))
+```
+
+```{r}
+# Missing language families
+
+# Get Glottolog language family names for PHOIBLE Glottocodes
+x <- index %>% select(InventoryID, Glottocode, family_id) %>% distinct()
+y <- left_join(x, languoids, by=c("family_id"="id"))
+y <- y %>% select(InventoryID, Glottocode, name)
+colnames(y) <- c("InventoryID", "Glottocode", "LanguageFamily")
+
+# Merge the language family names into the index
+index <- left_join(index, y)
+expect_equal(nrow(index), 3020)
+
+# Any blank or NA LanguageFamily?
+nrow(index %>% filter(LanguageFamily==""))
+nrow(index %>% filter(is.na(LanguageFamily)))
+
+# TODO: identify the language family isolates
+kable(index %>% filter(is.na(LanguageFamily)) %>% select(InventoryID, ISO6393, Glottocode, LanguageName, Source, LanguageFamily))
+```
+
+```{r}
+# Missing macroareas
+nrow(index %>% filter(macroarea=="") %>% select(InventoryID, ISO6393, Glottocode, LanguageName, Source, macroarea))
+kable(index %>% filter(macroarea=="") %>% select(InventoryID, ISO6393, Glottocode, LanguageName, Source, macroarea))
+#
+nrow(index %>% filter(is.na(macroarea)) %>% select(InventoryID, ISO6393, Glottocode, LanguageName, Source, macroarea))
+kable(index %>% filter(is.na(macroarea)) %>% select(InventoryID, ISO6393, Glottocode, LanguageName, Source, macroarea))
+```
