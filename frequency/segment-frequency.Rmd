@@ -12,12 +12,22 @@ library(ggplot2)
 ```{r}
 # Get data
 phoible <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/data/phoible.csv', stringsAsFactors = F)
+```
 
+```{r}
+# Merge in Glottolog data
+# Glottolog 3.3 data
+# https://cdstar.shh.mpg.de/bitstreams/EAEA0-E7DE-FA06-8817-0/glottolog_languoid.csv.zip
+languoids <- read.csv('../data/glottolog_languoid.csv/languoid.csv', stringsAsFactors = FALSE) 
+geo <- read.csv(url("https://cdstar.shh.mpg.de/bitstreams/EAEA0-E7DE-FA06-8817-0/languages_and_dialects_geo.csv"), stringsAsFactors = FALSE)
+
+phoible <- left_join(phoible, languoids, by=c("Glottocode"="id"))
+phoible <- left_join(phoible, geo)
 ```
 
 ```{r}
 # Get cross-linguistic phoneme counts from all inventories
-phonemes <- phoible %>% group_by(Phoneme) %>% summarize(count=n())
+phonemes <- phoible %>% group_by(Phoneme, SegmentClass) %>% summarize(count=n())
 phonemes$coverage <- phonemes$count/nrow(phonemes)
 phonemes.sorted <- phonemes %>% arrange(desc(coverage))
 # phonemes.sorted <- phonemes.sorted %>% head(n=25)
@@ -25,13 +35,23 @@ head(phonemes.sorted)
 ```
 
 ```{r}
-# All phonemes
+# All phonemes across all inventories in the full sample
 temp <- head(phonemes.sorted, n=35)
 p <- ggplot(aes(y=coverage, x=reorder(Phoneme, -coverage)), data=temp) +
   geom_bar(stat="identity", width = 0.3, color = "black") +
   xlab("Phonemes") +
   ylab("Percentage of data points")
 p
+```
+
+```{r}
+# All phonemes across all inventories in the full sample - flipped
+temp <- head(phonemes.sorted, n=35)
+p <- ggplot(aes(y=coverage, x=reorder(Phoneme, coverage)), data=temp) +
+  geom_bar(stat="identity", width = 0.3, color = "black") +
+  xlab("Phonemes") +
+  ylab("Percentage of data points")
+p + coord_flip()
 ```
 
 ```{r}
@@ -43,6 +63,10 @@ phonemes$coverage <- phonemes$count/nrow(distinct.isos)
 phonemes.sorted <- phonemes %>% arrange(desc(coverage))
 # phonemes.sorted <- phonemes.sorted %>% head(n=25)
 head(phonemes.sorted)
+
+# Merge in SegmentClass values
+segment.class <- phoible %>% select(Phoneme, SegmentClass) %>% distinct()
+phonemes.sorted <- left_join(phonemes.sorted, segment.class)
 ```
 
 ```{r}
@@ -53,4 +77,123 @@ p <- ggplot(aes(y=coverage, x=reorder(Phoneme, -coverage)), data=temp) +
   xlab("Phonemes") +
   ylab("Percentage of data points")
 p
+```
+
+```{r}
+# All phonemes across all ISOs - flipped
+temp <- head(phonemes.sorted, n=35)
+p <- ggplot(aes(y=coverage, x=reorder(Phoneme, coverage)), data=temp) +
+  geom_bar(stat="identity", width = 0.3, color = "black") +
+  xlab("Phonemes") +
+  ylab("Percentage of data points")
+p + coord_flip()
+```
+
+
+```{r}
+# Consonants only
+temp <- phonemes.sorted %>% filter(SegmentClass == "consonant") %>% head(phonemes.sorted, n=35)
+p <- ggplot(aes(y=coverage, x=reorder(Phoneme, -coverage)), data=temp) +
+  geom_bar(stat="identity", width = 0.3, color = "black") +
+  xlab("Phonemes") +
+  ylab("Percentage of data points")
+p
+```
+
+```{r}
+# Consonants only flipped
+p <- ggplot(aes(y=coverage, x=reorder(Phoneme, coverage)), data=temp) +
+  geom_bar(stat="identity", width = 0.3, color = "black") +
+  xlab("Phonemes") +
+  ylab("Percentage of data points")
+p + coord_flip()
+```
+
+```{r}
+# Vowels only
+temp <- phonemes.sorted %>% filter(SegmentClass == "vowel") %>% head(phonemes.sorted, n=35)
+p <- ggplot(aes(y=coverage, x=reorder(Phoneme, -coverage)), data=temp) +
+  geom_bar(stat="identity", width = 0.3, color = "black") +
+  xlab("Phonemes") +
+  ylab("Percentage of data points")
+p
+```
+
+```{r}
+# Vowels only
+temp <- phonemes.sorted %>% filter(SegmentClass == "vowel") %>% head(phonemes.sorted, n=35)
+p <- ggplot(aes(y=coverage, x=reorder(Phoneme, coverage)), data=temp) +
+  geom_bar(stat="identity", width = 0.3, color = "black") +
+  xlab("Phonemes") +
+  ylab("Percentage of data points")
+p + coord_flip()
+```
+
+```{r}
+# Summarize how frequent infrequent sounds are
+temp <- phonemes.sorted %>% group_by(count) %>% summarize(segments=n())
+temp <- temp %>% head(n=10)
+p <- ggplot(aes(y=segments, x=reorder(count, -segments)), data=temp) +
+  geom_bar(stat="identity", width = 0.3, color = "black") +
+  xlab("How many languages they occur in") +
+  ylab("Number of segment types")
+p
+```
+
+```{r}
+# Summarize how frequent infrequent sounds are - flipped
+temp <- phonemes.sorted %>% group_by(count) %>% summarize(segments=n())
+temp <- temp %>% head(n=10)
+p <- ggplot(aes(y=segments, x=reorder(count, segments)), data=temp) +
+  geom_bar(stat="identity", width = 0.3, color = "black") +
+  xlab("How many languages they occur in") +
+  ylab("Number of segment types")
+p + coord_flip()
+```
+
+```{r}
+iso.marcoareas <- phoible %>% select(ISO6393, macroarea) %>% distinct()
+phonemes.per.iso.with.geo <- left_join(phonemes.per.iso, iso.marcoareas)
+phonemes.per.iso.with.geo
+
+# How many data points do we have per macroregion (by ISO code)
+x <- phonemes.per.iso.with.geo %>% group_by(ISO6393, macroarea) %>% summarize(count=n())
+geo.counts <- x %>% group_by(macroarea) %>% summarise(totals=n())
+
+# 
+macro.area.phoneme.counts <- phonemes.per.iso.with.geo %>% group_by(macroarea, Phoneme) %>% summarize(count = n()) %>% filter(macroarea!="")  %>% filter(!is.na(macroarea))
+
+y <- left_join(macro.area.phoneme.counts, geo.counts)
+y$coverage <- y$count/y$totals
+y
+
+z <- left_join(y, phonemes.sorted, by=c("Phoneme"="Phoneme"))
+```
+
+```{r}
+theme_set(
+  theme_bw()
+)
+
+# Get top n by area
+top.by.area <- z %>% group_by(macroarea) %>% filter(SegmentClass=="consonant") %>% top_n(n = 10, wt = coverage.y)
+
+p <- ggplot(aes(y=coverage.x, x=reorder(Phoneme, -count.y), fill=macroarea), data=top.by.area) +
+  geom_bar(stat="identity", width = 0.9, position=position_dodge(0.9)) +
+  xlab("Phonemes") +
+  ylab("Percentage of data points") +
+  scale_fill_manual(values=c(alpha('#4477aa', .8), alpha('#66ccee', .8), alpha('#228833', .8), alpha('#ccbb44', .8), alpha('#ee6677', .8), alpha('#aa3377', .8)))
+p
+```
+
+```{r}
+# Get top n by area with phonemes on y axis
+top.by.area <- z %>% group_by(macroarea) %>% filter(SegmentClass=="consonant") %>% top_n(n = 20, wt = coverage.y)
+
+p <- ggplot(aes(y=coverage.x, x=reorder(Phoneme, count.y), fill=macroarea), data=top.by.area) +
+  geom_bar(stat="identity", width = 0.9, position=position_dodge(0.9)) +
+  xlab("Phonemes") +
+  ylab("Percentage of data points") +
+  scale_fill_manual(values=c(alpha('#4477aa', .8), alpha('#66ccee', .8), alpha('#228833', .8), alpha('#ccbb44', .8), alpha('#ee6677', .8), alpha('#aa3377', .8)))
+p + coord_flip()
 ```
