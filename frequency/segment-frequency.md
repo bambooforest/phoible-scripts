@@ -5,6 +5,10 @@ Steven Moran &lt;<steven.moran@uzh.ch>&gt;
 ``` r
 library(dplyr)
 library(ggplot2)
+
+theme_set(
+  theme_bw()
+)
 ```
 
 ``` r
@@ -261,10 +265,6 @@ z <- left_join(y, phonemes.sorted, by=c("Phoneme"="Phoneme"))
 ```
 
 ``` r
-theme_set(
-  theme_bw()
-)
-
 # Get top n by area
 top.by.area <- z %>% group_by(macroarea) %>% filter(SegmentClass=="consonant") %>% top_n(n = 10, wt = coverage.y)
 
@@ -291,3 +291,7 @@ p + coord_flip()
 ```
 
 ![](segment-frequency_files/figure-markdown_github/unnamed-chunk-18-1.png)
+
+``` r
+# TODO: order within each bar group
+```

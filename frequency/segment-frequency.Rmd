@@ -7,6 +7,10 @@ output: github_document
 ```{r, message=F, warning=F}
 library(dplyr)
 library(ggplot2)
+
+theme_set(
+  theme_bw()
+)
 ```
 
 ```{r}
@@ -171,10 +175,6 @@ z <- left_join(y, phonemes.sorted, by=c("Phoneme"="Phoneme"))
 ```
 
 ```{r}
-theme_set(
-  theme_bw()
-)
-
 # Get top n by area
 top.by.area <- z %>% group_by(macroarea) %>% filter(SegmentClass=="consonant") %>% top_n(n = 10, wt = coverage.y)
 
@@ -196,4 +196,8 @@ p <- ggplot(aes(y=coverage.x, x=reorder(Phoneme, count.y), fill=macroarea), data
   ylab("Percentage of data points") +
   scale_fill_manual(values=c(alpha('#4477aa', .8), alpha('#66ccee', .8), alpha('#228833', .8), alpha('#ccbb44', .8), alpha('#ee6677', .8), alpha('#aa3377', .8)))
 p + coord_flip()
+```
+
+```{r}
+# TODO: order within each bar group
 ```
