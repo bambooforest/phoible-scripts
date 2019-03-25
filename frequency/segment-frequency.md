@@ -3,8 +3,10 @@ PHOIBLE phoneme frequencies
 Steven Moran &lt;<steven.moran@uzh.ch>&gt;
 
 ``` r
+library(knitr)
 library(dplyr)
 library(ggplot2)
+library(Cairo)
 
 theme_set(
   theme_bw()
@@ -52,10 +54,19 @@ head(phonemes.sorted)
 ``` r
 # All phonemes across all inventories in the full sample
 temp <- head(phonemes.sorted, n=35)
+cairo_pdf("segment-frequency_files/all_phonemes_35.pdf", family="Helvetica")
 p <- ggplot(aes(y=coverage, x=reorder(Phoneme, -coverage)), data=temp) +
   geom_bar(stat="identity", width = 0.3, color = "black") +
   xlab("Phonemes") +
   ylab("Percentage of data points")
+print(p)
+dev.off()
+```
+
+    ## quartz_off_screen 
+    ##                 2
+
+``` r
 p
 ```
 
@@ -279,6 +290,20 @@ p
 ![](segment-frequency_files/figure-markdown_github/unnamed-chunk-17-1.png)
 
 ``` r
+# Rank with each bar
+test <- top.by.area %>% group_by(Phoneme) %>% mutate(counts_rank = rank(-coverage.x)) %>% ungroup()
+
+p <- ggplot(aes(y=coverage.x, x=reorder(Phoneme, -count.y), fill=macroarea, group=counts_rank), data=test) +
+  geom_bar(stat="identity", width = 0.9, position=position_dodge(0.9)) +
+  xlab("Phonemes") +
+  ylab("Percentage of data points") +
+  scale_fill_manual(values=c(alpha('#4477aa', .8), alpha('#66ccee', .8), alpha('#228833', .8), alpha('#ccbb44', .8), alpha('#ee6677', .8), alpha('#aa3377', .8)))
+p
+```
+
+![](segment-frequency_files/figure-markdown_github/unnamed-chunk-18-1.png)
+
+``` r
 # Get top n by area with phonemes on y axis
 top.by.area <- z %>% group_by(macroarea) %>% filter(SegmentClass=="consonant") %>% top_n(n = 20, wt = coverage.y)
 
@@ -290,8 +315,18 @@ p <- ggplot(aes(y=coverage.x, x=reorder(Phoneme, count.y), fill=macroarea), data
 p + coord_flip()
 ```
 
-![](segment-frequency_files/figure-markdown_github/unnamed-chunk-18-1.png)
+![](segment-frequency_files/figure-markdown_github/unnamed-chunk-19-1.png)
 
 ``` r
-# TODO: order within each bar group
+# Rank with each bar
+test <- top.by.area %>% group_by(Phoneme) %>% mutate(counts_rank = rank(coverage.x)) %>% ungroup()
+
+p <- ggplot(aes(y=coverage.x, x=reorder(Phoneme, count.y), fill=macroarea, group=counts_rank), data=test) +
+  geom_bar(stat="identity", width = 0.9, position=position_dodge(0.9)) +
+  xlab("Phonemes") +
+  ylab("Percentage of data points") +
+  scale_fill_manual(values=c(alpha('#4477aa', .8), alpha('#66ccee', .8), alpha('#228833', .8), alpha('#ccbb44', .8), alpha('#ee6677', .8), alpha('#aa3377', .8)))
+p + coord_flip()
 ```
+
+![](segment-frequency_files/figure-markdown_github/unnamed-chunk-20-1.png)
