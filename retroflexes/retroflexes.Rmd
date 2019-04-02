@@ -1,0 +1,82 @@
+---
+title: "PHOIBLE retroflexes in South Asia"
+author: "Steven Moran \\<steven.moran@uzh.ch\\>"
+output: github_document
+---
+  
+```{r, message=F, warning=F}
+library(dplyr)
+```
+
+```{r}
+# Get PHOIBLE data and merge in Glottolog metadata
+phoible <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/data/phoible.csv', stringsAsFactors = F)
+
+# Merge in Glottolog 3.3 data
+# https://cdstar.shh.mpg.de/bitstreams/EAEA0-E7DE-FA06-8817-0/glottolog_languoid.csv.zip
+languoids <- read.csv('../data/glottolog_languoid.csv/languoid.csv', stringsAsFactors = FALSE) 
+geo <- read.csv(url("https://cdstar.shh.mpg.de/bitstreams/EAEA0-E7DE-FA06-8817-0/languages_and_dialects_geo.csv"), stringsAsFactors = FALSE)
+
+phoible <- left_join(phoible, languoids, by=c("Glottocode"="id"))
+phoible <- left_join(phoible, geo)
+```
+
+```{r}
+# What do we consider retroflexes in PHOIBLE by phonological features?
+retros.by.features <- phoible %>% filter(coronal %in% "+") %>% filter(anterior %in% "-") %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# Retroflexes from Yoav
+retros <- c("ʈ", "ɖ", "ɳ", "ɽ", "ʐ", "ʂ", "ɻ", "ɭ")
+```
+
+```{r}
+# table(phoible$country_ids)
+se.asia <- phoible %>% filter(grepl("BT|IN|BD|MV|NP|PK|LK|TJ", country_ids))
+
+# Number of data points
+nrow(se.asia %>% select(InventoryID, Glottocode, LanguageName) %>% distinct())
+
+# Number of unique Glottocodes
+nrow(se.asia %>% select(Glottocode) %>% distinct())
+```
+
+```{r}
+# Does the language contain "pure" retroflexes?
+r1 <- se.asia %>% group_by(InventoryID, Glottocode, LanguageName) %>% summarize(has.retroflex = any(Phoneme %in% c("ʈ", "ɖ", "ɳ", "ɽ", "ʐ", "ʂ", "ɻ", "ɭ")))
+
+# Does the language contain regrex matched retroflexes?
+r2 <- se.asia %>% group_by(InventoryID, Glottocode, LanguageName) %>% summarize(has.retroflex = any(grepl("ʈ|ɖ|ɳ|ɽ|ʐ|ʂ|ɻ|ɭ", Phoneme)))
+
+# Numbers differ
+table(r1$has.retroflex)
+table(r2$has.retroflex)
+
+# Which data points differ?
+x <- left_join(r1, r2, by=c("InventoryID"="InventoryID"))
+x$diff <- x$has.retroflex.x != x$has.retroflex.y
+x[which(x$diff),]
+
+# How do they differ?
+phoible %>% filter(InventoryID %in% c(497, 2525, 2578)) %>% select(InventoryID, Glottocode, LanguageName, Phoneme, Allophones, country_ids)
+```
+
+```{r}
+# Which languages don't have retroflexes?
+r2 %>% filter(!has.retroflex)
+no.retroflexes <- r2 %>% filter(!has.retroflex)
+no.retroflexes
+
+# Here's an example
+phoible %>% filter(InventoryID==21) %>% select(InventoryID, Glottocode, LanguageName, Phoneme, country_ids)
+
+# Write all the language data to CSV
+df <- phoible %>% filter(InventoryID %in% no.retroflexes$InventoryID) %>% select(InventoryID, Glottocode, LanguageName, Phoneme, country_ids)
+write.csv(df, file="phoible-langs-no-retroflexes-seasia.csv", row.names = F)
+```
+
+```{r}
+# Specifically, I am looking for the languages in South Asia (Indian sub-continent) which do not have any retroflex sounds. I have already collected the PHOIBLE data for the languages which do have retroflex sounds in that area. The area of interest includes India, Pakistan, Nepal, Bangladesh, Bhutan, and the Tibetan plateau.
+```
+
