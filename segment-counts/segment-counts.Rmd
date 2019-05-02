@@ -1,0 +1,86 @@
+---
+title: "PHOIBLE phoneme class counts"
+author: "Steven Moran \\<steven.moran@uzh.ch\\>"
+output: github_document
+---
+  
+```{r, message=F, warning=F}
+library(dplyr)
+library(testthat)
+```
+
+```{r}
+# Get data
+phoible <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/data/phoible.csv', stringsAsFactors = F)
+```
+
+
+```{r}
+# Make sure there aren't any NAs in SegmentClass
+table(phoible$SegmentClass, exclude=F)
+expect_false(any(is.na(phoible$SegmentClass)))
+```
+
+```{r}
+# Get counts by segment class
+phonemes <- phoible %>% group_by(InventoryID, ISO6393, Glottocode, Source) %>% summarize(phonemes=n())
+vowels <- phoible %>% group_by(InventoryID, ISO6393, Glottocode, Source) %>% filter(SegmentClass=="vowel") %>% summarize(vowels=n())
+consonants <- phoible %>% group_by(InventoryID, ISO6393, Glottocode, Source) %>% filter(SegmentClass=="consonant") %>% summarize(consonants=n())
+tones <- phoible %>% group_by(InventoryID, ISO6393, Glottocode, Source) %>% filter(SegmentClass=="tone") %>% summarize(tones=n())
+```
+
+```{r}
+# Merge into new df
+phonemes <- left_join(phonemes, consonants)
+phonemes <- left_join(phonemes, vowels)
+phonemes <- left_join(phonemes, tones)
+head(phonemes)
+```
+
+```{r}
+# There shouldn't be any NAs for consonants or vowels (tones OK)
+expect_false(any(is.na(phonemes$consonants)))
+expect_false(any(is.na(phonemes$vowels)))
+
+# Reassign NAs in tones to zero -- TODO: this ignores the fact that we know that UPSID does not contain tone!!
+phonemes$tones[is.na(phonemes$tones)] <- 0
+head(phonemes)
+range(phonemes$tones)
+```
+
+```{r}
+# Check the counts
+phonemes$counts.match <- phonemes$consonants + phonemes$vowels + phonemes$tones == phonemes$phonemes
+expect_true(all(phonemes$counts.match))
+```
+
+```{r}
+# Write the CSV
+df <- phonemes %>% select(-counts.match)
+head(df)
+write.csv(df, "phoible-counts.csv", row.names = F)
+```
+
+
+```{r}
+# Total counts
+counts <- table(phonemes$phonemes)
+barplot(counts)
+```
+```{r}
+# Total consonants
+counts <- table(phonemes$consonants)
+barplot(counts)
+```
+
+```{r}
+# Total vowels
+counts <- table(phonemes$vowels)
+barplot(counts)
+```
+
+```{r}
+# Total counts
+counts <- table(phonemes$tones)
+barplot(counts)
+```
