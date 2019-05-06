@@ -72,33 +72,28 @@ head(phonemes)
 expect_false(any(is.na(phonemes$consonants)))
 expect_false(any(is.na(phonemes$vowels)))
 
-# Reassign NAs in tones to zero -- TODO: this ignores the fact that we know that UPSID does not contain tone!!
+# Reassign NAs in tones to zero -- this ignores the fact that we know that some sources does not report tone!
 phonemes$tones[is.na(phonemes$tones)] <- 0
-head(phonemes)
-```
 
-    ## # A tibble: 6 x 8
-    ## # Groups:   InventoryID, ISO6393, Glottocode [6]
-    ##   InventoryID ISO6393 Glottocode Source phonemes consonants vowels tones
-    ##         <int> <chr>   <chr>      <chr>     <int>      <int>  <int> <dbl>
-    ## 1           1 kor     kore1280   spa          40         22     18     0
-    ## 2           2 ket     kett1243   spa          32         18     14     0
-    ## 3           3 lbe     lakk1252   spa          69         60      9     0
-    ## 4           4 kbd     kaba1278   spa          56         49      7     0
-    ## 5           5 kat     nucl1302   spa          35         29      6     0
-    ## 6           6 bsk     buru1296   spa          53         38     12     3
-
-``` r
-range(phonemes$tones)
-```
-
-    ## [1]  0 10
-
-``` r
 # Check the counts
 phonemes$counts.match <- phonemes$consonants + phonemes$vowels + phonemes$tones == phonemes$phonemes
 expect_true(all(phonemes$counts.match))
+
+# Mark sources without tones as NA
+phonemes$tones[phonemes$Source=="upsid"] <- NA
+phonemes$tones[phonemes$Source=="saphon"] <- NA
+table(phonemes$tones, exclude = F)
 ```
+
+    ## 
+    ##    0    1    2    3    4    5    6    7    8    9   10 <NA> 
+    ## 1578    7  181  217  123   60   25    7   10    4    2  806
+
+``` r
+range(phonemes$tones, na.rm = TRUE)
+```
+
+    ## [1]  0 10
 
 ``` r
 # Write the CSV
@@ -127,7 +122,7 @@ counts <- table(phonemes$phonemes)
 barplot(counts)
 ```
 
-![](segment-counts_files/figure-markdown_github/unnamed-chunk-9-1.png)
+![](segment-counts_files/figure-markdown_github/unnamed-chunk-8-1.png)
 
 ``` r
 # Total consonants
@@ -135,7 +130,7 @@ counts <- table(phonemes$consonants)
 barplot(counts)
 ```
 
-![](segment-counts_files/figure-markdown_github/unnamed-chunk-10-1.png)
+![](segment-counts_files/figure-markdown_github/unnamed-chunk-9-1.png)
 
 ``` r
 # Total vowels
@@ -143,7 +138,7 @@ counts <- table(phonemes$vowels)
 barplot(counts)
 ```
 
-![](segment-counts_files/figure-markdown_github/unnamed-chunk-11-1.png)
+![](segment-counts_files/figure-markdown_github/unnamed-chunk-10-1.png)
 
 ``` r
 # Total counts
@@ -151,4 +146,4 @@ counts <- table(phonemes$tones)
 barplot(counts)
 ```
 
-![](segment-counts_files/figure-markdown_github/unnamed-chunk-12-1.png)
+![](segment-counts_files/figure-markdown_github/unnamed-chunk-11-1.png)

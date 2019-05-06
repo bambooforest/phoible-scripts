@@ -42,17 +42,20 @@ head(phonemes)
 expect_false(any(is.na(phonemes$consonants)))
 expect_false(any(is.na(phonemes$vowels)))
 
-# Reassign NAs in tones to zero -- TODO: this ignores the fact that we know that UPSID does not contain tone!!
+# Reassign NAs in tones to zero -- this ignores the fact that we know that some sources does not report tone!
 phonemes$tones[is.na(phonemes$tones)] <- 0
-head(phonemes)
-range(phonemes$tones)
-```
 
-```{r}
 # Check the counts
 phonemes$counts.match <- phonemes$consonants + phonemes$vowels + phonemes$tones == phonemes$phonemes
 expect_true(all(phonemes$counts.match))
+
+# Mark sources without tones as NA
+phonemes$tones[phonemes$Source=="upsid"] <- NA
+phonemes$tones[phonemes$Source=="saphon"] <- NA
+table(phonemes$tones, exclude = F)
+range(phonemes$tones, na.rm = TRUE)
 ```
+
 
 ```{r}
 # Write the CSV
