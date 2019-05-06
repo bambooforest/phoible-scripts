@@ -1,7 +1,8 @@
 ---
-title: "PHOIBLE data dump to CLDF 1.0"
+title: "PHOIBLE data dump to CLDF 1.0 specification"
 author: "Steven Moran \\<steven.moran@uzh.ch\\>"
 output: github_document
+date: "\n`r format(Sys.time(), '%d %B, %Y')`"
 ---
   
 ```{r, message=F, warning=F}
@@ -13,10 +14,8 @@ library(digest)
 ```
 
 ```{r}
-# PHOIBLE aggregated data
-## load(url('https://raw.githubusercontent.com/phoible/dev/refactor-agg/data/phoible-by-phoneme.RData'))
-load('../../phoible/data/phoible.RData')
-#
+# PHOIBLE aggregated data (dev)
+load(url('https://github.com/phoible/dev/blob/master/data/phoible.RData?raw=true'))
 expect_equal(nrow(phoible), 105467)
 ```
 
