@@ -221,7 +221,7 @@ glimpse(contributors)
 ```
 
     ## Observations: 10
-    ## Variables: 8
+    ## Variables: 9
     ## $ ID          <fct> aa, gm, ph, ra, saphon, spa, upsid, uz, ea, er
     ## $ Name        <fct> AA, GM, PH, RA, SAPHON, SPA, UPSID, UZ, EA, ER
     ## $ Contributor <fct> "Christian Chanard and Rhonda L. Hartell (AA)", "Chr…
@@ -230,6 +230,7 @@ glimpse(contributors)
     ## $ Citation    <fct> Chanard2006; Hartell1993, Moran_etal2014, Moran_etal…
     ## $ SourceURL   <fct> http://sumale.vjf.cnrs.fr/phono/, , , , http://lingu…
     ## $ URL         <fct> https://github.com/phoible/dev/tree/master/raw-data/…
+    ## $ with_tones  <int> 1, 1, 1, 1, 0, 1, 0, 1, 1, 1
 
 ``` r
 rm(contributors)
