@@ -57,8 +57,8 @@ kable(rings)
 | ɓ̥       | spa;upsid;aa;gm;saphon             |
 | ɓ̥ː      | gm                                 |
 | d̪̤̥       | spa                                |
-| d̺̥       | ea                                 |
 | d̪̥       | ea                                 |
+| d̺̥       | ea                                 |
 | d̤̥       | spa                                |
 | d̥       | uz;ea                              |
 | d̥ː      | ea                                 |
@@ -201,3 +201,53 @@ kable(rings)
 | ˀm̥      | ph                                 |
 | ˀn̪̥      | ph                                 |
 | ˀw̥      | ph                                 |
+
+``` r
+# Check for ambigously placed segments, e.g. ring above and below (awful hack here because copy and pasting diacritics in R studio is problematic)
+syllabic.below <- distinct.segments %>% filter(grepl("̩", Phoneme))
+syllabic.above <- distinct.segments %>% filter(grepl("̍", Phoneme))
+syllabic <- rbind(syllabic.above, syllabic.below)
+syllabic <- syllabic %>% arrange(Phoneme)
+write.csv(syllabic, file="syllabic.csv", row.names = F)
+
+kable(syllabic)
+```
+
+| Phoneme | Sources            |
+|:--------|:-------------------|
+| b̩       | spa                |
+| d̩       | spa                |
+| f̩       | ea                 |
+| ɡ̩       | spa                |
+| ɡb̩      | spa                |
+| ɡ̩ʷ      | spa                |
+| ɣ̩       | spa                |
+| i̩ː      | uz                 |
+| ɟ̰̩       | ph                 |
+| l̩       | spa;ea             |
+| l̪̩       | spa                |
+| ɭ̩       | spa                |
+| m̩       | spa;ph;gm;ra;uz;ea |
+| n̩       | spa;ph;gm;ra;uz;ea |
+| n̪̩       | ea                 |
+| n̠̩d̠ʒ     | gm                 |
+| ɲ̩       | spa                |
+| ŋ̩       | spa;ph;gm;ra;uz;ea |
+| ŋ̩ʷ      | spa                |
+| r̩       | spa;ea             |
+| ɹ̩       | spa;uz             |
+| ɹ̪̩       | ea                 |
+| ɹ̪̰̩       | ea                 |
+| ɹ̪̹̩       | ea                 |
+| ɹ̪̩ˠ      | ea                 |
+| ɻ̩       | ea                 |
+| ɻ̹̩       | ea                 |
+| ɽ̩       | ra                 |
+| s̩       | ea                 |
+| v̩       | spa;ea             |
+| ʋ̩       | ea                 |
+| z̩       | spa;ea             |
+| z̞̩       | spa                |
+| z̞̩ˠ      | spa                |
+| z̞̩̃ˠ      | spa                |
+| ʒ̩       | ea                 |

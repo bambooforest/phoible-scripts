@@ -39,3 +39,14 @@ write.csv(rings, file="rings.csv", row.names = F)
 kable(rings)
 ```
 
+```{r}
+# Check for ambigously placed segments, e.g. ring above and below (awful hack here because copy and pasting diacritics in R studio is problematic)
+syllabic.below <- distinct.segments %>% filter(grepl("̩", Phoneme))
+syllabic.above <- distinct.segments %>% filter(grepl("̍", Phoneme))
+syllabic <- rbind(syllabic.above, syllabic.below)
+syllabic <- syllabic %>% arrange(Phoneme)
+write.csv(syllabic, file="syllabic.csv", row.names = F)
+
+kable(syllabic)
+```
+
