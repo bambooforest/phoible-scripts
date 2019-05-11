@@ -1,31 +1,33 @@
 What's PHOIBLE's coverage of Glottolog?
 ================
 Steven Moran
-15 September, 2018
+11 May, 2019
 
 PHOIBLE data
 ============
 
 ``` r
-phoible.csv <- read.table(url("https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-LanguageCodes.tsv"), sep="\t", header=TRUE, stringsAsFactors = FALSE, quote="\"")
+phoible.csv <- read.csv(url("https://github.com/phoible/dev/raw/master/mappings/InventoryID-LanguageCodes.csv"),  header=TRUE, stringsAsFactors = FALSE, quote="\"")
 glimpse(phoible.csv)
 ```
 
-    ## Observations: 3,016
+    ## Observations: 3,020
     ## Variables: 5
-    ## $ InventoryID  <int> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15...
-    ## $ LanguageCode <chr> "kor", "ket", "lbe", "kbd", "kat", "bsk", "kru", ...
-    ## $ Glottocode   <chr> "kore1280", "kett1243", "lakk1252", "kaba1278", "...
-    ## $ LanguageName <chr> "Korean", "Ket", "Lak", "Kabardian", "Georgian", ...
-    ## $ Source       <chr> "spa", "spa", "spa", "spa", "spa", "spa", "spa", ...
+    ## $ InventoryID  <int> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, …
+    ## $ ISO6393      <chr> "kor", "ket", "lbe", "kbd", "kat", "bsk", "kru", "t…
+    ## $ Glottocode   <chr> "kore1280", "kett1243", "lakk1252", "kaba1278", "nu…
+    ## $ LanguageName <chr> "Korean", "Ket", "Lak", "Kabardian", "Georgian", "B…
+    ## $ Source       <chr> "spa", "spa", "spa", "spa", "spa", "spa", "spa", "s…
+
+``` r
+expect_equal(nrow(phoible.csv), 3020) # latest phoible number of data points
+```
 
 ``` r
 # PHOIBLE inventory data contains duplicate Glottocodes -- remove for coverage analysis
 phoible.gcodes <- phoible.csv %>% select(Glottocode) %>% distinct()
-dim(phoible.gcodes)
+expect_equal(nrow(phoible.gcodes), 2185)
 ```
-
-    ## [1] 2139    1
 
 Glottolog data
 ==============
@@ -231,23 +233,23 @@ glimpse(families.glottocodes)
 
     ## Observations: 8,293
     ## Variables: 17
-    ## $ id                   <chr> "aari1239", "aari1240", "aasa1238", "abad...
-    ## $ family_id            <chr> "sout2845", "book1242", "afro1255", "aust...
-    ## $ parent_id            <chr> "aari1238", "book1242", "unun9872", "west...
-    ## $ name                 <chr> "Aari", "Aariya", "Aasax", "Abadi", "Abag...
-    ## $ bookkeeping          <chr> "False", "True", "False", "False", "False...
-    ## $ level                <chr> "language", "language", "language", "lang...
-    ## $ status               <chr> "safe", "safe", "extinct", "safe", "criti...
-    ## $ latitude             <dbl> 5.950340, NA, -4.006790, -9.033890, -6.12...
-    ## $ longitude            <dbl> 36.57210, NA, 36.86480, 146.99200, 145.66...
-    ## $ iso639P3code         <chr> "aiw", "aay", "aas", "kbt", "abg", "abf",...
-    ## $ description          <lgl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N...
-    ## $ markup_description   <lgl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N...
-    ## $ child_family_count   <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
-    ## $ child_language_count <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
-    ## $ child_dialect_count  <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4, 0, 2,...
-    ## $ country_ids          <chr> "ET", "IN", "TZ", "PG", "PG", "MY", "MY",...
-    ## $ in.phoible           <lgl> TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, ...
+    ## $ id                   <chr> "aari1239", "aari1240", "aasa1238", "abad12…
+    ## $ family_id            <chr> "sout2845", "book1242", "afro1255", "aust13…
+    ## $ parent_id            <chr> "aari1238", "book1242", "unun9872", "west28…
+    ## $ name                 <chr> "Aari", "Aariya", "Aasax", "Abadi", "Abaga"…
+    ## $ bookkeeping          <chr> "False", "True", "False", "False", "False",…
+    ## $ level                <chr> "language", "language", "language", "langua…
+    ## $ status               <chr> "safe", "safe", "extinct", "safe", "critica…
+    ## $ latitude             <dbl> 5.950340, NA, -4.006790, -9.033890, -6.1202…
+    ## $ longitude            <dbl> 36.57210, NA, 36.86480, 146.99200, 145.6650…
+    ## $ iso639P3code         <chr> "aiw", "aay", "aas", "kbt", "abg", "abf", "…
+    ## $ description          <lgl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
+    ## $ markup_description   <lgl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
+    ## $ child_family_count   <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+    ## $ child_language_count <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+    ## $ child_dialect_count  <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4, 0, 2, 0…
+    ## $ country_ids          <chr> "ET", "IN", "TZ", "PG", "PG", "MY", "MY", "…
+    ## $ in.phoible           <lgl> TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FA…
 
 ``` r
 # How many data points in phoible in or not in Glottolog?
@@ -256,7 +258,7 @@ table(families.glottocodes$in.phoible)
 
     ## 
     ## FALSE  TRUE 
-    ##  6342  1951
+    ##  6324  1969
 
 ``` r
 # Which Glottocodes are in phoible are not in the Glottolog?
@@ -265,10 +267,10 @@ table(phoible.gcodes$Glottocode %in% families.glottocodes$id)
 
     ## 
     ## FALSE  TRUE 
-    ##   188  1951
+    ##   216  1969
 
 ``` r
-# 188 FALSE -- some may be due to isolates
+# 216 FALSE -- some may be due to isolates
 ```
 
 ``` r
@@ -284,7 +286,7 @@ in.phoible <- families.glottocodes %>% filter(in.phoible)
 ggplot(data=in.phoible, aes(x=longitude,y=latitude)) + borders("world", colour="gray50", fill="gray50") + geom_point()
 ```
 
-    ## Warning: Removed 7 rows containing missing values (geom_point).
+    ## Warning: Removed 9 rows containing missing values (geom_point).
 
 ![](get_coverage_files/figure-markdown_github/unnamed-chunk-17-1.png)
 
@@ -296,7 +298,7 @@ not.in.phoible <- families.glottocodes %>% filter(!in.phoible)
 ggplot(data=not.in.phoible, aes(x=longitude,y=latitude)) + borders("world", colour="gray50", fill="gray50") + geom_point()
 ```
 
-    ## Warning: Removed 703 rows containing missing values (geom_point).
+    ## Warning: Removed 701 rows containing missing values (geom_point).
 
 ![](get_coverage_files/figure-markdown_github/unnamed-chunk-18-1.png)
 
@@ -310,13 +312,16 @@ table(languages.geo$in.phoible)
 
     ## 
     ## FALSE  TRUE 
-    ##  6348  2023
+    ##  6330  2041
 
 ``` r
 # Get Glottolog macroareas
 # This should be filtered in the Glottolog data extraction script, but just in case
 languages.geo <- languages.geo %>% filter(level=="language") %>% filter(macroarea!="")
 ```
+
+    ## Warning: Detecting old grouped_df format, replacing `vars` attribute by
+    ## `groups`
 
 ``` r
 # Get Glottolog macroarea counts
@@ -353,15 +358,57 @@ kable(macroarea.counts)
 
 | macroarea     |  glottolog.count|  phoible.count|  percentage|
 |:--------------|----------------:|--------------:|-----------:|
-| Africa        |             2338|            692|   0.2959795|
-| Australia     |              383|            261|   0.6814621|
-| Eurasia       |             1966|            417|   0.2121058|
+| Africa        |             2338|            693|   0.2964072|
+| Australia     |              383|            266|   0.6945170|
+| Eurasia       |             1966|            429|   0.2182096|
 | North America |              784|            143|   0.1823980|
-| Papunesia     |             2197|            186|   0.0846609|
-| South America |              703|            324|   0.4608819|
+| Papunesia     |             2197|            185|   0.0842057|
+| South America |              703|            325|   0.4623044|
 
 ``` r
 # We have very poor coverage of "Papunesia"
+```
+
+``` r
+# What's with Australia? There are many data points in phoible that don't seem to match Glottolog
+table(phoible.csv$Source)
+```
+
+    ## 
+    ##     aa     ea     er     gm     ph     ra saphon    spa  upsid     uz 
+    ##    203    390    392    460    389    100    355    197    451     83
+
+``` r
+aus <- languages.geo %>% filter(macroarea=="Australia")
+phoible.aus <- phoible.csv %>% filter(Source=="er") %>% distinct(Glottocode)
+table(phoible.aus$Glottocode %in% aus$glottocode)
+```
+
+    ## 
+    ## FALSE  TRUE 
+    ##    80   260
+
+``` r
+phoible.aus[which(!(phoible.aus$Glottocode %in% aus$glottocode)), ]
+```
+
+    ##  [1] "murr1259" "gund1246" "gune1238" "mura1269" "guma1252" "naia1238"
+    ##  [7] "gari1254" "ilga1238" "ngal1294" "binb1242" "guda1243" "east2380"
+    ## [13] "west2442" "mpar1238" "ayer1246" "yugu1249" "gida1240" "minj1242"
+    ## [19] "waal1238" "wayi1238" "wirr1237" "yuwa1242" "yuwa1243" "jand1248"
+    ## [25] NA         "yaga1262" "kara1508" "ngam1284" "nhir1234" "punt1240"
+    ## [31] "wong1246" "kala1380" "daun1234" "yari1243" "ladj1234" "madh1244"
+    ## [37] "wadi1260" "djad1246" "nari1241" "djab1234" "wemb1241" "wotj1234"
+    ## [43] "kera1256" "ngin1247" "yith1234" "mayi1236" "mayi1235" "bili1250"
+    ## [49] "wany1244" "maln1239" "bibb1234" "gore1235" "kani1276" "pinj1244"
+    ## [55] "ward1248" "waju1234" "ndra1239" "luth1234" "mpal1238" "ulku1238"
+    ## [61] "oyka1239" "gabi1248" "duun1241" "kart1247" "many1256" "pudi1238"
+    ## [67] "wang1288" "kala1378" "kala1377" "maly1234" "wadi1261" "yard1234"
+    ## [73] "dhal1246" "djap1238" "gund1248" "ngar1297" "umii1236" "yawi1239"
+    ## [79] "west2437" "werg1234"
+
+``` r
+# Answer is that these languages don't appear in the geo data and therefore aren't counted... TODO: fix macroarea counts above (they are wrong!).
 ```
 
 By language family
@@ -371,12 +418,29 @@ By language family
 # Get Glottolog family counts
 glottolog.family.counts <- families.glottocodes %>% group_by(family_id) %>% summarize(glottolog.count=n())
 # 241 families without isolates (?)
+
+# Add up Glottolog familes and isolates
+total.family.count <- nrow(glottolog.family.counts) + nrow(isolates)
 ```
 
 ``` r
 # Get phoible family counts
 phoible.family.counts <- families.glottocodes %>% filter(in.phoible) %>% group_by(family_id) %>% summarise(phoible.count=n())
 ```
+
+``` r
+# How much total family coverage does phoible have?
+phoible.total.family.count <- nrow(phoible.family.counts) + nrow(isolates.in.phoible)
+phoible.total.family.count
+```
+
+    ## [1] 246
+
+``` r
+phoible.total.family.count/total.family.count
+```
+
+    ## [1] 0.5734266
 
 ``` r
 # Join the family counts and get percentage
@@ -405,9 +469,9 @@ kable(family.counts)
 | araw1282   |                6|              5|   0.8333333|
 | arti1236   |               16|             NA|          NA|
 | atha1245   |               45|             10|   0.2222222|
-| atla1278   |             1435|            407|   0.2836237|
+| atla1278   |             1435|            408|   0.2843206|
 | aust1305   |              159|             39|   0.2452830|
-| aust1307   |             1276|            112|   0.0877743|
+| aust1307   |             1276|            111|   0.0869906|
 | ayma1253   |                3|              2|   0.6666667|
 | baib1250   |                2|             NA|          NA|
 | bain1263   |                6|              1|   0.1666667|
@@ -558,7 +622,7 @@ kable(family.counts)
 | otom1299   |              180|             17|   0.0944444|
 | paho1240   |                2|             NA|          NA|
 | pala1350   |                2|              1|   0.5000000|
-| pama1250   |              248|            183|   0.7379032|
+| pama1250   |              248|            188|   0.7580645|
 | pano1259   |               45|             23|   0.5111111|
 | pauw1244   |                5|             NA|          NA|
 | peba1241   |                3|              2|   0.6666667|
@@ -576,7 +640,7 @@ kable(family.counts)
 | sepi1257   |               36|              7|   0.1944444|
 | shas1238   |                3|              1|   0.3333333|
 | sign1238   |              183|             NA|          NA|
-| sino1245   |              491|             85|   0.1731161|
+| sino1245   |              491|             95|   0.1934827|
 | siou1252   |               18|              3|   0.1666667|
 | skoo1245   |                9|              3|   0.3333333|
 | soma1242   |                2|             NA|          NA|
@@ -602,7 +666,7 @@ kable(family.counts)
 | toro1256   |               13|             NA|          NA|
 | toto1251   |               12|              3|   0.2500000|
 | tsim1258   |                3|              2|   0.6666667|
-| tuca1253   |               26|             18|   0.6923077|
+| tuca1253   |               26|             19|   0.7307692|
 | tung1282   |               13|              5|   0.3846154|
 | tupi1275   |               71|             48|   0.6760563|
 | tura1263   |                4|             NA|          NA|
@@ -610,7 +674,7 @@ kable(family.counts)
 | tuuu1241   |                8|              1|   0.1250000|
 | unat1236   |               68|             NA|          NA|
 | uncl1493   |              121|              1|   0.0082645|
-| ural1272   |               48|             28|   0.5833333|
+| ural1272   |               48|             30|   0.6250000|
 | uruc1242   |                2|              2|   1.0000000|
 | utoa1244   |               69|             15|   0.2173913|
 | waka1280   |                6|              2|   0.3333333|

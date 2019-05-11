@@ -15,18 +15,20 @@ knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
 library(ggplot2)
 library(knitr)
+library(testthat)
 ```
 
 # PHOIBLE data
 ```{r}
-phoible.csv <- read.table(url("https://raw.githubusercontent.com/phoible/dev/master/mappings/InventoryID-LanguageCodes.tsv"), sep="\t", header=TRUE, stringsAsFactors = FALSE, quote="\"")
+phoible.csv <- read.csv(url("https://github.com/phoible/dev/raw/master/mappings/InventoryID-LanguageCodes.csv"),  header=TRUE, stringsAsFactors = FALSE, quote="\"")
 glimpse(phoible.csv)
+expect_equal(nrow(phoible.csv), 3020) # latest phoible number of data points
 ```
 
 ```{r}
 # PHOIBLE inventory data contains duplicate Glottocodes -- remove for coverage analysis
 phoible.gcodes <- phoible.csv %>% select(Glottocode) %>% distinct()
-dim(phoible.gcodes)
+expect_equal(nrow(phoible.gcodes), 2185)
 ```
 
 # Glottolog data
@@ -92,7 +94,7 @@ table(families.glottocodes$in.phoible)
 ```{r}
 # Which Glottocodes are in phoible are not in the Glottolog?
 table(phoible.gcodes$Glottocode %in% families.glottocodes$id)
-# 188 FALSE -- some may be due to isolates
+# 216 FALSE -- some may be due to isolates
 ```
 
 ```{r}
@@ -142,16 +144,37 @@ kable(macroarea.counts)
 # We have very poor coverage of "Papunesia"
 ```
 
+```{r}
+# What's with Australia? There are many data points in phoible that don't seem to match Glottolog
+table(phoible.csv$Source)
+aus <- languages.geo %>% filter(macroarea=="Australia")
+phoible.aus <- phoible.csv %>% filter(Source=="er") %>% distinct(Glottocode)
+table(phoible.aus$Glottocode %in% aus$glottocode)
+phoible.aus[which(!(phoible.aus$Glottocode %in% aus$glottocode)), ]
+
+# Answer is that these languages don't appear in the geo data and therefore aren't counted... TODO: fix macroarea counts above (they are wrong!).
+```
+
 # By language family
 ```{r}
 # Get Glottolog family counts
 glottolog.family.counts <- families.glottocodes %>% group_by(family_id) %>% summarize(glottolog.count=n())
 # 241 families without isolates (?)
+
+# Add up Glottolog familes and isolates
+total.family.count <- nrow(glottolog.family.counts) + nrow(isolates)
 ```
 
 ```{r}
 # Get phoible family counts
 phoible.family.counts <- families.glottocodes %>% filter(in.phoible) %>% group_by(family_id) %>% summarise(phoible.count=n())
+```
+
+```{r}
+# How much total family coverage does phoible have?
+phoible.total.family.count <- nrow(phoible.family.counts) + nrow(isolates.in.phoible)
+phoible.total.family.count
+phoible.total.family.count/total.family.count
 ```
 
 ````{r}
