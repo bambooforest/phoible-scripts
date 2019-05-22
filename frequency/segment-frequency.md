@@ -436,8 +436,10 @@ temp$Phoneme <- factor(temp$Phoneme, levels = temp$Phoneme)
 # Plot all data points
 ggplot(temp, aes(Phoneme, group=1)) +
   geom_line(aes(y = coverage.x, colour = "PHOIBLE")) + 
-  geom_line(aes(y = coverage.y, colour = "UPSID"))
+  geom_point(aes(y = coverage.y, colour = "UPSID"))
 ```
+
+    ## Warning: Removed 2264 rows containing missing values (geom_point).
 
 ![](segment-frequency_files/figure-markdown_github/unnamed-chunk-25-1.png)
 
