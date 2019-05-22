@@ -1,7 +1,7 @@
 What's PHOIBLE's coverage of Glottolog?
 ================
 Steven Moran
-11 May, 2019
+15 May, 2019
 
 PHOIBLE data
 ============
