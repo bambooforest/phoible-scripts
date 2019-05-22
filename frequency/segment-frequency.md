@@ -16,6 +16,7 @@ theme_set(
 ``` r
 # Get data
 phoible <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/data/phoible.csv', stringsAsFactors = F)
+# phoible <- read.csv('../../phoible/data/phoible.csv', stringsAsFactors = F)
 ```
 
 ``` r
@@ -44,12 +45,12 @@ head(phonemes.sorted)
     ## # Groups:   Phoneme [6]
     ##   Phoneme SegmentClass count coverage
     ##   <chr>   <chr>        <int>    <dbl>
-    ## 1 m       consonant     2914    0.918
-    ## 2 i       vowel         2779    0.875
-    ## 3 k       consonant     2730    0.860
-    ## 4 j       consonant     2716    0.855
-    ## 5 u       vowel         2646    0.833
-    ## 6 a       vowel         2600    0.819
+    ## 1 m       consonant     2914    0.915
+    ## 2 i       vowel         2779    0.873
+    ## 3 k       consonant     2730    0.858
+    ## 4 j       consonant     2716    0.853
+    ## 5 u       vowel         2646    0.831
+    ## 6 a       vowel         2600    0.817
 
 ``` r
 # All phonemes across all inventories in the full sample
@@ -221,21 +222,21 @@ phonemes.per.iso.with.geo <- left_join(phonemes.per.iso, iso.marcoareas)
 phonemes.per.iso.with.geo
 ```
 
-    ## # A tibble: 82,346 x 4
-    ## # Groups:   ISO6393 [?]
-    ##    ISO6393 Phoneme count macroarea
-    ##    <chr>   <chr>   <int> <chr>    
-    ##  1 aae     a           2 Eurasia  
-    ##  2 aae     b           2 Eurasia  
-    ##  3 aae     c           1 Eurasia  
-    ##  4 aae     ç           2 Eurasia  
-    ##  5 aae     d           2 Eurasia  
-    ##  6 aae     ð           2 Eurasia  
-    ##  7 aae     dz          2 Eurasia  
-    ##  8 aae     d̠ʒ          2 Eurasia  
-    ##  9 aae     ə           1 Eurasia  
-    ## 10 aae     ɛ           2 Eurasia  
-    ## # ... with 82,336 more rows
+    ## # A tibble: 82,350 x 4
+    ## # Groups:   ISO6393 [2,100]
+    ##    ISO6393 Phoneme count macroarea    
+    ##    <chr>   <chr>   <int> <chr>        
+    ##  1 <NA>    a          35 South America
+    ##  2 <NA>    a          35 <NA>         
+    ##  3 <NA>    a          35 Eurasia      
+    ##  4 <NA>    a          35 Australia    
+    ##  5 <NA>    a          35 ""           
+    ##  6 <NA>    ã           2 South America
+    ##  7 <NA>    ã           2 <NA>         
+    ##  8 <NA>    ã           2 Eurasia      
+    ##  9 <NA>    ã           2 Australia    
+    ## 10 <NA>    ã           2 ""           
+    ## # … with 82,340 more rows
 
 ``` r
 # How many data points do we have per macroregion (by ISO code)
@@ -255,8 +256,8 @@ y$coverage <- y$count/y$totals
 y
 ```
 
-    ## # A tibble: 5,414 x 5
-    ## # Groups:   macroarea [?]
+    ## # A tibble: 5,421 x 5
+    ## # Groups:   macroarea [6]
     ##    macroarea Phoneme count totals coverage
     ##    <chr>     <chr>   <int>  <int>    <dbl>
     ##  1 Africa    ˥          40    708  0.0565 
@@ -269,7 +270,7 @@ y
     ##  8 Africa    ˦˥          3    708  0.00424
     ##  9 Africa    ˦˦˨         1    708  0.00141
     ## 10 Africa    ˦˧          9    708  0.0127 
-    ## # ... with 5,404 more rows
+    ## # … with 5,411 more rows
 
 ``` r
 z <- left_join(y, phonemes.sorted, by=c("Phoneme"="Phoneme"))
@@ -330,3 +331,88 @@ p + coord_flip()
 ```
 
 ![](segment-frequency_files/figure-markdown_github/unnamed-chunk-20-1.png)
+
+``` r
+# Reshape data for phoneme frequency by area
+library(reshape2)
+head(z)
+```
+
+    ## # A tibble: 6 x 8
+    ## # Groups:   macroarea [1]
+    ##   macroarea Phoneme count.x totals coverage.x count.y coverage.y
+    ##   <chr>     <chr>     <int>  <int>      <dbl>   <int>      <dbl>
+    ## 1 Africa    ˥            40    708    0.0565       77   0.0367  
+    ## 2 Africa    ˥˦            4    708    0.00565      16   0.00762 
+    ## 3 Africa    ˥˧            1    708    0.00141       2   0.000952
+    ## 4 Africa    ˥˨            1    708    0.00141       1   0.000476
+    ## 5 Africa    ˥˨˧           1    708    0.00141       1   0.000476
+    ## 6 Africa    ˥˩           40    708    0.0565       65   0.0310  
+    ## # … with 1 more variable: SegmentClass <chr>
+
+``` r
+# Extract worldwide coverage
+temp <- as.data.frame(z %>% select(Phoneme, coverage.y) %>% ungroup())
+```
+
+    ## Adding missing grouping variables: `macroarea`
+
+``` r
+temp <- temp[,2:3]
+temp <- temp %>% distinct()
+
+# Recast coverage by area
+coverage.by.area <- dcast(z, Phoneme ~ macroarea, value.var = "coverage.x")
+coverage.by.area <- left_join(temp, coverage.by.area)
+```
+
+    ## Joining, by = "Phoneme"
+
+``` r
+colnames(coverage.by.area) <- c("Phoneme", "Worldwide", "Africa", "Australia", "Eurasia", "NorthAmerica", "Papunesia", "SouthAmerica")
+
+coverage.by.area <- coverage.by.area %>% arrange(desc(Worldwide))
+```
+
+``` r
+# By area
+p.test <- coverage.by.area %>% head(n=75)
+p.test$Phoneme <- factor(p.test$Phoneme, levels = p.test$Phoneme)
+
+ggplot(p.test, aes(Phoneme, group=1)) +
+  geom_line(aes(y = Worldwide, colour = "Worldwide"), size=1.5) + 
+  geom_line(aes(y = Africa, colour = "Africa")) + 
+  geom_line(aes(y = Australia, colour = "Australia")) +
+  geom_line(aes(y = Eurasia, colour = "Eurasia")) +
+  geom_line(aes(y = NorthAmerica, colour = "NorthAmerica")) +
+  geom_line(aes(y = Papunesia, colour = "Papunesia")) +
+  geom_line(aes(y = SouthAmerica, colour = "SouthAmerica")) 
+```
+
+![](segment-frequency_files/figure-markdown_github/unnamed-chunk-22-1.png)
+
+``` r
+# By area with points
+ggplot(p.test, aes(Phoneme, group=1)) +
+  geom_line(aes(y = Worldwide, colour = "Worldwide"), size=1.5) + 
+  geom_point(aes(y = Africa, colour = "Africa")) + 
+  geom_point(aes(y = Australia, colour = "Australia")) +
+  geom_point(aes(y = Eurasia, colour = "Eurasia")) +
+  geom_point(aes(y = NorthAmerica, colour = "NorthAmerica")) +
+  geom_point(aes(y = Papunesia, colour = "Papunesia")) +
+  geom_point(aes(y = SouthAmerica, colour = "SouthAmerica")) 
+```
+
+    ## Warning: Removed 1 rows containing missing values (geom_point).
+
+    ## Warning: Removed 6 rows containing missing values (geom_point).
+
+    ## Warning: Removed 2 rows containing missing values (geom_point).
+
+    ## Warning: Removed 3 rows containing missing values (geom_point).
+
+    ## Warning: Removed 1 rows containing missing values (geom_point).
+
+    ## Warning: Removed 1 rows containing missing values (geom_point).
+
+![](segment-frequency_files/figure-markdown_github/unnamed-chunk-23-1.png)

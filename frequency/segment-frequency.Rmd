@@ -13,12 +13,12 @@ library(Cairo)
 theme_set(
   theme_bw()
 )
-
 ```
 
 ```{r}
 # Get data
 phoible <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/data/phoible.csv', stringsAsFactors = F)
+# phoible <- read.csv('../../phoible/data/phoible.csv', stringsAsFactors = F)
 ```
 
 ```{r}
@@ -225,4 +225,81 @@ p <- ggplot(aes(y=coverage.x, x=reorder(Phoneme, count.y), fill=macroarea, group
   ylab("Percentage of data points") +
   scale_fill_manual(values=c(alpha('#4477aa', .8), alpha('#66ccee', .8), alpha('#228833', .8), alpha('#ccbb44', .8), alpha('#ee6677', .8), alpha('#aa3377', .8)))
 p + coord_flip()
+```
+
+```{r}
+# Reshape data for phoneme frequency by area
+library(reshape2)
+head(z)
+
+# Extract worldwide coverage
+temp <- as.data.frame(z %>% select(Phoneme, coverage.y) %>% ungroup())
+temp <- temp[,2:3]
+temp <- temp %>% distinct()
+
+# Recast coverage by area
+coverage.by.area <- dcast(z, Phoneme ~ macroarea, value.var = "coverage.x")
+coverage.by.area <- left_join(temp, coverage.by.area)
+
+colnames(coverage.by.area) <- c("Phoneme", "Worldwide", "Africa", "Australia", "Eurasia", "NorthAmerica", "Papunesia", "SouthAmerica")
+
+coverage.by.area <- coverage.by.area %>% arrange(desc(Worldwide))
+```
+
+```{r}
+# By area
+p.test <- coverage.by.area %>% head(n=75)
+p.test$Phoneme <- factor(p.test$Phoneme, levels = p.test$Phoneme)
+
+ggplot(p.test, aes(Phoneme, group=1)) +
+  geom_line(aes(y = Worldwide, colour = "Worldwide"), size=1.5) + 
+  geom_line(aes(y = Africa, colour = "Africa")) + 
+  geom_line(aes(y = Australia, colour = "Australia")) +
+  geom_line(aes(y = Eurasia, colour = "Eurasia")) +
+  geom_line(aes(y = NorthAmerica, colour = "NorthAmerica")) +
+  geom_line(aes(y = Papunesia, colour = "Papunesia")) +
+  geom_line(aes(y = SouthAmerica, colour = "SouthAmerica")) 
+```
+
+```{r}
+# By area with points
+ggplot(p.test, aes(Phoneme, group=1)) +
+  geom_line(aes(y = Worldwide, colour = "Worldwide"), size=1.5) + 
+  geom_point(aes(y = Africa, colour = "Africa")) + 
+  geom_point(aes(y = Australia, colour = "Australia")) +
+  geom_point(aes(y = Eurasia, colour = "Eurasia")) +
+  geom_point(aes(y = NorthAmerica, colour = "NorthAmerica")) +
+  geom_point(aes(y = Papunesia, colour = "Papunesia")) +
+  geom_point(aes(y = SouthAmerica, colour = "SouthAmerica")) 
+```
+
+```{r}
+# Compare genealogically stratied UPSID sample for PHOIBLE
+
+# Get UPSID counts
+upsid <- phoible %>% filter(Source=="upsid")
+upsid.counts <- upsid %>% select(Phoneme) %>% group_by(Phoneme) %>% summarize(count=n()) %>% arrange(desc(count))
+upsid.counts$coverage <- upsid.counts$count/length(unique(upsid$InventoryID))
+
+# Join with PHOIBLE counts
+temp <- left_join(phonemes.sorted, upsid.counts, by=c("Phoneme"="Phoneme"))
+
+# Reformaulate Phoneme as an order factor
+temp$Phoneme <- factor(temp$Phoneme, levels = temp$Phoneme)
+```
+
+```{r}
+# Plot all data points
+ggplot(temp, aes(Phoneme, group=1)) +
+  geom_line(aes(y = coverage.x, colour = "PHOIBLE")) + 
+  geom_line(aes(y = coverage.y, colour = "UPSID"))
+```
+
+```{r}
+# Plot a subset
+test <- temp %>% head(n=75)
+
+ggplot(test, aes(Phoneme, group=1)) +
+  geom_line(aes(y = coverage.x, colour = "PHOIBLE")) + 
+  geom_point(aes(y = coverage.y, colour = "UPSID"))
 ```
