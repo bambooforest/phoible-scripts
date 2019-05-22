@@ -296,8 +296,8 @@ ggplot(temp, aes(Phoneme, group=1)) +
 ```
 
 ```{r}
-# Plot a subset
-test <- temp %>% head(n=75)
+# Plot a subset of UPSID and PHOIBLE segments
+test <- temp %>% head(n=100)
 
 ggplot(test, aes(Phoneme, group=1)) +
   geom_line(aes(y = coverage.x, colour = "PHOIBLE")) + 

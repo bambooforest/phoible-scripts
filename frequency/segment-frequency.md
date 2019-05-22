@@ -416,3 +416,40 @@ ggplot(p.test, aes(Phoneme, group=1)) +
     ## Warning: Removed 1 rows containing missing values (geom_point).
 
 ![](segment-frequency_files/figure-markdown_github/unnamed-chunk-23-1.png)
+
+``` r
+# Compare genealogically stratied UPSID sample for PHOIBLE
+
+# Get UPSID counts
+upsid <- phoible %>% filter(Source=="upsid")
+upsid.counts <- upsid %>% select(Phoneme) %>% group_by(Phoneme) %>% summarize(count=n()) %>% arrange(desc(count))
+upsid.counts$coverage <- upsid.counts$count/length(unique(upsid$InventoryID))
+
+# Join with PHOIBLE counts
+temp <- left_join(phonemes.sorted, upsid.counts, by=c("Phoneme"="Phoneme"))
+
+# Reformaulate Phoneme as an order factor
+temp$Phoneme <- factor(temp$Phoneme, levels = temp$Phoneme)
+```
+
+``` r
+# Plot all data points
+ggplot(temp, aes(Phoneme, group=1)) +
+  geom_line(aes(y = coverage.x, colour = "PHOIBLE")) + 
+  geom_line(aes(y = coverage.y, colour = "UPSID"))
+```
+
+![](segment-frequency_files/figure-markdown_github/unnamed-chunk-25-1.png)
+
+``` r
+# Plot a subset of UPSID and PHOIBLE segments
+test <- temp %>% head(n=100)
+
+ggplot(test, aes(Phoneme, group=1)) +
+  geom_line(aes(y = coverage.x, colour = "PHOIBLE")) + 
+  geom_point(aes(y = coverage.y, colour = "UPSID"))
+```
+
+    ## Warning: Removed 6 rows containing missing values (geom_point).
+
+![](segment-frequency_files/figure-markdown_github/unnamed-chunk-26-1.png)
