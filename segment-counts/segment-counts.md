@@ -9,7 +9,8 @@ library(testthat)
 
 ``` r
 # Get phoible dev data
-phoible <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/data/phoible.csv', stringsAsFactors = F)
+phoible <- read.csv('/Users/stiv/Github/dev/data/phoible.csv', stringsAsFactors = F)
+# phoible <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/data/phoible.csv', stringsAsFactors = F)
 ```
 
 ``` r
@@ -80,7 +81,8 @@ phonemes$counts.match <- phonemes$consonants + phonemes$vowels + phonemes$tones 
 expect_true(all(phonemes$counts.match))
 
 # Mark sources without tones as NA from CLDF contributors CSV
-contribs <- read.csv('https://raw.githubusercontent.com/bambooforest/phoible-scripts/master/to_cldf/cldf/contributors.csv')
+# contribs <- read.csv('https://raw.githubusercontent.com/bambooforest/phoible-scripts/master/to_cldf/cldf/contributors.csv')
+contribs <- read.csv('/Users/stiv/Github/phoible-scripts/to_cldf/cldf/contributors.csv')
 phonemes <- left_join(phonemes, contribs, by=c("Source"="ID"))
 ```
 
