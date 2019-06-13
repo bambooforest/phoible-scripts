@@ -91,3 +91,17 @@ p
 ```
 
 ![](plot-segment-frequency_files/figure-markdown_github/unnamed-chunk-6-1.png)
+
+``` r
+temp <- head(phonemes.sorted, n=250)
+p <- ggplot(aes(y=coverage, x=reorder(Phoneme, -coverage)), data=temp) +
+  geom_point() +
+  theme(axis.title.y=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  xlab("Phonemes") +
+  ylab("Percentage of data points")
+p
+```
+
+![](plot-segment-frequency_files/figure-markdown_github/unnamed-chunk-7-1.png)
