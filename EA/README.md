@@ -1,3 +1,9 @@
+Note that this code is deprecated. We have been changing:
+
+https://github.com/phoible/dev/blob/master/raw-data/EA/EA_IPA_correspondences.tsv
+
+directly on phoible, and so the data in the two pipelines is no longer aligned. Precede with caution.
+
 # Conversion pipeline to convert the database of Euroasian phonologies to PHOIBLE format
 
 ## To get the data
