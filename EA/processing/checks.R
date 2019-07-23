@@ -4,6 +4,17 @@
 
 library(dplyr)
 
+# Check that the number of inventories in the EA csv dump (from JSON file) is same as in PHOIBLE dev
+
+phoible <- read.csv(url("https://github.com/phoible/dev/blob/master/data/phoible.csv?raw=true"))
+ea.raw <- read.csv(url("https://github.com/bambooforest/phoible-scripts/raw/master/EA/data/raw/phono_dbase.csv"))
+
+ea.raw.counts <- ea.raw %>% group_by(LanguageCode, LanguageName) %>% summarize(count=n())
+phoible.ea.counts <- phoible %>% filter(Source=="ea") %>% group_by(InventoryID, LanguageName) %>% summarize(count=n())
+
+d <- left_join(ea.raw.counts, phoible.ea.counts, by=c("LanguageName"="LanguageName"))
+d$diff <- d$count.x == d$count.y
+d %>% filter(!diff)
 
 
 ##########
