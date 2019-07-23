@@ -84,3 +84,8 @@ kable(index %>% filter(macroarea=="") %>% select(InventoryID, ISO6393, Glottocod
 nrow(index %>% filter(is.na(macroarea)) %>% select(InventoryID, ISO6393, Glottocode, LanguageName, Source, macroarea))
 kable(index %>% filter(is.na(macroarea)) %>% select(InventoryID, ISO6393, Glottocode, LanguageName, Source, macroarea))
 ```
+
+```{r}
+# Write the new index to CSV
+write.csv(index, file = "phoible-index-glottolog.csv", row.names = F)
+```
