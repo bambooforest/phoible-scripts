@@ -78,3 +78,27 @@ p <- ggplot(aes(y=coverage, x=reorder(Phoneme, -coverage)), data=temp) +
   ylab("Percentage of data points")
 p
 ```
+
+```{r}
+temp <- phonemes %>% filter(SegmentClass!="tone")
+p <- ggplot(aes(y=coverage, x=reorder(Phoneme, -coverage), fill=SegmentClass, color=SegmentClass), data=temp) +
+  geom_point() +
+  theme(axis.title.y=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  xlab("Phoneme rank") +
+  ylab("Worldwide frequency of speech sound")
+p
+```
+
+```{r}
+temp <- head(phonemes.sorted, n=220)
+temp <- temp %>% filter(SegmentClass=="consonant")
+p <- ggplot(aes(y=coverage, x=reorder(Phoneme, -coverage)), data=temp) +
+  geom_point() +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  xlab("PHOIBLE rank") +
+  ylab("Worldwide frequency of speech sounds")
+p
+```

@@ -105,3 +105,31 @@ p
 ```
 
 ![](plot-segment-frequency_files/figure-markdown_github/unnamed-chunk-7-1.png)
+
+``` r
+temp <- phonemes %>% filter(SegmentClass!="tone")
+p <- ggplot(aes(y=coverage, x=reorder(Phoneme, -coverage), fill=SegmentClass, color=SegmentClass), data=temp) +
+  geom_point() +
+  theme(axis.title.y=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  xlab("Phoneme rank") +
+  ylab("Worldwide frequency of speech sound")
+p
+```
+
+![](plot-segment-frequency_files/figure-markdown_github/unnamed-chunk-8-1.png)
+
+``` r
+temp <- head(phonemes.sorted, n=220)
+temp <- temp %>% filter(SegmentClass=="consonant")
+p <- ggplot(aes(y=coverage, x=reorder(Phoneme, -coverage)), data=temp) +
+  geom_point() +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  xlab("PHOIBLE rank") +
+  ylab("Worldwide frequency of speech sounds")
+p
+```
+
+![](plot-segment-frequency_files/figure-markdown_github/unnamed-chunk-9-1.png)
