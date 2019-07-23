@@ -1,8 +1,15 @@
 ---
 title: "Get EA inventories-IPA correspondences data for PHOIBLE"
 author: "Steven Moran \\<steven.moran@uzh.ch>"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: github_document
 ---
+
+```{r}
+# NOTE: deprecated!! This file does not contain any changes made directly to the EA_IPA_correspondences.tsv file here:
+  
+# https://github.com/phoible/dev/tree/master/raw-data/EA
+```
 
 ```{r packages, echo=F, message=F}
 library(stringi)

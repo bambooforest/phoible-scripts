@@ -1,33 +1,44 @@
 ---
 title: "Process EA inventory data for PHOIBLE"
 author: "Steven Moran \\<steven.moran@uzh.ch>"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: github_document
 ---
 
+```{r,  message=FALSE}
+library(dplyr)
+library(data.table)
+```
+
 ```{r}
-## Process the inventories
+# Data
 ea.raw <- read.csv("../data/raw/phono_dbase.csv", header=T,  stringsAsFactors=FALSE)
 ```
 
 ```{r}
-## Add PHOIBLE Inventory ID
-library(data.table)
+# Add PHOIBLE Inventory ID
 DT <- data.table(ea.raw)
 DT[, InventoryID := .GRP, by = list(LanguageCode, LanguageName)]
 DT$InventoryID <- DT$InventoryID+2238
 tail(DT)
-DT <- DT[, c(4, 1:3)] # reorder for phoible import
-glimpse(DT)
+
+# Reorder for phoible import
+DT <- DT[, c(4, 1:3)]
+head(DT)
+```
+
+```{r}
+# Trim white space
 DT %>% filter(grepl(" ʑ", Segment))
 DT$Segment <- trimws(DT$Segment)
 DT %>% filter(grepl(" ʑ", Segment))
 ```
 
 ```{r}
-## Check ISO codes
+# Check ISO codes
 iso639.3 <- read.csv("http://www-01.sil.org/iso639-3/iso-639-3.tab", sep="\t")
 u.iso <- unique(iso639.3$Id)
-# EA
+# EA's codes
 ea.iso <- unique(DT$LanguageCode)
 ea <- as.data.frame(ea.iso)
 "drh" %in% ea
@@ -37,18 +48,21 @@ ea %>% filter(!in.iso)
 ```
 
 ```{r}
-## Fix ISO codes
-# Check how many inventories lack codes.
+# Fix ISO codes
+## Check how many inventories lack codes.
 x <- DT[DT$LanguageCode=="0" | DT$LanguageCode=="-"]
 x %>% select(InventoryID) %>% unique() # 39 rows (this is verified via manual inspection)
-# Reassign them to NA.
+## Reassign them to NA.
 DT$LanguageCode[DT$LanguageCode=="0"] <- NA
 DT$LanguageCode[DT$LanguageCode=="-"] <- NA
 DT[DT$LanguageCode=="0" | DT$LanguageCode=="-"] # 0 rows
 ```
+
 ## Write inventories to PHOIBLE format
 ```{r}
+# Recheck whitespace
 DT %>% filter(grepl(" ʑ", Segment))
+
 write.table(DT, file="../data/formatted/EA_inventories.tsv", row.names=FALSE, sep="\t", quote=F)
 ```
 
