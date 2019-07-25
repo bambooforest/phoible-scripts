@@ -1,0 +1,103 @@
+---
+title: "Aggregate HUPC phoible resources and run tests"
+author: "Steven Moran"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  github_document:
+  pandoc_args: --webtex
+---
+
+```{r, message=F}
+library(dplyr)
+library(knitr)
+library(testthat)
+```
+
+## HUPC
+
+```{r}
+inventories <- read.csv("raw-data/PHOIBLE inventories - inventories.csv")
+metadata <- read.csv("raw-data/PHOIBLE inventories - metadata.csv")
+```
+
+## Tests
+
+```{r}
+# How many unique pairings do we have? (TODO: may not be needed if we remove these values from `inventories`)
+ids <- inventories %>% select(Glottocode, LanguageName, FileNames) %>% distinct()
+nrow(ids)
+```
+
+```{r}
+# Are there NAs in the input for Phoneme?
+expect_false(any(is.na(inventories$Phoneme)))
+```
+
+```{r}
+# Check for duplicate phonemes in the input
+inventories %>% group_by(InventoryID, Phoneme, Allophones) %>% filter(n()>1)
+expect_equal(nrow(inventories %>% group_by(InventoryID, Phoneme, Allophones) %>% filter(n()>1)), 0)
+```
+
+```{r}
+# Spot check the number of segments per entry
+inventories.segments <- inventories %>% group_by(InventoryID, LanguageName, FileNames) %>% select(InventoryID, LanguageName, FileNames) %>% summarize(segments = n())
+kable(head(inventories.segments))
+```
+
+```{r}
+# Inventories in the input range this much in size:
+range(inventories.segments$segments)
+```
+
+```{r}
+# Check if all segments in the input are already appear in phoible (i.e. cheap check for phoible conventions)
+phoible <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/data/phoible.csv', header = T, stringsAsFactors = F)
+phoible.segments <- phoible %>% select(Phoneme) %>% distinct()
+
+# Preprocess (drop the brackets for marginal sounds)
+inventories.segments <- inventories %>% select(Phoneme) %>% transmute(Phonemes = gsub("<|>", "", Phoneme)) %>% distinct()
+
+# Which segments in the input are *not* in phoible already?
+inventories.segments[which(!(inventories.segments$Phoneme %in% phoible.segments$Phoneme)),]
+```
+
+```{r}
+# TODO: when these inventories are fully incorporated into phoible this test should pass
+# expect_true(all(ah.segments$Phoneme %in% phoible.segments$Phoneme))
+```
+
+## TODO
+
+```{r}
+# TODO: dump the metadata so that it can be appended easily to phoible mappings
+# TODO: dump the inventories data so that it can be aggregated into phoible
+```
+
+## Old code
+
+```{r}
+## NOTE: This code was to generate the initial IDs, etc., for the shared Google sheet.
+
+## Generate PHOIBLE Inventory IDs -- with dplyr group_indices this apparently recorders by 
+#library(data.table)
+#inventories.ids <- data.table(inventories)
+#inventories.ids[, InventoryID := .GRP, by = list(Glottocode, LanguageName, FileNames)]
+#inventories.ids$InventoryID <- inventories.ids$InventoryID+3021
+
+## Rearrange the columns
+#inventories.ids <- inventories.ids[, c(9, 1:8)] # reorder for phoible import
+#write.csv(inventories.ids, file="inventory-ids.csv")
+
+## How many IDs? (Seems to match above)
+#nrow(inventories.ids %>% select(InventoryID) %>% distinct())
+#idq <- inventories.ids %>% select(InventoryID, Glottocode, FileNames) %>% distinct()
+#write.csv(idq, file="inventories-ids-unique.csv")
+```
+
+```{r}
+# Load in helper functions from phoible
+# source(url('https://raw.githubusercontent.com/phoible/dev/master/scripts/aggregation-helper-functions.R'))
+```
+
+
