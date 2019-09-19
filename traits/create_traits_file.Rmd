@@ -1,0 +1,33 @@
+---
+title: "Create a BayesTrait like traits file for Glottocodes and phonemes"
+author: "Steven Moran"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  github_document:
+  pandoc_args: --webtex
+---
+  
+```{r  echo=FALSE, include=FALSE}
+library(dplyr)
+library(reshape2)
+# library(testthat)
+```
+
+```{r load}
+# Get the phoible data
+load(url('https://github.com/phoible/dev/raw/master/data/phoible.RData'))
+
+# Big assumption here(!): we take the intersection of all phonemes across all doculects as "the language" given a Glottolog code
+gcodes.phonemes <- phoible %>% select(Glottocode, Phoneme) %>% group_by(Glottocode) %>% distinct(Phoneme)
+
+# Drop NA Glottocodes
+gcodes.phonemes <- gcodes.phonemes %>% filter(!is.na(Glottocode))
+
+# Create traits file
+traits <- dcast(gcodes.phonemes, Glottocode~Phoneme)
+traits <- mutate_at(traits, vars(-Glottocode), function(x) ifelse(is.na(x), "N", "Y"))
+rownames(traits) <- traits[,1]
+
+write.csv(traits, file="phoible-glottocode-phonemes.csv", row.names = F)
+save(traits, file="phoible-glottocode-phonemes.Rdata")
+```
