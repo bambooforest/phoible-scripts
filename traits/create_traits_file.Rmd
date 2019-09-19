@@ -10,12 +10,11 @@ output:
 ```{r  echo=FALSE, include=FALSE}
 library(dplyr)
 library(reshape2)
-# library(testthat)
 ```
 
 ```{r load}
-# Get the phoible data
-load(url('https://github.com/phoible/dev/raw/master/data/phoible.RData'))
+# Get the phoible data (here we use the in-development ad-hoc inventories)
+load(url('https://github.com/bambooforest/phoible/raw/ad-hoc/data/phoible.RData'))
 
 # Big assumption here(!): we take the intersection of all phonemes across all doculects as "the language" given a Glottolog code
 gcodes.phonemes <- phoible %>% select(Glottocode, Phoneme) %>% group_by(Glottocode) %>% distinct(Phoneme)
