@@ -72,6 +72,8 @@ inventories.segments[which(!(inventories.segments$Phoneme %in% phoible.segments$
 ```{r}
 # TODO: dump the metadata so that it can be appended easily to phoible mappings
 # TODO: dump the inventories data so that it can be aggregated into phoible
+# TODO: check that the bibtex ids match the metadata sheet
+# TODO: make sure that the filenames match the bibtex keys
 ```
 
 ## Old code
