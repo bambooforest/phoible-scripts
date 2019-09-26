@@ -26,7 +26,9 @@ gcodes.phonemes <- gcodes.phonemes %>% filter(!is.na(Glottocode))
 traits <- dcast(gcodes.phonemes, Glottocode~Phoneme)
 traits <- mutate_at(traits, vars(-Glottocode), function(x) ifelse(is.na(x), "N", "Y"))
 rownames(traits) <- traits[,1]
+colnames(traits)[1] <- "taxa"
 
 write.csv(traits, file="phoible-glottocode-phonemes.csv", row.names = F)
 save(traits, file="phoible-glottocode-phonemes.Rdata")
+rm(gcodes.phonemes, phoible, traits)
 ```
