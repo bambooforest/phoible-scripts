@@ -1,0 +1,36 @@
+---
+title: "What's PHOIBLE's coverage per source?"
+author: "Steven Moran"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  github_document:
+  pandoc_args: --webtex
+---
+  
+```{r, warning=FALSE, message=FALSE}
+library(knitr)
+library(dplyr)
+```
+
+```{r}
+p <- read.csv("../update-index/phoible-index-glottolog.csv")
+```
+
+```{r}
+# Worldwide counts
+kable(table(p$macroarea))
+```
+
+```{r}
+# Counts per area by source
+area.by.source <- table(p$Source, p$macroarea)
+colnames(area.by.source)[1] <- "NAs"
+kable(area.by.source)
+```
+
+```{r}
+# Just the distribution of data points per source in South America
+sa <- p %>% filter(macroarea=="South America")
+sa <- droplevels(sa) # Drop the zero count levels per macroarea
+kable(table(sa$Glottocode, sa$Source))
+```
