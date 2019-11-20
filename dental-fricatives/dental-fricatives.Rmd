@@ -1,0 +1,47 @@
+---
+title: "PHOIBLE dental fricatives"
+author: "Steven Moran \\<steven.moran@uzh.ch\\>"
+output: github_document
+---
+  
+```{r, message=F, warning=F}
+library(dplyr)
+```
+
+```{r}
+# Load the PHOIBLE development data from the GitHub repository
+phoible <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/data/phoible.csv', stringsAsFactors = F)
+
+# Merge in Glottolog 3.3 data that has macroarea data
+geo <- read.csv(url("https://cdstar.shh.mpg.de/bitstreams/EAEA0-E7DE-FA06-8817-0/languages_and_dialects_geo.csv"), stringsAsFactors = FALSE)
+
+phoible <- left_join(phoible, geo, by=c("Glottocode"="glottocode"))
+```
+
+```{r}
+# Which rows in phoible have dental fricatives?
+dental.fricatives <- phoible %>% filter(grepl("θ|ð", Phoneme))
+```
+
+```{r}
+# How many inventories have dental fricatives?
+nrow(dental.fricatives %>% select(InventoryID) %>% distinct())
+```
+
+```{r}
+# How many distinct Glottocodes (languiods, i.e. languages, dialects) have dental fricatives?
+gcodes.dental.fricatives <- dental.fricatives %>% select(Glottocode, macroarea) %>% distinct()
+```
+
+```{r}
+# How are they distributed in phoible?
+distribution.dental.fricatives <- dental.fricatives %>% group_by(Phoneme) %>% summarize(count=n()) %>% arrange(desc(count))
+distribution.dental.fricatives
+```
+
+```{r}
+# How are they distributed via macroarea
+table(gcodes.dental.fricatives$macroarea)
+```
+
+
