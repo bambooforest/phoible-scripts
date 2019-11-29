@@ -1,4 +1,4 @@
-PHOIBLE dental fricatives
+Interdental fricatives cross-linguistically
 ================
 Steven Moran &lt;<steven.moran@uzh.ch>&gt;
 
@@ -17,26 +17,36 @@ phoible <- left_join(phoible, geo, by=c("Glottocode"="glottocode"))
 ```
 
 ``` r
-# Which rows in phoible have dental fricatives?
-dental.fricatives <- phoible %>% filter(grepl("θ|ð", Phoneme))
+# Which rows in phoible have interdental fricatives?
+interdental.fricatives <- phoible %>% filter(grepl("θ|ð", Phoneme))
 ```
 
 ``` r
-# How many inventories have dental fricatives?
-nrow(dental.fricatives %>% select(InventoryID) %>% distinct())
+# How many Glottocodes are there in phoible?
+nrow(phoible %>% select(Glottocode) %>% distinct())
+```
+
+    ## [1] 2185
+
+``` r
+# How many phoible inventories have dental fricatives?
+nrow(interdental.fricatives %>% select(InventoryID) %>% distinct())
 ```
 
     ## [1] 237
 
 ``` r
 # How many distinct Glottocodes (languiods, i.e. languages, dialects) have dental fricatives?
-gcodes.dental.fricatives <- dental.fricatives %>% select(Glottocode, macroarea) %>% distinct()
+gcodes.interdental.fricatives <- interdental.fricatives %>% select(Glottocode, macroarea, latitude, longitude) %>% distinct()
+nrow(gcodes.interdental.fricatives)
 ```
 
+    ## [1] 171
+
 ``` r
-# How are they distributed in phoible?
-distribution.dental.fricatives <- dental.fricatives %>% group_by(Phoneme) %>% summarize(count=n()) %>% arrange(desc(count))
-distribution.dental.fricatives
+# How are they distributed in phoible (across duplicate languages)?
+distribution.interdental.fricatives <- interdental.fricatives %>% group_by(Phoneme) %>% summarize(count=n()) %>% arrange(desc(count))
+distribution.interdental.fricatives
 ```
 
     ## # A tibble: 29 x 2
@@ -56,7 +66,7 @@ distribution.dental.fricatives
 
 ``` r
 # How are they distributed via macroarea
-table(gcodes.dental.fricatives$macroarea)
+table(gcodes.interdental.fricatives$macroarea)
 ```
 
     ## 
@@ -64,3 +74,64 @@ table(gcodes.dental.fricatives$macroarea)
     ##             1            53            28            48            17 
     ##     Papunesia South America 
     ##             9            15
+
+``` r
+library(ggplot2)
+```
+
+    ## Warning: package 'ggplot2' was built under R version 3.5.2
+
+``` r
+temp <- gcodes.interdental.fricatives %>% filter(macroarea!="")
+ggplot(data=temp, aes(x=longitude,y=latitude, fill=macroarea, color=macroarea)) + 
+  borders("world", colour="gray50", fill="gray50") + 
+  geom_point()
+```
+
+    ## Warning: Removed 10 rows containing missing values (geom_point).
+
+![](dental-fricatives_files/figure-markdown_github/unnamed-chunk-9-1.png)
+
+``` r
+# How many proto-languages in BDPROTO have interdental fricatives?
+bdproto <- read.csv(url("https://raw.githubusercontent.com/bdproto/bdproto/master/bdproto.csv"), stringsAsFactors = FALSE)
+
+# Get the interdental fricatives
+bdproto.interdental.fricatives <- bdproto %>% filter(grepl("θ|ð", Phoneme))
+
+# How are they distributed?
+bdproto.distribution.interdental.fricatives <- bdproto.interdental.fricatives %>% group_by(Phoneme) %>% summarize(count=n()) %>% arrange(desc(count))
+bdproto.distribution.interdental.fricatives
+```
+
+    ## # A tibble: 21 x 2
+    ##    Phoneme count
+    ##    <chr>   <int>
+    ##  1 ð          21
+    ##  2 θ          16
+    ##  3 θ̪           6
+    ##  4 ð̪ʲ          5
+    ##  5 θː          4
+    ##  6 ðː          2
+    ##  7 θˁ          2
+    ##  8 ð’          1
+    ##  9 d̪ð̪          1
+    ## 10 ðʲ          1
+    ## # … with 11 more rows
+
+``` r
+# How many distinct Glottocodes (languiods, i.e. languages, dialects) have dental fricatives?
+bdproto.gcodes.interdental.fricatives <- bdproto.interdental.fricatives %>% select(Glottocode) %>% distinct()
+
+# Total unique Glottocodes in BDPROTO
+nrow(bdproto %>% select(Glottocode) %>% distinct())
+```
+
+    ## [1] 188
+
+``` r
+# Glottocodes with interdentals
+nrow(bdproto.gcodes.interdental.fricatives)
+```
+
+    ## [1] 25
