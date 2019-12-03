@@ -1,11 +1,15 @@
 ---
 title: "Interdental fricatives cross-linguistically"
 author: "Steven Moran \\<steven.moran@uzh.ch\\>"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: github_document
 ---
   
 ```{r, message=F, warning=F}
 library(dplyr)
+library(ggplot2)
+library(testthat)
+library(knitr)
 ```
 
 ```{r}
@@ -21,6 +25,23 @@ phoible <- left_join(phoible, geo, by=c("Glottocode"="glottocode"))
 ```{r}
 # Which rows in phoible have interdental fricatives?
 interdental.fricatives <- phoible %>% filter(grepl("θ|ð", Phoneme))
+
+# Assign whether they are voiced or voiceless
+voiceless <- interdental.fricatives %>% filter(grepl("θ", Phoneme)) %>% select(Phoneme) %>% distinct()
+voiced <- interdental.fricatives %>% filter(grepl("ð", Phoneme)) %>% select(Phoneme) %>% distinct()
+
+interdental.fricatives <- interdental.fricatives %>% mutate(voice = ifelse(Phoneme %in% voiceless$Phoneme, FALSE, TRUE))
+interdental.fricatives <- interdental.fricatives %>% mutate(voice = ifelse(Phoneme %in% voiced$Phoneme, TRUE, FALSE))
+
+# Make sure all rows are assigned
+table(interdental.fricatives$voice)
+expect_false(any(is.na(interdental.fricatives$voice)))
+expect_true(nrow(interdental.fricatives %>% filter(voice) %>% select(Phoneme) %>% distinct()) == nrow(voiced))
+expect_true(nrow(interdental.fricatives %>% filter(!voice) %>% select(Phoneme) %>% distinct()) == nrow(voiceless))
+
+# Spot check
+# interdental.fricatives %>% filter(voice) %>% select(Phoneme) %>% distinct()
+# interdental.fricatives %>% filter(!voice) %>% select(Phoneme) %>% distinct()
 ```
 
 ```{r}
@@ -35,14 +56,29 @@ nrow(interdental.fricatives %>% select(InventoryID) %>% distinct())
 
 ```{r}
 # How many distinct Glottocodes (languiods, i.e. languages, dialects) have dental fricatives?
-gcodes.interdental.fricatives <- interdental.fricatives %>% select(Glottocode, macroarea, latitude, longitude) %>% distinct()
+gcodes.interdental.fricatives <- interdental.fricatives %>% select(Glottocode, macroarea, latitude, longitude, voice) %>% distinct()
 nrow(gcodes.interdental.fricatives)
 ```
 
 ```{r}
 # How are they distributed in phoible (across duplicate languages)?
-distribution.interdental.fricatives <- interdental.fricatives %>% group_by(Phoneme) %>% summarize(count=n()) %>% arrange(desc(count))
-distribution.interdental.fricatives
+distribution.interdental.fricatives <- interdental.fricatives %>% group_by(Phoneme, voice) %>% summarize(count=n()) %>% arrange(desc(count))
+kable(distribution.interdental.fricatives)
+```
+
+```{r}
+# Order the frequency counts and plot the distribution of interdentals in the sample
+distribution.interdental.fricatives$Phoneme <- factor(distribution.interdental.fricatives$Phoneme, levels=distribution.interdental.fricatives$Phoneme[order(-distribution.interdental.fricatives$count)])
+
+# qplot(distribution.interdental.fricatives$Phoneme, distribution.interdental.fricatives$count)
+
+p <- ggplot(aes(y=count, x=Phoneme), data=distribution.interdental.fricatives) +
+  geom_bar(stat="identity", width = 0.3, color = "black") +
+  xlab("Segments") +
+  ylab("# of languages") +
+  theme_minimal() +
+  ggtitle("")
+p
 ```
 
 ```{r}
@@ -51,13 +87,39 @@ table(gcodes.interdental.fricatives$macroarea)
 ```
 
 ```{r}
-library(ggplot2)
 temp <- gcodes.interdental.fricatives %>% filter(macroarea!="")
 ggplot(data=temp, aes(x=longitude,y=latitude, fill=macroarea, color=macroarea)) + 
   borders("world", colour="gray50", fill="gray50") + 
   geom_point()
 ```
 
+```{r}
+# Add more maps, e.g. with th vs TH.
+temp <- gcodes.interdental.fricatives %>% filter(macroarea!="")
+ggplot(data=temp, aes(x=longitude,y=latitude, fill=voice, color=voice)) + 
+  borders("world", colour="gray50", fill="gray50") + 
+  geom_point()
+```
+
+```{r}
+# Distribution of interdentals per inventory
+interdental.fricatives.counts <- interdental.fricatives %>% select(InventoryID, Glottocode, Phoneme) %>% group_by(InventoryID, Glottocode) %>% summarize(count=n()) %>% arrange(desc(count))
+qplot(y=interdental.fricatives.counts$count)
+interdental.fricatives %>% filter(Glottocode=="stan1293")
+```
+
+```{r}
+# Which interndetals do languages have?
+kable(interdental.fricatives.counts)
+
+library(tidyr)
+library(stringi)
+
+interdental.fricatives.wide <- interdental.fricatives %>% group_by(InventoryID) %>% summarize(interdentals = paste(Phoneme, collapse = ", "))
+
+interdental.fricatives.counts <- left_join(interdental.fricatives.counts, interdental.fricatives.wide)
+kable(interdental.fricatives.counts)
+```
 
 ```{r}
 # How many proto-languages in BDPROTO have interdental fricatives?
