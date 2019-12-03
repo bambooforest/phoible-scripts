@@ -102,10 +102,9 @@ ggplot(data=temp, aes(x=longitude,y=latitude, fill=voice, color=voice)) +
 ```
 
 ```{r}
-# Distribution of interdentals per inventory
+# Distribution of interdentals per inventory (can't use Glottocode because there are multiple doculects)
 interdental.fricatives.counts <- interdental.fricatives %>% select(InventoryID, Glottocode, Phoneme) %>% group_by(InventoryID, Glottocode) %>% summarize(count=n()) %>% arrange(desc(count))
 qplot(y=interdental.fricatives.counts$count)
-interdental.fricatives %>% filter(Glottocode=="stan1293")
 ```
 
 ```{r}
