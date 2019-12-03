@@ -110,11 +110,6 @@ interdental.fricatives %>% filter(Glottocode=="stan1293")
 
 ```{r}
 # Which interndetals do languages have?
-kable(interdental.fricatives.counts)
-
-library(tidyr)
-library(stringi)
-
 interdental.fricatives.wide <- interdental.fricatives %>% group_by(InventoryID) %>% summarize(interdentals = paste(Phoneme, collapse = ", "))
 
 interdental.fricatives.counts <- left_join(interdental.fricatives.counts, interdental.fricatives.wide)
