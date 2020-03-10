@@ -1,0 +1,96 @@
+---
+title: "Which languages in PHOIBLE have multiple inventories?"
+author: "Steven Moran"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  github_document:
+  pandoc_args: --webtex
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r warning=FALSE, message=FALSE}
+library(testthat)
+library(dplyr)
+library(knitr)
+```
+
+PHOIBLE has both ISO 639-3 language name identifiers (aka language codes) and Glottocodes for most phonological inventories in its dataset:
+
+https://github.com/phoible/dev/blob/master/mappings/InventoryID-LanguageCodes.csv
+
+ISO codes identify language-level entries. Glottocodes identify all languoids, i.e. all families, languages, and dialects. In PHOIBLE, we assign the "lowest" level Glottocode, e.g. the dialect level when it's known for a given phonological inventory.
+
+This means that there are two levels of multiple inventories for data points in PHOIBLE: at the ISO versus the Glottocode levels.
+
+```{r}
+# Get the latest phoible dev data
+load(url('https://github.com/phoible/dev/blob/master/data/phoible.RData?raw=true'))
+expect_equal(nrow(phoible), 105467) # latest phoible number of data points
+```
+
+```{r}
+# Collapse inventories and get each inventory's phoneme count
+counts <- phoible %>% group_by(InventoryID, Glottocode, ISO6393) %>% summarize(phonemes = n()) %>% arrange(ISO6393, Glottocode, phonemes)
+expect_equal(nrow(counts), 3020) # phoible 2.0 has 3020 data points
+```
+
+```{r}
+# Get the distribution of multiple inventories at the ISO level
+dup.iso <- counts %>% group_by(ISO6393) %>% summarize(inventories = n()) %>% arrange(desc(inventories))
+expect_equal(nrow(dup.iso), 2099) # phoible 2.0 number of unique iso codes (should be less than dup glottocodes)
+
+# What's the distribution?
+kable(table(dup.iso$inventories))
+```
+
+```{r}
+# Get the distribution of multiple inventories at the Glottocode level
+dup.glottocodes <- counts %>% group_by(Glottocode) %>% summarize(inventories = n()) %>% arrange(desc(inventories))
+expect_equal(nrow(dup.glottocodes), 2184) # phoible 2.0 number of unique glottocodes
+
+# What's the distribution?
+kable(table(dup.glottocodes$inventories))
+```
+
+```{r}
+# Show some ISO singletons
+single.iso <- dup.iso %>% filter(inventories == 1)
+temp <- left_join(counts, single.iso)
+kable(temp %>% arrange(InventoryID) %>% filter(!is.na(inventories)) %>% head())
+```
+
+
+
+```{r}
+# Do the ranges, means, and stuff for ISO
+temp1 <- counts %>% group_by(ISO6393) %>% summarize(num_inventories = n(), min_phonemes = min(phonemes), max_phonemes = max(phonemes), mean_phonemes = mean(phonemes)) %>% arrange(desc(num_inventories))
+temp2 <- counts %>% group_by(ISO6393) %>% summarize(range = paste(phonemes, collapse=","))
+temp <- left_join(temp1, temp2)
+```
+
+Note range may not be ordered correctly.
+
+```{r}
+kable(temp %>% head(n=20))
+```
+
+```{r}
+# Do the ranges, means, and stuff for Glottocodes
+temp1 <- counts %>% group_by(Glottocode) %>% summarize(num_inventories = n(), min_phonemes = min(phonemes), max_phonemes = max(phonemes), mean_phonemes = mean(phonemes)) %>% arrange(desc(num_inventories))
+temp2 <- counts %>% group_by(Glottocode) %>% summarize(range = paste(phonemes, collapse=","))
+temp <- left_join(temp1, temp2)
+```
+
+Note range may not be ordered correctly.
+
+```{r}
+kable(temp %>% head(n=20))
+```
+
+```{r}
+# Clean up
+rm(list = ls())
+```
