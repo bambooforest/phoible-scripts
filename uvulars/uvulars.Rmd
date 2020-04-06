@@ -1,0 +1,92 @@
+---
+title: "PHOIBLE uvular consonants"
+author: "Steven Moran \\<steven.moran@uzh.ch\\>"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: github_document
+---
+  
+```{r, message=F, warning=F}
+library(dplyr)
+library(knitr)
+library(ggplot2)
+```
+
+```{r}
+# Get PHOIBLE data and merge in Glottolog metadata
+phoible <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/data/phoible.csv', stringsAsFactors = F)
+
+# Merge in Glottolog 4.1 data (https://glottolog.org/meta/downloads)
+languoids <- read.csv('glottolog_languoid.csv/languoid.csv', stringsAsFactors = FALSE) 
+geo <- read.csv("languages_and_dialects_geo.csv", stringsAsFactors = FALSE)
+
+phoible <- left_join(phoible, languoids, by=c("Glottocode"="id"))
+phoible <- left_join(phoible, geo)
+```
+
+```{r}
+# What do we consider retroflexes in PHOIBLE by phonological features?
+# retros.by.features <- phoible %>% filter(coronal %in% "+") %>% filter(anterior %in% "-") %>% select(Phoneme) %>% distinct()
+```
+
+```{r}
+# Which rows in phoible have uvular consonants?
+uvular.consonants <- phoible %>% filter(grepl("q|ɢ|ɴ|ʀ|χ|ʁ|ʛ|ʟ̠", Phoneme))
+
+# What about uvularization of consonants and/or vowels? I.e. < ʶ>
+```
+
+```{r}
+# How many Glottocodes are there in phoible?
+nrow(phoible %>% select(Glottocode) %>% distinct())
+```
+
+```{r}
+# How many phoible inventories have uvular consonants?
+nrow(uvular.consonants %>% select(InventoryID) %>% distinct())
+```
+
+```{r}
+# How many distinct Glottocodes (languiods, i.e. languages, dialects) have uvular.consonants?
+gcodes.uvular.consonants <- uvular.consonants %>% select(Glottocode, macroarea, latitude, longitude) %>% distinct()
+nrow(gcodes.uvular.consonants)
+```
+
+```{r}
+# How are they distributed in phoible (across duplicate languages)?
+distribution.uvular.consonants <- uvular.consonants %>% group_by(Phoneme) %>% summarize(count=n()) %>% arrange(desc(count))
+kable(distribution.uvular.consonants)
+```
+
+```{r}
+# Order the frequency counts and plot the distribution of uvular consonants in the sample
+distribution.uvular.consonants$Phoneme <- factor(distribution.uvular.consonants$Phoneme, levels=distribution.uvular.consonants$Phoneme[order(-distribution.uvular.consonants$count)])
+
+# qplot(distribution.uvular.consonants$Phoneme, distribution.uvular.consonants$count)
+
+p <- ggplot(aes(y=count, x=Phoneme), data=distribution.uvular.consonants) +
+  geom_bar(stat="identity", width = 0.3, color = "black") +
+  xlab("Segments") +
+  ylab("# of languages") +
+  theme_minimal() +
+  ggtitle("")
+p
+```
+
+```{r}
+# How are they distributed via macroarea
+table(gcodes.uvular.consonants$macroarea)
+```
+
+```{r}
+temp <- gcodes.uvular.consonants %>% filter(macroarea!="")
+ggplot(data=temp, aes(x=longitude,y=latitude, fill=macroarea, color=macroarea)) + 
+  borders("world", colour="gray50", fill="gray50") + 
+  geom_point()
+```
+
+```{r}
+# Distribution of uvular consonants per inventory (can't use Glottocode because there are multiple doculects)
+uvular.consonants.counts <- uvular.consonants %>% select(InventoryID, Glottocode, Phoneme) %>% group_by(InventoryID, Glottocode) %>% summarize(count=n()) %>% arrange(desc(count))
+qplot(y=uvular.consonants.counts$count)
+```
+
