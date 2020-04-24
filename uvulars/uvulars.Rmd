@@ -75,14 +75,14 @@ write.csv(df, "uvulars_ejectives.csv", row.names = FALSE)
 
 ```{r}
 # Do any languages contain uvulars that are always marginal? Yes.
-df[which(df$Uvulars==df$Marginal_Uvular),]
-phoible %>% select(InventoryID, Glottocode, LanguageName, Phoneme) %>% filter(InventoryID==354) %>% filter(grepl("q|ɢ|ɴ|ʀ|χ|ʁ|ʛ|ʟ̠", Phoneme))
+kable(df[which(df$Uvulars==df$Marginal_Uvular),])
+kable(phoible %>% select(InventoryID, Glottocode, LanguageName, Phoneme) %>% filter(InventoryID==354) %>% filter(grepl("q|ɢ|ɴ|ʀ|χ|ʁ|ʛ|ʟ̠", Phoneme)))
 ```
 
 ```{r}
 # Do any languages contain ejectives that are always marginal? Yes.
-df[which(df$Ejectives==df$Marginal_Ejective),]
-phoible %>% select(InventoryID, Glottocode, LanguageName, Phoneme) %>% filter(InventoryID==1276) %>% filter(grepl("ʼ", Phoneme))
+kable(df[which(df$Ejectives==df$Marginal_Ejective),])
+kable(phoible %>% select(InventoryID, Glottocode, LanguageName, Phoneme) %>% filter(InventoryID==1276) %>% filter(grepl("ʼ", Phoneme)))
 ```
 
 ## Descriptive
@@ -96,14 +96,14 @@ nrow(uvulars %>% select(InventoryID) %>% distinct())
 
 # How many are marginal?
 nrow(uvulars %>% filter(Marginal) %>% group_by(InventoryID, Marginal)) # 21 rows
-uvulars %>% filter(Marginal) %>% group_by(InventoryID, Marginal)
+kable(uvulars %>% filter(Marginal) %>% group_by(InventoryID, Marginal))
 
 # How many phoible inventories have ejectives?
 nrow(ejectives %>% select(InventoryID) %>% distinct())
 
 # How many are marginal?
-nrow(ejectives %>% filter(Marginal) %>% group_by(InventoryID, Marginal))
-ejectives %>% filter(Marginal) %>% group_by(InventoryID, Marginal) # 23 rows
+nrow(ejectives %>% filter(Marginal) %>% group_by(InventoryID, Marginal)) # 23 rows
+kable(ejectives %>% filter(Marginal) %>% group_by(InventoryID, Marginal))
 ```
 
 ## Exploratory
@@ -155,7 +155,7 @@ uvulars.counts <- uvulars %>% select(InventoryID, Glottocode, Phoneme, macroarea
 qplot(y=uvulars.counts$count)
 
 # How are they distributed via macroarea
-table(uvulars.counts$macroarea)
+kable(table(uvulars.counts$macroarea))
 ```
 
 ```{r}
@@ -165,7 +165,7 @@ ejectives.counts <- ejectives %>% select(InventoryID, Glottocode, Phoneme, macro
 qplot(y=ejectives.counts$count)
 
 # How are they distributed via macroarea
-table(ejectives.counts$macroarea)
+kable(table(ejectives.counts$macroarea))
 ```
 
 
