@@ -1,69 +1,124 @@
 ---
-title: "PHOIBLE uvular consonants"
+title: "PHOIBLE uvular and ejective consonants"
 author: "Steven Moran \\<steven.moran@uzh.ch\\>"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: github_document
 ---
-  
+
+```
+Data format for uvulars and ejectives data:
+
+InventoryID | Glottocode | ... | Uvulars | Ejectives | Marginal_Uvular | ...
+1 | aaaa1111 | ... | 2 | 4 | 1 | ...
+
+```
+
 ```{r, message=F, warning=F}
 library(dplyr)
 library(knitr)
 library(ggplot2)
 ```
 
+## Data prep
+
 ```{r}
 # Get PHOIBLE data and merge in Glottolog metadata
-phoible <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/data/phoible.csv', stringsAsFactors = F)
+# TODO: update to URL
+phoible <- read.csv('~/Github/phoible/data/phoible.csv', stringsAsFactors = F)
 
 # Merge in Glottolog 4.1 data (https://glottolog.org/meta/downloads)
 languoids <- read.csv('glottolog_languoid.csv/languoid.csv', stringsAsFactors = FALSE) 
 geo <- read.csv("languages_and_dialects_geo.csv", stringsAsFactors = FALSE)
-
 phoible <- left_join(phoible, languoids, by=c("Glottocode"="id"))
 phoible <- left_join(phoible, geo)
+rm(geo, languoids)
+
+# Create phoible index
+index <- phoible %>% select(InventoryID, Glottocode, ISO6393, LanguageName, SpecificDialect, Source, family_id, level, status, latitude, longitude, country_ids, macroarea) %>% distinct()
 ```
 
 ```{r}
-# What do we consider retroflexes in PHOIBLE by phonological features?
-# retros.by.features <- phoible %>% filter(coronal %in% "+") %>% filter(anterior %in% "-") %>% select(Phoneme) %>% distinct()
+# Get uvular consonant counts and the number of marginals
+# TODO: What about uvularization of consonants and/or vowels? I.e. < ʶ>
+uvulars <- phoible %>% filter(grepl("q|ɢ|ɴ|ʀ|χ|ʁ|ʛ|ʟ̠", Phoneme))
+uvular.counts <- uvulars %>% group_by(InventoryID) %>% summarize(Uvulars=n())
+uvular.marginals <- uvulars %>% filter(Marginal) %>% group_by(InventoryID) %>% summarize(Marginal_Uvular=n())
 ```
 
 ```{r}
-# Which rows in phoible have uvular consonants?
-uvular.consonants <- phoible %>% filter(grepl("q|ɢ|ɴ|ʀ|χ|ʁ|ʛ|ʟ̠", Phoneme))
-
-# What about uvularization of consonants and/or vowels? I.e. < ʶ>
+# Note that the features +dorsal and +back don't capture uvulars that are palatalized (negates [back])
+t1 <- uvulars %>% select(Phoneme) %>% distinct()
+"χʲ" %in% t1$Phoneme
+t2 <- phoible %>% filter(back=="+" & dorsal=="+") %>% select(Phoneme) %>% distinct()
+"χʲ" %in% t2$Phoneme
+setdiff(t1$Phoneme, t2$Phoneme)
+rm(t1, t2)
 ```
+
+```{r}
+# Get ejectives counts and the number of marginals
+ejectives <- phoible %>% filter(grepl("ʼ", Phoneme))
+ejective.counts <- ejectives %>% group_by(InventoryID) %>% summarize(Ejectives=n())
+ejective.marginals <- ejectives %>% filter(Marginal) %>% group_by(InventoryID) %>% summarize(Marginal_Ejective=n())
+```
+
+```{r}
+# Joins
+df <- left_join(index, uvular.counts)
+df <- left_join(df, uvular.marginals)
+df <- left_join(df, ejective.counts)
+df <- left_join(df, ejective.marginals)
+rm(ejective.counts, ejective.marginals, uvular.counts, uvular.marginals)
+
+write.csv(df, "uvulars_ejectives.csv", row.names = FALSE)
+```
+
+```{r}
+# Do any languages contain uvulars that are always marginal? Yes.
+df[which(df$Uvulars==df$Marginal_Uvular),]
+phoible %>% select(InventoryID, Glottocode, LanguageName, Phoneme) %>% filter(InventoryID==354) %>% filter(grepl("q|ɢ|ɴ|ʀ|χ|ʁ|ʛ|ʟ̠", Phoneme))
+```
+
+```{r}
+# Do any languages contain ejectives that are always marginal? Yes.
+df[which(df$Ejectives==df$Marginal_Ejective),]
+phoible %>% select(InventoryID, Glottocode, LanguageName, Phoneme) %>% filter(InventoryID==1276) %>% filter(grepl("ʼ", Phoneme))
+```
+
+## Descriptive
 
 ```{r}
 # How many Glottocodes are there in phoible?
 nrow(phoible %>% select(Glottocode) %>% distinct())
-```
 
-```{r}
 # How many phoible inventories have uvular consonants?
-nrow(uvular.consonants %>% select(InventoryID) %>% distinct())
+nrow(uvulars %>% select(InventoryID) %>% distinct())
+
+# How many are marginal?
+nrow(uvulars %>% filter(Marginal) %>% group_by(InventoryID, Marginal)) # 21 rows
+uvulars %>% filter(Marginal) %>% group_by(InventoryID, Marginal)
+
+# How many phoible inventories have ejectives?
+nrow(ejectives %>% select(InventoryID) %>% distinct())
+
+# How many are marginal?
+nrow(ejectives %>% filter(Marginal) %>% group_by(InventoryID, Marginal))
+ejectives %>% filter(Marginal) %>% group_by(InventoryID, Marginal) # 23 rows
 ```
 
-```{r}
-# How many distinct Glottocodes (languiods, i.e. languages, dialects) have uvular.consonants?
-gcodes.uvular.consonants <- uvular.consonants %>% select(Glottocode, macroarea, latitude, longitude) %>% distinct()
-nrow(gcodes.uvular.consonants)
-```
+## Exploratory
 
 ```{r}
-# How are they distributed in phoible (across duplicate languages)?
-distribution.uvular.consonants <- uvular.consonants %>% group_by(Phoneme) %>% summarize(count=n()) %>% arrange(desc(count))
-kable(distribution.uvular.consonants)
-```
+# How are uvulars distributed in phoible (across duplicate languages)?
+distribution.uvulars <- uvulars %>% group_by(Phoneme) %>% summarize(count=n()) %>% arrange(desc(count))
+kable(distribution.uvulars)
 
-```{r}
 # Order the frequency counts and plot the distribution of uvular consonants in the sample
-distribution.uvular.consonants$Phoneme <- factor(distribution.uvular.consonants$Phoneme, levels=distribution.uvular.consonants$Phoneme[order(-distribution.uvular.consonants$count)])
+distribution.uvulars$Phoneme <- factor(distribution.uvulars$Phoneme, levels=distribution.uvulars$Phoneme[order(-distribution.uvulars$count)])
 
-# qplot(distribution.uvular.consonants$Phoneme, distribution.uvular.consonants$count)
+# qplot(distribution.uvulars$Phoneme, distribution.uvulars$count)
 
-p <- ggplot(aes(y=count, x=Phoneme), data=distribution.uvular.consonants) +
+p <- ggplot(aes(y=count, x=Phoneme), data=distribution.uvulars) +
   geom_bar(stat="identity", width = 0.3, color = "black") +
   xlab("Segments") +
   ylab("# of languages") +
@@ -73,20 +128,44 @@ p
 ```
 
 ```{r}
-# How are they distributed via macroarea
-table(gcodes.uvular.consonants$macroarea)
+# How are uvulars distributed in phoible (across duplicate languages)?
+distribution.ejectives <- ejectives %>% group_by(Phoneme) %>% summarize(count=n()) %>% arrange(desc(count))
+kable(distribution.ejectives)
+
+# Order the frequency counts and plot the distribution of uvular consonants in the sample
+distribution.ejectives$Phoneme <- factor(distribution.ejectives$Phoneme, levels=distribution.ejectives$Phoneme[order(-distribution.ejectives$count)])
+
+# qplot(distribution.ejectives$Phoneme, distribution.ejectives$count)
+
+p <- ggplot(aes(y=count, x=Phoneme), data=distribution.ejectives) +
+  geom_bar(stat="identity", width = 0.3, color = "black") +
+  xlab("Segments") +
+  ylab("# of languages") +
+  theme_minimal() +
+  ggtitle("")
+p
 ```
 
-```{r}
-temp <- gcodes.uvular.consonants %>% filter(macroarea!="")
-ggplot(data=temp, aes(x=longitude,y=latitude, fill=macroarea, color=macroarea)) + 
-  borders("world", colour="gray50", fill="gray50") + 
-  geom_point()
-```
+
 
 ```{r}
 # Distribution of uvular consonants per inventory (can't use Glottocode because there are multiple doculects)
-uvular.consonants.counts <- uvular.consonants %>% select(InventoryID, Glottocode, Phoneme) %>% group_by(InventoryID, Glottocode) %>% summarize(count=n()) %>% arrange(desc(count))
-qplot(y=uvular.consonants.counts$count)
+uvulars.counts <- uvulars %>% select(InventoryID, Glottocode, Phoneme, macroarea) %>% group_by(InventoryID, Glottocode, macroarea) %>% summarize(count=n()) %>% arrange(desc(count))
+
+qplot(y=uvulars.counts$count)
+
+# How are they distributed via macroarea
+table(uvulars.counts$macroarea)
 ```
+
+```{r}
+# Distribution of ejective per inventory (can't use Glottocode because there are multiple doculects)
+ejectives.counts <- ejectives %>% select(InventoryID, Glottocode, Phoneme, macroarea) %>% group_by(InventoryID, Glottocode, macroarea) %>% summarize(count=n()) %>% arrange(desc(count))
+
+qplot(y=ejectives.counts$count)
+
+# How are they distributed via macroarea
+table(ejectives.counts$macroarea)
+```
+
 
