@@ -1,0 +1,55 @@
+---
+title: "Aggregate Glottolog metadata into PHOIBLE stats"
+author: "Steven Moran"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  github_document:
+  pandoc_args: --webtex
+---
+
+```{r, warning=FALSE, message=FALSE}
+library(dplyr)
+library(knitr)
+```
+
+```{r}
+# See README.md
+phoible <- read.csv('phoible-stats.csv')
+```
+
+```{r}
+# Glottolog languoids data (v 4.2)
+# https://cdstar.shh.mpg.de/bitstreams/EAEA0-18EC-5079-0173-0/glottolog_languoid.csv.zip
+languoids <- read.csv('glottolog_languoid.csv/languoid.csv', header=T, stringsAsFactors=F)
+languoids.cut <- languoids %>% select(id, family_id) %>% distinct()
+# Top level language family ids are empty, so fill them with their ids
+languoids.cut <- mutate(languoids.cut, family_id = ifelse(family_id == "", id, family_id))
+languoids.families <- languoids %>% filter(family_id=="") %>% select(id, name) %>% rename(FamilyName=name)
+
+# Glottolog geo data
+geo <- read.csv('https://cdstar.shh.mpg.de/bitstreams/EAEA0-18EC-5079-0173-0/languages_and_dialects_geo.csv')
+geo <- geo %>% rename(LanguageName=name) %>% select(-isocodes)
+```
+
+```{r}
+# Get WALS data for language genus field (note not all of PHOIBLE's data points are represented in WALS)
+wals <- read.csv('https://github.com/cldf-datasets/wals/raw/master/cldf/languages.csv')
+wals.cut <- wals %>% select(ISO639P3code, Genus)
+```
+
+```{r, warning=FALSE, message=FALSE}
+# Joins
+phoible <- left_join(phoible, geo, by=c("Glottocode"="glottocode"))
+phoible <- left_join(phoible, wals.cut)
+phoible <- left_join(phoible, languoids.cut, by=c("Glottocode"="id"))
+phoible <- left_join(phoible, languoids.families, by=c("family_id"="id"))
+```
+
+```{r}
+# Note that NA in the tones column means that the inventory does not have information about tone (e.g. UPSID inventories).
+phoible %>% head() %>% kable()
+```
+
+```{r}
+write.csv(phoible, file="phoible-aggregated.csv", row.names = FALSE)
+```
