@@ -15,6 +15,8 @@ to create a [summary statistics file](phoible-stats.csv) from PHOIBLE data (Mora
 
 Then run the `aggregate.Rmd` script (see [aggregate.md](aggregate.md)) to aggregate together the PHOIBLE CLDF stats data with metadata from [Glottolog](https://glottolog.org/) (Hammarström et al., 2020) and [WALS](https://github.com/cldf-datasets/wals) (Dryer & Haspelmath, 2014).
 
+The result is the [phoible-aggregated.csv](phoible-aggregated.csv) file with segment counts and geographical and genealogical information about languages in PHOIBLE.
+
 
 ## References
 
