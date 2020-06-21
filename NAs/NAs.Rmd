@@ -1,0 +1,349 @@
+---
+title: "Which data points are NA in PHOIBLE and why?"
+author: "Steven Moran"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  github_document:
+  pandoc_args: --webtex
+---
+
+```{r warning=FALSE, message=FALSE}
+library(dplyr)
+library(knitr)
+library(testthat)
+```
+
+PHOIBLE has both ISO 639-3 language name identifiers (aka language codes) and Glottocodes for most phonological inventories in its dataset:
+
+https://github.com/phoible/dev/blob/master/mappings/InventoryID-LanguageCodes.csv
+
+ISO codes identify language-level entries. Glottocodes identify all languoids, i.e. all families, languages, and dialects. In PHOIBLE, we assign the "lowest" level Glottocode, e.g. the dialect level when it's known for a given phonological inventory.
+
+Some of these codes are assigned NA. In this report, I go through these NAs and discuss why.
+
+Load the phoible inventory index.
+
+```{r}
+phoible <- read.csv('https://github.com/phoible/dev/blob/master/mappings/InventoryID-LanguageCodes.csv?raw=true')
+expect_equal(nrow(phoible), 3020)
+```
+
+First some sanity checks that we are actually loading <NA> correctly.
+
+```{r}
+expect_equal(nrow(phoible %>% filter(Glottocode=="")), 0)
+expect_equal(nrow(phoible %>% filter(Glottocode=="NA")), 0)
+expect_equal(nrow(phoible %>% filter(ISO6393=="")), 0)
+expect_equal(nrow(phoible %>% filter(ISO6393=="NA")), 0)
+```
+
+Which data points for ISO are NA? There are 37 data points.
+
+```{r}
+phoible %>% filter(is.na(ISO6393)) %>% kable()
+```
+
+Are there <NA> Glottocodes independent of <NA> ISO 639-3 codes? No. Both 2281 (Modern Aramaic (Northeastern)) and 2729 (Djindewal) are contained in the set of <NA> ISO 639-3 codes.
+
+```{r}
+phoible %>% filter(is.na(Glottocode)) %>% kable()
+```
+
+All <NA> data points belong to three sources: SAPHON (1), EA (6), and ER (30).
+
+## SAPHON
+
+In SAPHON, Pisamira:
+
+```{r}
+phoible %>% filter(InventoryID == 2143)
+```
+
+has no ISO code because one has not been assigned in the Ethnologue. See:
+
+https://glottolog.org/resource/languoid/id/pisa1245
+
+Specifically (in green box):
+
+"Pisamira, a Tucanoan language of the Eastern Eastern Tucanoan II subgroup ( Thiago Chacon 2014 ), is missing in E16/E17/E18/E19/E20/E21/E22/E23 as a separate language ( María Stella González de Pérez 2000 ). Pisamira is listed under Tucano [tuo] which is of the Eastern Eastern Tucanoan I subgroup and not at all intelligible to Pisamira ( Thiago Chacon 2014 , María Stella González de Pérez 2000 ). See also: Tucano [tuo]."
+
+The Wikipedia page:
+
+https://en.wikipedia.org/wiki/Pisamira_language
+
+states: 
+
+"Pisamira is a Tucanoan language. Ethnologue misidentifies it as a dialect of Tucano.[2]" ([2] Hammarström (2015) Ethnologue 16/17/18th editions: a comprehensive review: online appendices)"
+
+As such, the ISO 639-3 code is labelled None (mis). In ISO 639-3, "mis" is an identifier for "Uncoded languages":
+
+https://iso639-3.sil.org/code/mis
+
+a subset of "Non-language codes":
+
+https://en.wikipedia.org/wiki/ISO_639-3#Non-language_codes
+
+We should consider then labelling 2143 (Pisamira) with ISO 639-3 non-language code "mis". And perhaps other data points, too.
+
+## EA
+
+The <NA> language codes in EA include:
+
+```{r}
+phoible %>% filter(is.na(ISO6393)) %>% filter(Source=="ea") %>% kable()
+```
+
+### Modern Aramaic (Northeastern)
+
+Via Dmitry Nikolaev:
+
+"Modern Aramaic" is a misnomer because Aramaic languages also form a moderately sized subgroup of roughly the same depth, but the authors of this chapter failed to specify where exactly their data had been recorded so I cannot describe them properly. I think that at some point I will retire this record and replace it with more data points from http://kurdistanphonology.info/.
+
+One option is to retire the inventory. Another is to assign it a code along the lines of:
+
+* https://en.wikipedia.org/wiki/Neo-Aramaic_languages
+* https://iso639-3.sil.org/code/aii
+
+Another option is to use ISO 639-3 code "mul" for multiple languages, see:
+
+* https://en.wikipedia.org/wiki/ISO_639-3#Collective_languages
+
+Harald Hammarstrom told me in personal communication that "This describes the Jewish dialect of Amadiya and Zakho".
+
+
+### Lizu
+
+Lacks an ISO 639-3 code:
+
+"Lizu is an Ersuic language not intelligible to Ersu [ers] (or Duoxu) and should be a language separate from the Ersu [ers] entry ( Yu, Dominic 2012: 2 , Katia Chirkova 2014: 107 ). See also: Ersu [ers]."
+
+* https://glottolog.org/resource/languoid/id/lizu1234
+
+
+### Dolakha Newar 
+
+Lacks an ISO 639-3 code:
+
+"E16/E17/E18/E19/E20/E21/E22/E23 has one entry for Newari [new] but the dialects around Dolakha are not mutually intelligible to those in the Kathmandu Valley ( Genetti, Carol 2007: 1 ). Thus the entry should be split into two entries, at least. See also: Kathmandu Valley Newari [new]."
+
+* https://glottolog.org/resource/languoid/id/east2773
+
+
+### Zhongu Tibetan
+
+Lacks an ISO 639-3 code:
+
+"Zhongu, a Tibetic language not intelligible with the Tibetic languages listed in E16/E17/E18/E19/E20/E21/E22/E23, is missing from E16/E17/E18/E19/E20/E21/E22/E23 ( Sun, Tianshin Jackson 2003 )."
+
+* https://glottolog.org/resource/languoid/id/zhon1235
+
+
+### Eastern Khanty (Vakh)
+
+This inventory comes from:
+
+* https://eurphon.info/languages/html?lang_id=89
+
+And lists no ISO code. The reference is listed as:
+
+* Терешкин, Н.И. 1967. Ваховский диалект хантыйского языка (фонетика и морфология). Ленинград: Институт языкознания Академии наук СССР
+
+which transliterates to:
+
+* Tereshkin, N.I. 1967. Wakhovsky dialect of the Khanty language (phonetics and morphology). Leningrad: Institute of Linguistics of the USSR Academy of Sciences
+
+but searching on the author's name in Glottolog returns only:
+
+* https://glottolog.org/resource/reference/id/151064
+* https://glottolog.org/resource/reference/id/178078
+
+The former points to Kazym-Berezover-Suryskarer Khanty [kca]
+
+* https://glottolog.org/resource/languoid/id/khan1273
+
+One option that we discussed is to simply assign [kca] to this data point.
+
+Note I'm not sure where we got the BibTeX key from:
+
+@phdthesis{Desheriev1967,
+	Author = {Терешкин, НИ},
+	Date-Added = {2017-07-09 10:13:10 +0000},
+	Date-Modified = {2017-07-09 10:13:10 +0000},
+	School = {Ленинград: Институт языкознания Академии наук СССР},
+	Title = {Ваховский диалект хантыйского языка (фонетика и морфология)},
+	Year = {1967}}
+	
+but the rest of the entry is OK.
+
+
+### Forest Nenets
+
+Lacks an ISO 639-3 code:
+
+"E16/E17/E18/E19/E20/E21/E22/E23 has an entry Nenets [yrk] combining both Tundra and Forest Nenets, but the two are not intelligible thus require separate entries ( Salminen, Tapani 1997: 13 ). I wish to thank Matthew Dryer for alerting me to this fact. See also: Tundra Nenets [yrk]."
+
+* https://glottolog.org/resource/languoid/id/fore1274
+
+
+## ER
+
+The <NA> language codes in ER include:
+
+```{r}
+phoible %>% filter(is.na(ISO6393)) %>% filter(Source=="er") %>% kable()
+```
+
+## Djindewal
+
+Djindewal has neither an ISO 639-3 code or a Glottocode. It is a strange case because the string "Djindewal" does not occur in this source:
+
+Jefferies, Anthony (2011). Guwar, the language of Moreton Island, and its relationship to the Bandjalang and Yagara subgroups: a case for phylogenetic migratory expansion?. MPhil Thesis, School of Social Science, The University of Queensland.
+
+I emailed Erich Round for clarification.
+
+
+## Extinct and missing from Ethnologue
+
+The ISO 639-3 standard does in fact have language codes for (some) extinct language, i.e. it "attempts to provide as complete an enumeration of languages as possible, including living, extinct, ancient and constructed languages, whether major or minor, written or unwritten":
+
+* https://www.iso.org/standard/39534.html
+
+In the ER inventories above, these are noted by Glottolog to be well attested and lacking an ISO 639-3 code (often the text in the green box is telling of the situation in Pama-Nyungan, e.g. "yet another extinct northern Paman language, is missing from E16/E17/E18/E19/E20/E21/E22/E23"):
+
+* https://glottolog.org/resource/languoid/id/guwa1244
+* https://glottolog.org/resource/languoid/id/mith1236
+* https://glottolog.org/resource/languoid/id/cola1237
+* https://glottolog.org/resource/languoid/id/west2443
+* https://glottolog.org/resource/languoid/id/gudj1237
+* https://glottolog.org/resource/languoid/id/kawa1290
+* https://glottolog.org/resource/languoid/id/kawa1290
+* https://glottolog.org/resource/languoid/id/wala1263
+* https://glottolog.org/resource/languoid/id/tyan1235
+* https://glottolog.org/resource/languoid/id/mbiy1238
+* https://glottolog.org/resource/languoid/id/ngko1236
+* https://glottolog.org/resource/languoid/id/bula1255
+* https://glottolog.org/resource/languoid/id/yulp1239
+* https://glottolog.org/resource/languoid/id/west2443
+* https://glottolog.org/resource/languoid/id/sout2770
+
+If we tag these "mis", we would be in line with the ISO 639-3 code usage. And in the future, we could look for all "mis" to see if they've been created and assigned language codes.
+
+
+## Update ISO 639-3 code (TODO)
+
+These data points do have ISO 639-3 codes (at least now) according to their Glottocodes:
+
+2718
+* https://glottolog.org/resource/languoid/id/warr1257
+* https://iso639-3.sil.org/code/gjm
+
+2727
+* https://glottolog.org/resource/languoid/id/dhud1236
+* https://iso639-3.sil.org/code/ddr
+
+2877
+* https://glottolog.org/resource/languoid/id/pall1243
+* https://iso639-3.sil.org/code/pmd
+
+2884
+* https://glottolog.org/resource/languoid/id/angu1242
+* https://iso639-3.sil.org/code/awg
+
+2921
+* https://glottolog.org/resource/languoid/id/yinw1236
+* https://iso639-3.sil.org/code/yxm
+
+I've created an issue to fix these here:
+
+* https://github.com/phoible/dev/issues/280
+
+There is also a very new ISO change request (just added to the issue above); adopted create [xnm]:
+
+* https://glottolog.org/resource/languoid/id/ngum1253
+* https://iso639-3.sil.org/request/2019-057
+
+
+These two data points hint at there not being an ISO code (i.e. the NOCODE mentioned in the source :
+
+* https://glottolog.org/resource/languoid/id/lowe1402
+* https://glottolog.org/resource/languoid/id/yadh1237
+
+For example, the first "Lower Riverland" states:
+
+"The extinct Lower Riverland language (of the Lower Murray subgroup), is missing ( Moorhouse, Matthew 1886 , George Taplin 1879 , Gordon Grimwade 1975 , Pratt, George 1886 , Michael Horgen 2004 , Taplin, George 1872 , Eyre, Edward John 1845 , Moorhouse, Matthew 1846 )."
+
+Note that "Upper Riverland":
+
+* https://glottolog.org/resource/languoid/id/lowe1402
+
+lacks an ISO code:
+
+"The extinct Upper Riverland of the Lower Murray subgroup is missing from E16/E17/E18/E19/E20/E21/E22/E23 ( Pegler, A. H. 1886 , Michael Horgen 2004 , George Taplin 1879 , Fulford, F. W. 1886 )."
+
+The second data point, the "Yadhaykenu" language:
+
+* https://glottolog.org/resource/languoid/id/yadh1237
+
+is reported as a dialect of "Uradhi" (at least by Wikipedia):
+
+* https://en.wikipedia.org/wiki/Yadhaykenu#:~:text=The%20Yadhaykenu%20language%20was%20a,of%20urra%20for%20'this'.
+* https://en.wikipedia.org/wiki/Uradhi_language
+
+the latter URL points to various ISO and Glottocodes. TODO: decide what to do.
+
+
+## More things to decide
+
+Harald Hammarstrom told me in an email exchange that (2783):
+
+Jardwadjal = Djadjawurrungic [djad1246]
+
+* https://glottolog.org/resource/languoid/id/djad1246
+
+This page has an ISO change request to split this "dialect" into two more dialects, each which now has an ISO code:
+
+* https://glottolog.org/resource/languoid/id/djab1234
+* https://glottolog.org/resource/languoid/id/werg1234
+
+TODO: identify the source and figure out if one of these two fits.
+
+There are also several data points that are "dialects":
+
+* https://glottolog.org/resource/languoid/id/yari1243
+* https://glottolog.org/resource/languoid/id/kera1256
+* https://glottolog.org/resource/languoid/id/ngin1247
+* https://glottolog.org/resource/languoid/id/luth1234
+
+Perhaps we can "go up" the tree and identify their ISO codes.
+
+For these dialects:
+
+* https://glottolog.org/resource/languoid/id/yari1243
+* https://glottolog.org/resource/languoid/id/kera1256
+
+the higher level language "Northern Sunraysia" lacks an ISO code assignment:
+
+* https://glottolog.org/resource/languoid/id/nort2756
+
+it could be assigned "mis".
+
+For the "Ngindadj" dialect:
+
+* https://glottolog.org/resource/languoid/id/ngin1247
+
+its language "Upper Riverland" also lacks an ISO code:
+
+* https://glottolog.org/resource/languoid/id/uppe1415
+
+and could be assigned "mis".
+
+For the "Luthigh" dialect:
+
+* https://glottolog.org/resource/languoid/id/luth1234
+
+its language "Mpalityanh-Luthigh" also lacks an ISO code:
+
+* https://glottolog.org/resource/languoid/id/mpal1237
+
+and could be assigned "mis".
+
