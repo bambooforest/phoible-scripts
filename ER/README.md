@@ -2,7 +2,7 @@
 
 ## Citation
 
-Round, Erich R. 2017. Phonemic inventories of Australia.
+Round, Erich. (2019, September 29). Australian phonemic inventories contributed to PHOIBLE 2.0: Essential explanatory notes (Version 1.0). Zenodo. http://doi.org/10.5281/zenodo.3464333
 
 ## Notes from ER
 
