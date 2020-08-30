@@ -1,0 +1,94 @@
+---
+title: "Identify languages of Ethiopia in PHOIBLE"
+author: "Steven Moran"
+output:
+  github_document:
+  pandoc_args: --webtex
+---
+
+In regard to [issue 299](https://github.com/phoible/dev/issues/299), let's check the status of certain segments in Ethiopian languages.
+
+
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(knitr)
+library(testthat)
+```
+
+Load phoible.
+
+```{r}
+col_types <- cols(InventoryID='i', Marginal='l', .default='c')
+phoible <- read_csv(url('https://github.com/phoible/dev/blob/master/data/phoible.csv?raw=true'), col_types = col_types)
+```
+
+Load Glottolog.
+
+```{r, warning=FALSE, message=FALSE}
+glottolog <- read_csv('glottolog_languoid.csv/languoid.csv')
+```
+
+Subset phoible.
+
+```{r}
+cut <- phoible %>% select(InventoryID, LanguageName, Source, Glottocode) %>% distinct()
+```
+
+Merge in Glottlog.
+
+```{r}
+cut <- left_join(cut, glottolog, by=c("Glottocode"="id"))
+```
+
+Subset languages reportedly spoken in Ethiopia.
+
+```{r}
+cut <- cut %>% filter(grepl("ET", country_ids)) %>% arrange(InventoryID)
+```
+
+There are 72 inventories.
+
+```{r}
+cut %>% kable()
+```
+
+Sascha Völlmin notes that in [Zay](https://phoible.org/inventories/view/1510), [q] should be [k'] (the traditional notation for ejective k' in Ethiopistic studies).
+
+Let's see which of these languages have [q] in the inventories. First get the Ethiopian inventories.
+
+```{r}
+e_inventories <- phoible %>% filter(InventoryID %in% cut$InventoryID)
+
+# Double check that we have the same number of inventories
+expect_equal(nrow(e_inventories %>% select(InventoryID) %>% distinct()), nrow(cut))
+```
+
+Then select the ones with [q].
+
+```{r}
+e_inventories %>% filter(grepl("q", Phoneme)) %>% select(InventoryID, Glottocode, LanguageName, SpecificDialect, Source, Phoneme, Marginal) %>% kable()
+```
+
+I suspect that the sources `spa` and `upsid` are correct, e.g. Awngi (here listed with an inapproriate ethnonym) and Hamar indeed have a uvular [q]:
+
+* https://en.wikipedia.org/wiki/Awngi_language
+* https://en.wikipedia.org/wiki/Hamer_language
+
+And that the source `gm` inventories are potentially incorrect, including Zway. Fulfulde is spoken mainly in West Africa:
+
+* https://en.wikipedia.org/wiki/Fula_language
+
+But we should check the status of [q] there.
+
+Agaw's glottocode:
+
+* https://glottolog.org/resource/languoid/id/qima1242
+
+notes that the dialect is Qimant: 
+
+https://en.wikipedia.org/wiki/Qimant_language
+
+We should also check these sources since both Fula and Qimant seem to lack uvular [q].
+
+The rest of the `gm` languages in Ethiopia need to be checked for systematic transcriptio errors for [q] and any other transcription practices in Ethiopistic studies.
+
