@@ -1,0 +1,43 @@
+---
+title: "Investigate segments that don't part with IPA parser"
+author: "Steven Moran"
+output:
+  github_document:
+  pandoc_args: --webtex
+---
+
+
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(knitr)
+```
+
+```{r}
+col_types <- cols(InventoryID='i', Marginal='l', .default='c')
+phoible <- read_csv(url('https://github.com/phoible/dev/blob/master/data/phoible.csv?raw=true'), col_types = col_types)
+```
+
+```{r}
+segments <- c('N', 'R', 'Rʲ', 'R̪', 'R̪', 'R̪̥', 'R̪̰', 'b̪', 'dʼkxʼ', 'd̠ʒxʼ', 'd̠ʓ', 'd̠ʓʷ', 'd̪ʼkxʼ', 'fʃ', 'hv', 'j̪', 'kɡ', 'k‼', 'k‼x', 'k‼xʼ', 'k‼ʰ', 'k‼ʰʼ', 'k‼ʼ', 'ld', 'm̪', 'm̼', 'pt', 'pʼkxʼ', 'p̪', 'p̼', 'st', 's̻θ', 'tʼkxʼ', 't̠ʃx', 't̠ʆ', 't̠ʆʰ', 't̠ʆʷ', 't̠ʆʷʰ', 't̠ʆʷʼ', 't̪ʙ', 't̪ʼkxʼ', 'v̼', 'xk', 'xʀ̥', 'ŋɡmb', 'ŋ‼', 'ŋ‼ʱ', 'ȴ', 'ȴʷ', 'ȵ', 'ȵʷ', 'ȶ', 'ȶȵ', 'ȶʷ', 'ȶ͈', 'ȶ͉', 'ɡʼkxʼ', 'ɡ‼', 'ɡ‼x', 'ɡ‼xʼ', 'ɡ‼ʱ', 'ɣv', 'ʀʁ', 'ʃt', 'ʆ', 'ʆʷ', 'ʆʷʼ', 'ʆʼ', 'ʍw', 'ʓ', 'ʓʷ', 'ᴅ', 'ᴅ̪', 'ᴅ̪̰')
+
+```
+
+```{r}
+temp <- phoible %>% filter(Phoneme %in% segments) %>% select(InventoryID, Glottocode, LanguageName, Source, Phoneme) %>% arrange(Phoneme)
+```
+
+```{r}
+temp %>% group_by(Source) %>% summarize(count=n()) %>% kable()
+```
+
+```{r}
+temp %>% group_by(Phoneme) %>% filter(Source=="ea") %>% summarize(count = n()) %>% arrange(desc(count)) %>% kable()
+```
+
+```{r}
+temp %>% group_by(Phoneme) %>% filter(Source=="er") %>% summarize(count = n()) %>% arrange(desc(count)) %>% kable()
+```
+
+```{r}
+phoible %>% filter(Phoneme == "ȵ") %>% kable()
+```
