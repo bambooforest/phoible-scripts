@@ -35,9 +35,22 @@ temp %>% group_by(Phoneme) %>% filter(Source=="ea") %>% summarize(count = n()) %
 ```
 
 ```{r}
+phoible %>% filter(Phoneme == "d̠ʓʷ" )%>% select(InventoryID, Glottocode, LanguageName, Source, Phoneme)
+```
+
+
+```{r}
 temp %>% group_by(Phoneme) %>% filter(Source=="er") %>% summarize(count = n()) %>% arrange(desc(count)) %>% kable()
 ```
 
 ```{r}
-phoible %>% filter(Phoneme == "ȵ") %>% kable()
+phoible %>% filter(Phoneme == "ȵ") %>% head() %>% kable()
+```
+
+```{r}
+phoible %>% filter(Phoneme == "m̪")%>% kable()
+```
+
+```{r}
+phoible %>% filter(InventoryID == 1359) %>% select(LanguageName, Phoneme) %>% kable()
 ```
