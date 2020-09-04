@@ -1,0 +1,55 @@
+---
+title: "Investigate segments in ER"
+author: "Steven Moran"
+output:
+  github_document:
+  pandoc_args: --webtex
+---
+
+Let's look at the segment types in ER and their feature values.
+
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(knitr)
+```
+
+Load phoible dev.
+
+```{r}
+col_types <- cols(InventoryID='i', Marginal='l', .default='c')
+phoible <- read_csv(url('https://github.com/phoible/dev/blob/master/data/phoible.csv?raw=true'), col_types = col_types)
+```
+
+Get ER segment types and their counts.
+
+```{r}
+er_counts <- phoible %>% filter(Source=="er") %>% select(Phoneme) %>% group_by(Phoneme) %>% summarize(count = n()) %>% arrange(desc(count))
+```
+
+```{r}
+er_counts %>% kable()
+```
+
+Lets' grab the features.
+
+```{r}
+temp <- phoible %>% filter(Phoneme %in% er_counts$Phoneme)
+temp <- temp %>% select(-1,-2,-3,-4,-5,-6,-8,-9,-11)
+temp <- temp %>% group_by(Phoneme) %>% distinct()
+```
+
+```{r}
+temp %>% arrange(Phoneme) %>% kable()
+```
+
+Write to CSV.
+
+```{r}
+write_csv(temp, 'er_segments_features.csv')
+```
+
+Looks at just a few relevant Australian phonological features.
+
+```{r}
+temp %>% select(Phoneme, coronal, anterior, distributed) %>% arrange(Phoneme) %>% kable()
+```
