@@ -1,0 +1,91 @@
+---
+title: "Advanced front vowel?"
+author: "Steven Moran \\<steven.moran@unine.ch\\>"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: github_document
+---
+  
+```{r, message=F, warning=F}
+library(tidyverse)
+library(knitr)
+```
+
+# Overview
+
+A question regarding [a̟]: as an advanced front vowel is raised here:
+
+https://linguistics.stackexchange.com/questions/37345/a%cc%9f-advanced-front-vowel
+
+
+So in which inventory/ies does it occur and why?
+
+Load the PHOIBLE development data from the GitHub repository.
+
+```{r}
+phoible <- read_csv(url('https://github.com/phoible/dev/blob/master/data/phoible.csv?raw=true'), col_types=c(InventoryID='i', Marginal='l', .default='c'))
+```
+
+Get just the rows that contain an advanced [a].
+
+```{r}
+advanced_a <- phoible %>% filter(grepl("a̟", Phoneme))
+```
+
+Trim it down a bit to check if it's something that's source-specific.
+
+```{r}
+advanced_a %>% select(InventoryID, Glottocode, ISO6393, LanguageName, Source, Phoneme) %>% kable()
+```
+
+It's mainly in SPA and UPSID (with two data points in EA).
+
+## EA
+
+[EA](http://eurasianphonology.info/) lists all its segments [here](http://eurasianphonology.info/segments). In the "Plain series" for vowels, advanced a is listed under "near-front central". It is found in [Saami](http://eurasianphonology.info/search_exact?dialects=True&query=a%CC%9F)
+
+In the [pre-release version of EA](https://eurphon.info/), [Catalan (Mallorcan)](https://eurphon.info/languages/html?lang_id=443) also had the advanced [a]. The inventory seems to have been removed in the stable version of EA. The inventory source:
+
+* Lloret, Maria-Rosa. 2011. La fonologia del català. Col. «El que sabem de...» Articles de suport a la docència. Barcelona: Santillana.
+
+
+## UPSID
+
+In UPSID, the conversion from ASCII representations to Unicode IPA shows that:
+
+* [low front unrounded vowel](https://github.com/phoible/dev/blob/master/raw-data/UPSID/UPSID_IPA_correspondences.tsv#L819) is encoded as <a+>
+
+and
+
+* [low central unrounded vowel](https://github.com/phoible/dev/blob/master/raw-data/UPSID/UPSID_IPA_correspondences.tsv#L809) as <a>
+
+The low front unrounded vowel is reported in 26 languages (our of 451):
+
+* http://menzerath.phonetik.uni-frankfurt.de/S/S0302.html
+
+
+## SPA
+
+The [IPA correspondences in SPA](https://github.com/phoible/dev/blob/master/raw-data/SPA/SPA_IPA_correspondences.tsv) are more detailed than UPSID because SPA contains a rich set of allophonic (phonetic) descriptions.
+
+Here we also have an "a" vs "a-front" distinction:
+
+* https://github.com/phoible/dev/blob/master/raw-data/SPA/SPA_IPA_correspondences.tsv#L1536-L1537
+
+
+## Contrastive?
+
+Let's look and see if there is an "a" vs "a-front" phonemic contrast in any of these languages.
+
+```{r}
+df <- phoible %>% filter(InventoryID %in% advanced_a$InventoryID) %>% select(InventoryID, Glottocode, ISO6393, LanguageName, SpecificDialect, Source, Phoneme, Allophones, SegmentClass)
+df %>% filter(grepl("a", Phoneme)) %>% kable()
+```
+
+And indeed there is -- although not in every case of "a" vs "a-advanced".
+
+
+
+
+
+
+
