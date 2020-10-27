@@ -1,6 +1,7 @@
 ---
 title: "Investigate segments in ER"
 author: "Steven Moran"
+date: "(`r format(Sys.time(), '%d %B, %Y')`)"
 output:
   github_document:
   pandoc_args: --webtex
@@ -30,7 +31,7 @@ er_counts <- phoible %>% filter(Source=="er") %>% select(Phoneme) %>% group_by(P
 er_counts %>% kable()
 ```
 
-Lets' grab the features.
+Let's grab the features.
 
 ```{r}
 temp <- phoible %>% filter(Phoneme %in% er_counts$Phoneme)
@@ -39,7 +40,7 @@ temp <- temp %>% group_by(Phoneme) %>% distinct()
 ```
 
 ```{r}
-temp %>% arrange(Phoneme) %>% kable()
+temp %>% arrange(Phoneme) %>% kable() %>% head()
 ```
 
 Write to CSV.
@@ -48,8 +49,32 @@ Write to CSV.
 write_csv(temp, 'er_segments_features.csv')
 ```
 
-Looks at just a few relevant Australian phonological features.
+Let's look at just a few relevant Australian phonological features.
 
 ```{r}
 temp %>% select(Phoneme, coronal, anterior, distributed) %>% arrange(Phoneme) %>% kable()
 ```
+
+Let's look at the various n segments.
+
+```{r}
+n_segments <- temp %>% select(Phoneme, SegmentClass, nasal) %>% filter(nasal == "+") %>% filter(SegmentClass == "consonant")
+n_segments <- n_segments %>% filter(!grepl("m", Phoneme))
+```
+
+```{r}
+n_segments <- temp %>% filter(Phoneme %in% n_segments$Phoneme) %>% distinct()
+```
+
+How do they compare?
+
+```{r}
+n_segments %>% kable()
+```
+
+Whittle down the features.
+
+```{r}
+n_segments %>% select(Phoneme, coronal, anterior, distributed, dorsal, high, low, front, back, round) %>% kable()
+```
+
