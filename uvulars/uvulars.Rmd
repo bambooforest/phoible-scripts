@@ -1,6 +1,6 @@
 ---
 title: "PHOIBLE uvular and ejective consonants"
-author: "Steven Moran \\<steven.moran@uzh.ch\\>"
+author: "Steven Moran"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: github_document
 ---
@@ -34,7 +34,9 @@ phoible <- left_join(phoible, geo)
 rm(geo, languoids)
 
 # Create phoible index
-index <- phoible %>% select(InventoryID, Glottocode, ISO6393, LanguageName, SpecificDialect, Source, family_id, level, status, latitude, longitude, country_ids, macroarea) %>% distinct()
+index <- phoible %>% select(InventoryID, Glottocode, ISO6393, name, LanguageName, SpecificDialect, Source, family_id, level, status, latitude, longitude, country_ids, macroarea) %>% distinct()
+
+index <- index %>% rename(GlottologName = name, PhoibleName = LanguageName)
 ```
 
 ```{r}

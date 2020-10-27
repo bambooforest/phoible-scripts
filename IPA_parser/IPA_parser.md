@@ -1,6 +1,7 @@
 Investigate segments that don’t part with IPA parser
 ================
 Steven Moran
+(27 October, 2020)
 
     library(tidyverse)
     library(knitr)
@@ -21,7 +22,7 @@ Steven Moran
 | aa     |     1 |
 | ea     |    31 |
 | er     |  1059 |
-| gm     |    29 |
+| gm     |    25 |
 | ph     |     2 |
 | saphon |    11 |
 | spa    |     1 |
@@ -87,29 +88,28 @@ Steven Moran
 
     phoible %>% filter(Phoneme == "m̪")%>% kable()
 
-| InventoryID | Glottocode | ISO6393 | LanguageName | SpecificDialect | GlyphID   | Phoneme | Allophones | Marginal | SegmentClass | Source | tone | stress | syllabic | short | long | consonantal | sonorant | continuant | delayedRelease | approximant | tap | trill | nasal | lateral | labial | round | labiodental | coronal | anterior | distributed | strident | dorsal | high | low | front | back | tense | retractedTongueRoot | advancedTongueRoot | periodicGlottalSource | epilaryngealSource | spreadGlottis | constrictedGlottis | fortis | raisedLarynxEjective | loweredLarynxImplosive | click |
-|------------:|:-----------|:--------|:-------------|:----------------|:----------|:--------|:-----------|:---------|:-------------|:-------|:-----|:-------|:---------|:------|:-----|:------------|:---------|:-----------|:---------------|:------------|:----|:------|:------|:--------|:-------|:------|:------------|:--------|:---------|:------------|:---------|:-------|:-----|:----|:------|:-----|:------|:--------------------|:-------------------|:----------------------|:-------------------|:--------------|:-------------------|:-------|:---------------------|:-----------------------|:------|
-|        1359 | shil1265   | shk     | Shilluk      | NA              | 006D+032A | m̪       | m̪          | FALSE    | consonant    | gm     | 0    | \-     | \-       | \-    | \-   | \+          | \+       | \-         | 0              | \-          | \-  | \-    | \+    | \-      | \+     | \-    | \-          | \+      | \+       | \+          | 0        | \-     | 0    | 0   | 0     | 0    | 0     | 0                   | 0                  | \+                    | \-                 | \-            | \-                 | \-     | \-                   | \-                     | \-    |
+| InventoryID | Glottocode | ISO6393 | LanguageName | SpecificDialect | GlyphID | Phoneme | Allophones | Marginal | SegmentClass | Source | tone | stress | syllabic | short | long | consonantal | sonorant | continuant | delayedRelease | approximant | tap | trill | nasal | lateral | labial | round | labiodental | coronal | anterior | distributed | strident | dorsal | high | low | front | back | tense | retractedTongueRoot | advancedTongueRoot | periodicGlottalSource | epilaryngealSource | spreadGlottis | constrictedGlottis | fortis | raisedLarynxEjective | loweredLarynxImplosive | click |
+|------------:|:-----------|:--------|:-------------|:----------------|:--------|:--------|:-----------|:---------|:-------------|:-------|:-----|:-------|:---------|:------|:-----|:------------|:---------|:-----------|:---------------|:------------|:----|:------|:------|:--------|:-------|:------|:------------|:--------|:---------|:------------|:---------|:-------|:-----|:----|:------|:-----|:------|:--------------------|:-------------------|:----------------------|:-------------------|:--------------|:-------------------|:-------|:---------------------|:-----------------------|:------|
 
     phoible %>% filter(InventoryID == 1359) %>% select(LanguageName, Phoneme) %>% kable()
 
 | LanguageName | Phoneme |
 |:-------------|:--------|
 | Shilluk      | b       |
-| Shilluk      | b̪       |
+| Shilluk      | cç      |
 | Shilluk      | d       |
+| Shilluk      | d̪       |
 | Shilluk      | f       |
 | Shilluk      | h       |
 | Shilluk      | j       |
 | Shilluk      | k       |
 | Shilluk      | l       |
 | Shilluk      | m       |
-| Shilluk      | m̪       |
 | Shilluk      | n       |
+| Shilluk      | n̪       |
 | Shilluk      | p       |
-| Shilluk      | p̪       |
 | Shilluk      | t       |
-| Shilluk      | tç      |
+| Shilluk      | t̪       |
 | Shilluk      | w       |
 | Shilluk      | x       |
 | Shilluk      | ð       |
@@ -149,3 +149,6 @@ Steven Moran
 | Shilluk      | ɪː      |
 | Shilluk      | ʊ       |
 | Shilluk      | ʊː      |
+
+    temp <- phoible %>% filter(Phoneme == "ɲ̟")
+    write_csv(temp, 'temp.csv')

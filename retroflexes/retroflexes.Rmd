@@ -1,6 +1,7 @@
 ---
 title: "PHOIBLE retroflexes in South Asia"
-author: "Steven Moran \\<steven.moran@uzh.ch\\>"
+author: "Steven Moran"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: github_document
 ---
   
@@ -14,7 +15,7 @@ phoible <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/data/p
 
 # Merge in Glottolog 3.3 data
 # https://cdstar.shh.mpg.de/bitstreams/EAEA0-E7DE-FA06-8817-0/glottolog_languoid.csv.zip
-languoids <- read.csv('../data/glottolog_languoid.csv/languoid.csv', stringsAsFactors = FALSE) 
+languoids <- read.csv('../glottolog_languoid.csv/languoid.csv', stringsAsFactors = FALSE) 
 geo <- read.csv(url("https://cdstar.shh.mpg.de/bitstreams/EAEA0-E7DE-FA06-8817-0/languages_and_dialects_geo.csv"), stringsAsFactors = FALSE)
 
 phoible <- left_join(phoible, languoids, by=c("Glottocode"="id"))

@@ -1,6 +1,7 @@
 ---
 title: "Investigate segments that don't part with IPA parser"
 author: "Steven Moran"
+date: "(`r format(Sys.time(), '%d %B, %Y')`)"
 output:
   github_document:
   pandoc_args: --webtex
@@ -53,4 +54,9 @@ phoible %>% filter(Phoneme == "m̪")%>% kable()
 
 ```{r}
 phoible %>% filter(InventoryID == 1359) %>% select(LanguageName, Phoneme) %>% kable()
+```
+
+```{r}
+temp <- phoible %>% filter(Phoneme == "ɲ̟")
+write_csv(temp, 'temp.csv')
 ```
