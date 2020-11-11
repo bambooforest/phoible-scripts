@@ -1,19 +1,46 @@
-Investigate segments that don’t part with IPA parser
+Investigate segments that don’t parse with IPA parser
 ================
 Steven Moran
-(27 October, 2020)
+(11 November, 2020)
 
     library(tidyverse)
     library(knitr)
 
-    col_types <- cols(InventoryID='i', Marginal='l', .default='c')
-    phoible <- read_csv(url('https://github.com/phoible/dev/blob/master/data/phoible.csv?raw=true'), col_types = col_types)
+# Overview
 
-    segments <- c('N', 'R', 'Rʲ', 'R̪', 'R̪', 'R̪̥', 'R̪̰', 'b̪', 'dʼkxʼ', 'd̠ʒxʼ', 'd̠ʓ', 'd̠ʓʷ', 'd̪ʼkxʼ', 'fʃ', 'hv', 'j̪', 'kɡ', 'k‼', 'k‼x', 'k‼xʼ', 'k‼ʰ', 'k‼ʰʼ', 'k‼ʼ', 'ld', 'm̪', 'm̼', 'pt', 'pʼkxʼ', 'p̪', 'p̼', 'st', 's̻θ', 'tʼkxʼ', 't̠ʃx', 't̠ʆ', 't̠ʆʰ', 't̠ʆʷ', 't̠ʆʷʰ', 't̠ʆʷʼ', 't̪ʙ', 't̪ʼkxʼ', 'v̼', 'xk', 'xʀ̥', 'ŋɡmb', 'ŋ‼', 'ŋ‼ʱ', 'ȴ', 'ȴʷ', 'ȵ', 'ȵʷ', 'ȶ', 'ȶȵ', 'ȶʷ', 'ȶ͈', 'ȶ͉', 'ɡʼkxʼ', 'ɡ‼', 'ɡ‼x', 'ɡ‼xʼ', 'ɡ‼ʱ', 'ɣv', 'ʀʁ', 'ʃt', 'ʆ', 'ʆʷ', 'ʆʷʼ', 'ʆʼ', 'ʍw', 'ʓ', 'ʓʷ', 'ᴅ', 'ᴅ̪', 'ᴅ̪̰')
+Some segments in PHOIBLE don’t parse with Dmitry Nikolaev’s IPA parser:
 
-    temp <- phoible %>% filter(Phoneme %in% segments) %>% select(InventoryID, Glottocode, LanguageName, Source, Phoneme) %>% arrange(Phoneme)
+-   <a href="https://github.com/macleginn/consonant-inventory-gaps" class="uri">https://github.com/macleginn/consonant-inventory-gaps</a>
 
-    temp %>% group_by(Source) %>% summarize(count=n()) %>% kable()
+Full stats are given here:
+
+-   <a href="https://github.com/macleginn/consonant-inventory-gaps/blob/master/stats.csv" class="uri">https://github.com/macleginn/consonant-inventory-gaps/blob/master/stats.csv</a>
+
+The most frequent segments that don’t parse, some highlighted below,
+include:
+
+-   symbols with the curl in ER’s Australian data (these are currently
+    being discussed with E. Round)
+-   archi-phonemes like R, N
+-   the flap symbol in UPSID
+-   clicks
+
+In this short report, I investigate these.
+
+    col_types <- cols(InventoryID = "i", Marginal = "l", .default = "c")
+    phoible <- read_csv(url("https://github.com/phoible/dev/blob/master/data/phoible.csv?raw=true"), col_types = col_types)
+
+    segments <- c("N", "R", "Rʲ", "R̪", "R̪", "R̪̥", "R̪̰", "b̪", "dʼkxʼ", "d̠ʒxʼ", "d̠ʓ", "d̠ʓʷ", "d̪ʼkxʼ", "fʃ", "hv", "j̪", "kɡ", "k‼", "k‼x", "k‼xʼ", "k‼ʰ", "k‼ʰʼ", "k‼ʼ", "ld", "m̪", "m̼", "pt", "pʼkxʼ", "p̪", "p̼", "st", "s̻θ", "tʼkxʼ", "t̠ʃx", "t̠ʆ", "t̠ʆʰ", "t̠ʆʷ", "t̠ʆʷʰ", "t̠ʆʷʼ", "t̪ʙ", "t̪ʼkxʼ", "v̼", "xk", "xʀ̥", "ŋɡmb", "ŋ‼", "ŋ‼ʱ", "ȴ", "ȴʷ", "ȵ", "ȵʷ", "ȶ", "ȶȵ", "ȶʷ", "ȶ͈", "ȶ͉", "ɡʼkxʼ", "ɡ‼", "ɡ‼x", "ɡ‼xʼ", "ɡ‼ʱ", "ɣv", "ʀʁ", "ʃt", "ʆ", "ʆʷ", "ʆʷʼ", "ʆʼ", "ʍw", "ʓ", "ʓʷ", "ᴅ", "ᴅ̪", "ᴅ̪̰")
+
+    temp <- phoible %>%
+      filter(Phoneme %in% segments) %>%
+      select(InventoryID, Glottocode, LanguageName, Source, Phoneme) %>%
+      arrange(Phoneme)
+
+    temp %>%
+      group_by(Source) %>%
+      summarize(count = n()) %>%
+      kable()
 
     ## `summarise()` ungrouping output (override with `.groups` argument)
 
@@ -29,7 +56,12 @@ Steven Moran
 | upsid  |    22 |
 | uz     |     9 |
 
-    temp %>% group_by(Phoneme) %>% filter(Source=="ea") %>% summarize(count = n()) %>% arrange(desc(count)) %>% kable()
+    temp %>%
+      group_by(Phoneme) %>%
+      filter(Source == "ea") %>%
+      summarize(count = n()) %>%
+      arrange(desc(count)) %>%
+      kable()
 
     ## `summarise()` ungrouping output (override with `.groups` argument)
 
@@ -50,7 +82,9 @@ Steven Moran
 | t̠ʆʰ     |     1 |
 | t̠ʆʷ     |     1 |
 
-    phoible %>% filter(Phoneme == "d̠ʓʷ" )%>% select(InventoryID, Glottocode, LanguageName, Source, Phoneme)
+    phoible %>%
+      filter(Phoneme == "d̠ʓʷ") %>%
+      select(InventoryID, Glottocode, LanguageName, Source, Phoneme)
 
     ## # A tibble: 3 x 5
     ##   InventoryID Glottocode LanguageName Source Phoneme
@@ -59,7 +93,12 @@ Steven Moran
     ## 2        2468 abkh1244   Abkhaz       ea     d̠ʓʷ    
     ## 3        2552 abkh1244   Abkhaz       ea     d̠ʓʷ
 
-    temp %>% group_by(Phoneme) %>% filter(Source=="er") %>% summarize(count = n()) %>% arrange(desc(count)) %>% kable()
+    temp %>%
+      group_by(Phoneme) %>%
+      filter(Source == "er") %>%
+      summarize(count = n()) %>%
+      arrange(desc(count)) %>%
+      kable()
 
     ## `summarise()` ungrouping output (override with `.groups` argument)
 
@@ -75,7 +114,10 @@ Steven Moran
 | ȶʷ      |    10 |
 | j̪       |     5 |
 
-    phoible %>% filter(Phoneme == "ȵ") %>% head() %>% kable()
+    phoible %>%
+      filter(Phoneme == "ȵ") %>%
+      head() %>%
+      kable()
 
 | InventoryID | Glottocode | ISO6393 | LanguageName      | SpecificDialect | GlyphID | Phoneme | Allophones | Marginal | SegmentClass | Source | tone | stress | syllabic | short | long | consonantal | sonorant | continuant | delayedRelease | approximant | tap | trill | nasal | lateral | labial | round | labiodental | coronal | anterior | distributed | strident | dorsal | high | low | front | back | tense | retractedTongueRoot | advancedTongueRoot | periodicGlottalSource | epilaryngealSource | spreadGlottis | constrictedGlottis | fortis | raisedLarynxEjective | loweredLarynxImplosive | click |
 |------------:|:-----------|:--------|:------------------|:----------------|:--------|:--------|:-----------|:---------|:-------------|:-------|:-----|:-------|:---------|:------|:-----|:------------|:---------|:-----------|:---------------|:------------|:----|:------|:------|:--------|:-------|:------|:------------|:--------|:---------|:------------|:---------|:-------|:-----|:----|:------|:-----|:------|:--------------------|:-------------------|:----------------------|:-------------------|:--------------|:-------------------|:-------|:---------------------|:-----------------------|:------|
@@ -86,12 +128,17 @@ Steven Moran
 |        2632 | madn1237   | zml     | Matngele          | NA              | 0235    | ȵ       | NA         | FALSE    | consonant    | er     | 0    | \-     | \-       | \-    | \-   | \+          | \+       | \-         | 0              | \-          | \-  | \-    | \+    | \-      | \-     | 0     | 0           | \+      | \+       | \+          | \-       | \+     | \+   | \-  | \+    | \-   | 0     | 0                   | 0                  | \+                    | \-                 | \-            | \-                 | \-     | \-                   | \-                     | \-    |
 |        2633 | mull1237   | mpb     | Malak-Malak       | NA              | 0235    | ȵ       | NA         | FALSE    | consonant    | er     | 0    | \-     | \-       | \-    | \-   | \+          | \+       | \-         | 0              | \-          | \-  | \-    | \+    | \-      | \-     | 0     | 0           | \+      | \+       | \+          | \-       | \+     | \+   | \-  | \+    | \-   | 0     | 0                   | 0                  | \+                    | \-                 | \-            | \-                 | \-     | \-                   | \-                     | \-    |
 
-    phoible %>% filter(Phoneme == "m̪")%>% kable()
+    phoible %>%
+      filter(Phoneme == "m̪") %>%
+      kable()
 
 | InventoryID | Glottocode | ISO6393 | LanguageName | SpecificDialect | GlyphID | Phoneme | Allophones | Marginal | SegmentClass | Source | tone | stress | syllabic | short | long | consonantal | sonorant | continuant | delayedRelease | approximant | tap | trill | nasal | lateral | labial | round | labiodental | coronal | anterior | distributed | strident | dorsal | high | low | front | back | tense | retractedTongueRoot | advancedTongueRoot | periodicGlottalSource | epilaryngealSource | spreadGlottis | constrictedGlottis | fortis | raisedLarynxEjective | loweredLarynxImplosive | click |
 |------------:|:-----------|:--------|:-------------|:----------------|:--------|:--------|:-----------|:---------|:-------------|:-------|:-----|:-------|:---------|:------|:-----|:------------|:---------|:-----------|:---------------|:------------|:----|:------|:------|:--------|:-------|:------|:------------|:--------|:---------|:------------|:---------|:-------|:-----|:----|:------|:-----|:------|:--------------------|:-------------------|:----------------------|:-------------------|:--------------|:-------------------|:-------|:---------------------|:-----------------------|:------|
 
-    phoible %>% filter(InventoryID == 1359) %>% select(LanguageName, Phoneme) %>% kable()
+    phoible %>%
+      filter(InventoryID == 1359) %>%
+      select(LanguageName, Phoneme) %>%
+      kable()
 
 | LanguageName | Phoneme |
 |:-------------|:--------|
@@ -151,4 +198,4 @@ Steven Moran
 | Shilluk      | ʊː      |
 
     temp <- phoible %>% filter(Phoneme == "ɲ̟")
-    write_csv(temp, 'temp.csv')
+    write_csv(temp, "temp.csv")

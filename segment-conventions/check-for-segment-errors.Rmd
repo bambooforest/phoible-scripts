@@ -1,31 +1,38 @@
 ---
 title: "Check for errors in PHOIBLE segment conventions"
-author: "Steven Moran \\<steven.moran@uzh.ch\\>"
-output: github_document
+author: "Steven Moran"
+date: "(`r format(Sys.time(), '%d %B, %Y')`)"
+output:
+  github_document:
+  pandoc_args: --webtex
 ---
   
 ```{r, message=F, warning=F}
-library(testthat)
 library(dplyr)
+library(readr)
+library(testthat)
 library(knitr)
 ```
 
+# Overview
+
+Check for segment errors in the [PHOIBLE dev data](https://github.com/phoible/dev).
 
 ```{r}
-load(url('https://github.com/phoible/dev/blob/master/data/phoible.RData?raw=true'))
-expect_equal(nrow(phoible), 105467)
+phoible <- read_csv("https://github.com/phoible/dev/blob/master/data/phoible.csv?raw=true")
+expect_equal(nrow(phoible), 105460) # https://github.com/phoible/dev/commit/9d21f8fa7d8bb592f6aa6378fb456757354d1441
 ```
 
 ```{r}
 # Get a list of unique segments and which sources they appear in
 phoneme.source <- phoible %>% select(Phoneme, Source) %>% group_by(Phoneme, Source) %>% distinct()
 distinct.segments <- phoneme.source %>% group_by(Phoneme) %>% summarize(Sources=tolower(paste(Source, collapse=";"))) %>% arrange(Phoneme)
-expect_equal(nrow(distinct.segments), 3183)
+expect_equal(nrow(distinct.segments), 3164)
 head(distinct.segments)
 ```
 
 ```{r}
-write.csv(distinct.segments, file="distinct-segments.csv", row.names = F)
+# write.csv(distinct.segments, file="distinct-segments.csv", row.names = F)
 ```
 
 ```{r}

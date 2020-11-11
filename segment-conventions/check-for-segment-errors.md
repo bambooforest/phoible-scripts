@@ -1,25 +1,50 @@
 Check for errors in PHOIBLE segment conventions
 ================
-Steven Moran &lt;<steven.moran@uzh.ch>&gt;
+Steven Moran
+(11 November, 2020)
 
-``` r
-library(testthat)
-library(dplyr)
-library(knitr)
-```
+    library(dplyr)
+    library(readr)
+    library(testthat)
+    library(knitr)
 
-``` r
-load(url('https://github.com/phoible/dev/blob/master/data/phoible.RData?raw=true'))
-expect_equal(nrow(phoible), 105467)
-```
+# Overview
 
-``` r
-# Get a list of unique segments and which sources they appear in
-phoneme.source <- phoible %>% select(Phoneme, Source) %>% group_by(Phoneme, Source) %>% distinct()
-distinct.segments <- phoneme.source %>% group_by(Phoneme) %>% summarize(Sources=tolower(paste(Source, collapse=";"))) %>% arrange(Phoneme)
-expect_equal(nrow(distinct.segments), 3183)
-head(distinct.segments)
-```
+Check for segment errors in the [PHOIBLE dev
+data](https://github.com/phoible/dev).
+
+    phoible <- read_csv("https://github.com/phoible/dev/blob/master/data/phoible.csv?raw=true")
+
+    ## 
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## cols(
+    ##   .default = col_character(),
+    ##   InventoryID = col_double(),
+    ##   SpecificDialect = col_logical(),
+    ##   Marginal = col_logical()
+    ## )
+    ## ℹ Use `spec()` for the full column specifications.
+
+    ## Warning: 21986 parsing failures.
+    ##   row             col           expected       actual                                                                   file
+    ## 21603 SpecificDialect 1/0/T/F/TRUE/FALSE Adja (Bénin) 'https://github.com/phoible/dev/blob/master/data/phoible.csv?raw=true'
+    ## 21604 SpecificDialect 1/0/T/F/TRUE/FALSE Adja (Bénin) 'https://github.com/phoible/dev/blob/master/data/phoible.csv?raw=true'
+    ## 21605 SpecificDialect 1/0/T/F/TRUE/FALSE Adja (Bénin) 'https://github.com/phoible/dev/blob/master/data/phoible.csv?raw=true'
+    ## 21606 SpecificDialect 1/0/T/F/TRUE/FALSE Adja (Bénin) 'https://github.com/phoible/dev/blob/master/data/phoible.csv?raw=true'
+    ## 21607 SpecificDialect 1/0/T/F/TRUE/FALSE Adja (Bénin) 'https://github.com/phoible/dev/blob/master/data/phoible.csv?raw=true'
+    ## ..... ............... .................. ............. ......................................................................
+    ## See problems(...) for more details.
+
+    expect_equal(nrow(phoible), 105460) # https://github.com/phoible/dev/commit/9d21f8fa7d8bb592f6aa6378fb456757354d1441
+
+    # Get a list of unique segments and which sources they appear in
+    phoneme.source <- phoible %>% select(Phoneme, Source) %>% group_by(Phoneme, Source) %>% distinct()
+    distinct.segments <- phoneme.source %>% group_by(Phoneme) %>% summarize(Sources=tolower(paste(Source, collapse=";"))) %>% arrange(Phoneme)
+
+    ## `summarise()` ungrouping output (override with `.groups` argument)
+
+    expect_equal(nrow(distinct.segments), 3164)
+    head(distinct.segments)
 
     ## # A tibble: 6 x 2
     ##   Phoneme Sources           
@@ -31,20 +56,16 @@ head(distinct.segments)
     ## 5 ˥˧̰      ph                
     ## 6 ˥˧˥     spa
 
-``` r
-write.csv(distinct.segments, file="distinct-segments.csv", row.names = F)
-```
+    # write.csv(distinct.segments, file="distinct-segments.csv", row.names = F)
 
-``` r
-# Check for ambigously placed segments, e.g. ring above and below (awful hack here because copy and pasting diacritics in R studio is problematic)
-rings.below <- distinct.segments %>% filter(grepl("̥", Phoneme))
-rings.above <- distinct.segments %>% filter(grepl("̊", Phoneme))
-rings <- rbind(rings.above, rings.below)
-rings <- rings %>% arrange(Phoneme)
-write.csv(rings, file="rings.csv", row.names = F)
+    # Check for ambigously placed segments, e.g. ring above and below (awful hack here because copy and pasting diacritics in R studio is problematic)
+    rings.below <- distinct.segments %>% filter(grepl("̥", Phoneme))
+    rings.above <- distinct.segments %>% filter(grepl("̊", Phoneme))
+    rings <- rbind(rings.above, rings.below)
+    rings <- rings %>% arrange(Phoneme)
+    write.csv(rings, file="rings.csv", row.names = F)
 
-kable(rings)
-```
+    kable(rings)
 
 | Phoneme | Sources                            |
 |:--------|:-----------------------------------|
@@ -57,8 +78,8 @@ kable(rings)
 | ɓ̥       | spa;upsid;aa;gm;saphon             |
 | ɓ̥ː      | gm                                 |
 | d̪̤̥       | spa                                |
-| d̪̥       | ea                                 |
 | d̺̥       | ea                                 |
+| d̪̥       | ea                                 |
 | d̤̥       | spa                                |
 | d̥       | uz;ea                              |
 | d̥ː      | ea                                 |
@@ -101,7 +122,7 @@ kable(rings)
 | l̪̊       | ea                                 |
 | l̪̥       | upsid                              |
 | l̥       | spa;upsid;aa;ph;gm;ra;saphon;uz;ea |
-| l̪̥|l̥     | upsid                              |
+| l̪̥\|l̥    | upsid                              |
 | l̥ː      | gm;ea                              |
 | l̥ˠ      | spa;upsid                          |
 | l̥ʲ      | spa;upsid;ea                       |
@@ -122,10 +143,10 @@ kable(rings)
 | m̥ʷ      | spa                                |
 | ɱ̥f      | ph                                 |
 | n̪̊       | ea                                 |
-| n̪̥       | upsid;ea                           |
 | n̠̥       | upsid                              |
+| n̪̥       | upsid;ea                           |
 | n̥       | spa;upsid;ph;gm;saphon;uz;ea       |
-| n̪̥|n̥     | upsid                              |
+| n̪̥\|n̥    | upsid                              |
 | n̥ː      | ea                                 |
 | n̥ˠ      | spa;upsid                          |
 | n̥ʲ      | spa;upsid;ea                       |
@@ -136,14 +157,14 @@ kable(rings)
 | ɲ̊       | uz;ea                              |
 | ɲ̟̥       | uz                                 |
 | ɲ̥       | spa;upsid;ph;gm;saphon;ea          |
-| ɲ̥ɲ̥      | uz                                 |
+| ɲ̥ɲ      | uz                                 |
 | ɳ̥       | upsid                              |
 | ɳʈr̠̥     | spa                                |
 | ŋ̊       | uz;ea                              |
 | ŋ̥       | spa;upsid;ph;gm;saphon;uz;ea       |
 | ŋ̥ʲ      | spa;upsid                          |
 | ŋ̥m̥      | upsid                              |
-| ŋ̊ŋ      | uz                                 |
+| ŋ̥ŋ      | uz                                 |
 | ŋ̥ʷ      | upsid                              |
 | ŋ̊ǀ      | gm                                 |
 | ŋ̥ǀ͓ʰ     | upsid                              |
@@ -169,13 +190,13 @@ kable(rings)
 | o̞̥       | upsid                              |
 | r̺̥       | ea                                 |
 | r̥       | spa;upsid;ph;ra;saphon;ea          |
-| r̪̥|r̥     | upsid                              |
-| R̪̥|R̥     | upsid                              |
+| r̪̥\|r̥    | upsid                              |
+| R̪̥\|R̥    | upsid                              |
 | r̥ː      | ea                                 |
 | r̥ʲ      | ea                                 |
 | r̥ʲː     | ea                                 |
 | ɹ̥       | ea                                 |
-| ɹ̪̥|ɹ̥     | upsid                              |
+| ɹ̪̥\|ɹ̥    | upsid                              |
 | ɺ̥       | saphon                             |
 | ɻ̊       | ea                                 |
 | ɽ̊       | ea                                 |
@@ -202,16 +223,14 @@ kable(rings)
 | ˀn̪̥      | ph                                 |
 | ˀw̥      | ph                                 |
 
-``` r
-# Check for ambigously placed segments, e.g. ring above and below (awful hack here because copy and pasting diacritics in R studio is problematic)
-syllabic.below <- distinct.segments %>% filter(grepl("̩", Phoneme))
-syllabic.above <- distinct.segments %>% filter(grepl("̍", Phoneme))
-syllabic <- rbind(syllabic.above, syllabic.below)
-syllabic <- syllabic %>% arrange(Phoneme)
-write.csv(syllabic, file="syllabic.csv", row.names = F)
+    # Check for ambigously placed segments, e.g. ring above and below (awful hack here because copy and pasting diacritics in R studio is problematic)
+    syllabic.below <- distinct.segments %>% filter(grepl("̩", Phoneme))
+    syllabic.above <- distinct.segments %>% filter(grepl("̍", Phoneme))
+    syllabic <- rbind(syllabic.above, syllabic.below)
+    syllabic <- syllabic %>% arrange(Phoneme)
+    write.csv(syllabic, file="syllabic.csv", row.names = F)
 
-kable(syllabic)
-```
+    kable(syllabic)
 
 | Phoneme | Sources            |
 |:--------|:-------------------|

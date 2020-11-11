@@ -1,5 +1,5 @@
 ---
-title: "Investigate segments that don't part with IPA parser"
+title: "Investigate segments that don't parse with IPA parser"
 author: "Steven Moran"
 date: "(`r format(Sys.time(), '%d %B, %Y')`)"
 output:
@@ -7,56 +7,100 @@ output:
   pandoc_args: --webtex
 ---
 
-
 ```{r, warning=FALSE, message=FALSE}
 library(tidyverse)
 library(knitr)
 ```
 
+# Overview
+
+Some segments in PHOIBLE don't parse with Dmitry Nikolaev's IPA parser:
+
+* https://github.com/macleginn/consonant-inventory-gaps
+
+Full stats are given here:
+
+* https://github.com/macleginn/consonant-inventory-gaps/blob/master/stats.csv
+
+The most frequent segments that don't parse, some highlighted below, include:
+
+* symbols with the curl in ER's Australian data (these are currently being discussed with E. Round)
+* archi-phonemes like R, N
+* the flap symbol in UPSID
+* clicks
+
+In this short report, I investigate these.
+
+
 ```{r}
-col_types <- cols(InventoryID='i', Marginal='l', .default='c')
-phoible <- read_csv(url('https://github.com/phoible/dev/blob/master/data/phoible.csv?raw=true'), col_types = col_types)
+col_types <- cols(InventoryID = "i", Marginal = "l", .default = "c")
+phoible <- read_csv(url("https://github.com/phoible/dev/blob/master/data/phoible.csv?raw=true"), col_types = col_types)
 ```
 
 ```{r}
-segments <- c('N', 'R', 'Rʲ', 'R̪', 'R̪', 'R̪̥', 'R̪̰', 'b̪', 'dʼkxʼ', 'd̠ʒxʼ', 'd̠ʓ', 'd̠ʓʷ', 'd̪ʼkxʼ', 'fʃ', 'hv', 'j̪', 'kɡ', 'k‼', 'k‼x', 'k‼xʼ', 'k‼ʰ', 'k‼ʰʼ', 'k‼ʼ', 'ld', 'm̪', 'm̼', 'pt', 'pʼkxʼ', 'p̪', 'p̼', 'st', 's̻θ', 'tʼkxʼ', 't̠ʃx', 't̠ʆ', 't̠ʆʰ', 't̠ʆʷ', 't̠ʆʷʰ', 't̠ʆʷʼ', 't̪ʙ', 't̪ʼkxʼ', 'v̼', 'xk', 'xʀ̥', 'ŋɡmb', 'ŋ‼', 'ŋ‼ʱ', 'ȴ', 'ȴʷ', 'ȵ', 'ȵʷ', 'ȶ', 'ȶȵ', 'ȶʷ', 'ȶ͈', 'ȶ͉', 'ɡʼkxʼ', 'ɡ‼', 'ɡ‼x', 'ɡ‼xʼ', 'ɡ‼ʱ', 'ɣv', 'ʀʁ', 'ʃt', 'ʆ', 'ʆʷ', 'ʆʷʼ', 'ʆʼ', 'ʍw', 'ʓ', 'ʓʷ', 'ᴅ', 'ᴅ̪', 'ᴅ̪̰')
-
+segments <- c("N", "R", "Rʲ", "R̪", "R̪", "R̪̥", "R̪̰", "b̪", "dʼkxʼ", "d̠ʒxʼ", "d̠ʓ", "d̠ʓʷ", "d̪ʼkxʼ", "fʃ", "hv", "j̪", "kɡ", "k‼", "k‼x", "k‼xʼ", "k‼ʰ", "k‼ʰʼ", "k‼ʼ", "ld", "m̪", "m̼", "pt", "pʼkxʼ", "p̪", "p̼", "st", "s̻θ", "tʼkxʼ", "t̠ʃx", "t̠ʆ", "t̠ʆʰ", "t̠ʆʷ", "t̠ʆʷʰ", "t̠ʆʷʼ", "t̪ʙ", "t̪ʼkxʼ", "v̼", "xk", "xʀ̥", "ŋɡmb", "ŋ‼", "ŋ‼ʱ", "ȴ", "ȴʷ", "ȵ", "ȵʷ", "ȶ", "ȶȵ", "ȶʷ", "ȶ͈", "ȶ͉", "ɡʼkxʼ", "ɡ‼", "ɡ‼x", "ɡ‼xʼ", "ɡ‼ʱ", "ɣv", "ʀʁ", "ʃt", "ʆ", "ʆʷ", "ʆʷʼ", "ʆʼ", "ʍw", "ʓ", "ʓʷ", "ᴅ", "ᴅ̪", "ᴅ̪̰")
 ```
 
 ```{r}
-temp <- phoible %>% filter(Phoneme %in% segments) %>% select(InventoryID, Glottocode, LanguageName, Source, Phoneme) %>% arrange(Phoneme)
+temp <- phoible %>%
+  filter(Phoneme %in% segments) %>%
+  select(InventoryID, Glottocode, LanguageName, Source, Phoneme) %>%
+  arrange(Phoneme)
 ```
 
 ```{r}
-temp %>% group_by(Source) %>% summarize(count=n()) %>% kable()
+temp %>%
+  group_by(Source) %>%
+  summarize(count = n()) %>%
+  kable()
 ```
 
 ```{r}
-temp %>% group_by(Phoneme) %>% filter(Source=="ea") %>% summarize(count = n()) %>% arrange(desc(count)) %>% kable()
+temp %>%
+  group_by(Phoneme) %>%
+  filter(Source == "ea") %>%
+  summarize(count = n()) %>%
+  arrange(desc(count)) %>%
+  kable()
 ```
 
 ```{r}
-phoible %>% filter(Phoneme == "d̠ʓʷ" )%>% select(InventoryID, Glottocode, LanguageName, Source, Phoneme)
+phoible %>%
+  filter(Phoneme == "d̠ʓʷ") %>%
+  select(InventoryID, Glottocode, LanguageName, Source, Phoneme)
 ```
 
 
 ```{r}
-temp %>% group_by(Phoneme) %>% filter(Source=="er") %>% summarize(count = n()) %>% arrange(desc(count)) %>% kable()
+temp %>%
+  group_by(Phoneme) %>%
+  filter(Source == "er") %>%
+  summarize(count = n()) %>%
+  arrange(desc(count)) %>%
+  kable()
 ```
 
 ```{r}
-phoible %>% filter(Phoneme == "ȵ") %>% head() %>% kable()
+phoible %>%
+  filter(Phoneme == "ȵ") %>%
+  head() %>%
+  kable()
 ```
 
 ```{r}
-phoible %>% filter(Phoneme == "m̪")%>% kable()
+phoible %>%
+  filter(Phoneme == "m̪") %>%
+  kable()
 ```
 
 ```{r}
-phoible %>% filter(InventoryID == 1359) %>% select(LanguageName, Phoneme) %>% kable()
+phoible %>%
+  filter(InventoryID == 1359) %>%
+  select(LanguageName, Phoneme) %>%
+  kable()
 ```
 
 ```{r}
 temp <- phoible %>% filter(Phoneme == "ɲ̟")
-write_csv(temp, 'temp.csv')
+write_csv(temp, "temp.csv")
 ```
