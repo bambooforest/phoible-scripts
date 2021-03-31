@@ -1,0 +1,183 @@
+---
+title: "Palatal consonants in PHOIBLE"
+author: "Steven Moran\n"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: github_document
+bibliography: 'references.bib'
+---
+
+# Overview
+
+This report extracts [palatal consonants](https://en.wikipedia.org/wiki/Palatal_consonant) from [PHOIBLE](https://phoible.org/) [@MoranMcCloy2019].
+
+The output data format is a [CSV](https://en.wikipedia.org/wiki/Comma-separated_values) file with the following columns:
+
+```
+InventoryID | Glottocode | ... | Palatals | Marginal_palatals | ...
+1 | aaaa1111 | ... |
+```
+
+
+## Data preparation
+
+This report uses these [R](https://cran.r-project.org/) libraries [@tidyverse;@knitr]:
+
+```{r, message=F, warning=F}
+library(tidyverse)
+library(knitr)
+```
+
+Get the PHOIBLE data and merge in the metadata from [Glottolog](https://glottolog.org/) [@Hammarstrom_etal2020].
+
+PHOIBLE data is released periodically be version because the editors add new data, make reported corrections, etc. Here we use the PHOIBLE dev version from [May 2020](https://github.com/phoible/dev/tree/646f5e4f64bfefb7868bf4a3b65bcd1da243976a).
+
+```{r}
+phoible <- read_csv(url("https://github.com/phoible/dev/blob/646f5e4f64bfefb7868bf4a3b65bcd1da243976a/data/phoible.csv?raw=true"), 
+                    col_types = c(InventoryID = "i", Marginal = "l", .default = "c"))
+```
+
+Merge in [Glottolog 4.1](https://glottolog.org/meta/downloads) data.
+
+```{r}
+languoids <- read.csv("glottolog_languoid.csv/languoid.csv", stringsAsFactors = FALSE)
+geo <- read.csv("languages_and_dialects_geo.csv", stringsAsFactors = FALSE)
+phoible <- left_join(phoible, languoids, by = c("Glottocode" = "id"))
+phoible <- left_join(phoible, geo)
+rm(geo, languoids)
+```
+
+Create a PHOIBLE index.
+
+```{r}
+index <- phoible %>%
+  select(InventoryID, 
+         Glottocode, 
+         ISO6393, 
+         name, 
+         LanguageName, 
+         SpecificDialect, 
+         Source, 
+         family_id, 
+         level, 
+         status, 
+         latitude, 
+         longitude, 
+         country_ids, 
+         macroarea) %>%
+    distinct()
+
+index <- index %>% rename(GlottologName = name, PhoibleName = LanguageName)
+```
+
+Get palatal consonant counts and their number of marginals.
+
+```{r}
+palatals <- phoible %>% filter(grepl("j|ɲ|c|ɟ|ç|ʝ|ʎ", Phoneme))
+
+palatal_counts <- palatals %>%
+  group_by(InventoryID) %>%
+  summarize(palatals = n())
+
+palatals_marginals <- palatals %>%
+  filter(Marginal) %>%
+  group_by(InventoryID) %>%
+  summarize(Marginal_palatals = n())
+```
+Let's write the palatals data to disk.
+
+```{r}
+write_csv(palatals, 'palatals.csv')
+```
+
+
+## Exploratory
+
+Have a look at the data.
+
+```{r}
+df %>%
+  head() %>%
+  kable()
+```
+
+Merge together the palatal and marginal palatal counts.
+
+```{r}
+df <- left_join(palatal_counts, palatals_marginals)
+```
+
+Do any languages contain palatals that are always marginal? Yes.
+
+```{r}
+temp <- df[which(df$palatals == df$Marginal_palatals), ]
+temp %>% kable()
+```
+
+Which languages and which palatals are in that set?
+
+```{r}
+phoible %>% select(InventoryID, Glottocode, LanguageName, Phoneme) %>% filter(InventoryID %in% temp$InventoryID) %>% filter(grepl("j|ɲ|c|ɟ|ç|ʝ|ʎ", Phoneme))
+```
+
+How many Glottocodes are there in phoible?
+
+```{r}
+nrow(phoible %>% select(Glottocode) %>% distinct())
+```
+
+How many phoible inventories have palatal consonants?
+
+```{r}
+nrow(palatals %>% select(InventoryID) %>% distinct())
+```
+
+How many are marginal?
+
+```{r}
+nrow(palatals %>% filter(Marginal) %>% group_by(InventoryID, Marginal)) # 70 rows
+kable(palatals %>% filter(Marginal) %>% group_by(InventoryID, Marginal))
+```
+
+How are palatals distributed in phoible (across duplicate languages)?
+
+```{r}
+distribution_palatals <- palatals %>%
+  group_by(Phoneme) %>%
+  summarize(count = n()) %>%
+  arrange(desc(count))
+kable(distribution_palatals)
+
+# Order the frequency counts and plot the distribution of uvular consonants in the sample
+distribution_palatals$Phoneme <- factor(distribution_palatals$Phoneme, levels = distribution_palatals$Phoneme[order(-distribution_palatals$count)])
+
+# qplot(distribution_palatals$Phoneme, distribution_palatals$count)
+
+p <- ggplot(aes(y = count, x = Phoneme), data = distribution_palatals) +
+  geom_bar(stat = "identity", width = 0.3, color = "black") +
+  xlab("Segments") +
+  ylab("# of languages") +
+  theme_minimal() +
+  ggtitle("")
+p
+```
+
+
+Distribution of palatal consonants per inventory (can't use Glottocode because there are multiple doculects).
+
+```{r}
+palatals_counts <- palatals %>%
+  select(InventoryID, Glottocode, Phoneme, macroarea) %>%
+  group_by(InventoryID, Glottocode, macroarea) %>%
+  summarize(count = n()) %>%
+  arrange(desc(count))
+
+qplot(y = palatals_counts$count)
+```
+
+How are they distributed via macroarea?
+
+```{r}
+kable(table(palatals_counts$macroarea))
+```
+
+# References
