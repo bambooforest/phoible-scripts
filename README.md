@@ -4,4 +4,4 @@ Some scripts for things like getting the sample coverage of [phoible](https://gi
 
 author = 'Steven Moran \<steven.moran@uzh.ch\>'
 
-copyright = 'Copyright (c) 2020 Steven Moran'
+copyright = 'Copyright (c) 2021 Steven Moran'
