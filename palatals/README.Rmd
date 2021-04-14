@@ -2,20 +2,15 @@
 title: "Palatal consonants in PHOIBLE"
 author: "Steven Moran\n"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output: github_document
+output:
+  github_document:
+      toc: true
 bibliography: 'references.bib'
 ---
 
 # Overview
 
-This report extracts [palatal consonants](https://en.wikipedia.org/wiki/Palatal_consonant) from [PHOIBLE](https://phoible.org/) [@MoranMcCloy2019].
-
-The output data format is a [CSV](https://en.wikipedia.org/wiki/Comma-separated_values) file with the following columns:
-
-```
-InventoryID | Glottocode | ... | Palatals | Marginal_palatals | ...
-1 | aaaa1111 | ... |
-```
+This report does tasks like extracting [palatal consonants](https://en.wikipedia.org/wiki/Palatal_consonant) from [PHOIBLE](https://phoible.org/) [@MoranMcCloy2019].
 
 
 ## Data preparation
@@ -83,7 +78,12 @@ palatals_marginals <- palatals %>%
   group_by(InventoryID) %>%
   summarize(Marginal_palatals = n())
 ```
-Let's write the palatals data to disk.
+Let's write the palatals count data to disk. The output data format is a [CSV](https://en.wikipedia.org/wiki/Comma-separated_values) file with the following columns:
+
+```
+InventoryID | Glottocode | ... | Palatals | Marginal_palatals | ...
+1 | aaaa1111 | ... |
+```
 
 ```{r}
 write_csv(palatals, 'palatals.csv')
@@ -92,18 +92,18 @@ write_csv(palatals, 'palatals.csv')
 
 ## Exploratory
 
+Merge together the palatal and marginal palatal counts.
+
+```{r}
+df <- left_join(palatal_counts, palatals_marginals)
+```
+
 Have a look at the data.
 
 ```{r}
 df %>%
   head() %>%
   kable()
-```
-
-Merge together the palatal and marginal palatal counts.
-
-```{r}
-df <- left_join(palatal_counts, palatals_marginals)
 ```
 
 Do any languages contain palatals that are always marginal? Yes.
@@ -179,5 +179,18 @@ How are they distributed via macroarea?
 ```{r}
 kable(table(palatals_counts$macroarea))
 ```
+
+
+## Some searches
+
+For example, languages that have /ʎ/ and /c/ simultaneously.
+
+```{r}
+temp <- phoible %>% filter(Phoneme %in% c('ʎ', 'c'))
+tallied <- temp %>% group_by(InventoryID) %>% tally()
+tallied <- tallied %>% filter(n>1)
+temp %>% filter(InventoryID %in% tallied$InventoryID) %>% arrange(InventoryID) %>% kable()
+```
+
 
 # References
