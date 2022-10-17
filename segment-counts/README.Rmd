@@ -1,6 +1,6 @@
 ---
 title: "PHOIBLE phoneme class counts"
-author: "Steven Moran \\<steven.moran@uzh.ch\\>"
+author: "Steven Moran"
 output: github_document
 ---
   

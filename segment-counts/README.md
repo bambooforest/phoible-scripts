@@ -1,6 +1,6 @@
 PHOIBLE phoneme class counts
 ================
-Steven Moran &lt;<steven.moran@uzh.ch>&gt;
+Steven Moran
 
 ``` r
 library(dplyr)
@@ -9,8 +9,7 @@ library(testthat)
 
 ``` r
 # Get phoible dev data
-phoible <- read.csv('/Users/stiv/Github/dev/data/phoible.csv', stringsAsFactors = F)
-# phoible <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/data/phoible.csv', stringsAsFactors = F)
+phoible <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/data/phoible.csv', stringsAsFactors = F)
 ```
 
 ``` r
@@ -20,7 +19,7 @@ table(phoible$SegmentClass, exclude=F)
 
     ## 
     ## consonant      tone     vowel 
-    ##     72257      2147     31063
+    ##     72282      2150     31056
 
 ``` r
 expect_false(any(is.na(phoible$SegmentClass)))
@@ -29,10 +28,31 @@ expect_false(any(is.na(phoible$SegmentClass)))
 ``` r
 # Get counts by segment class
 phonemes <- phoible %>% group_by(InventoryID, ISO6393, Glottocode, Source) %>% summarize(phonemes=n())
+```
+
+    ## `summarise()` has grouped output by 'InventoryID', 'ISO6393', 'Glottocode'. You
+    ## can override using the `.groups` argument.
+
+``` r
 vowels <- phoible %>% group_by(InventoryID, ISO6393, Glottocode, Source) %>% filter(SegmentClass=="vowel") %>% summarize(vowels=n())
+```
+
+    ## `summarise()` has grouped output by 'InventoryID', 'ISO6393', 'Glottocode'. You
+    ## can override using the `.groups` argument.
+
+``` r
 consonants <- phoible %>% group_by(InventoryID, ISO6393, Glottocode, Source) %>% filter(SegmentClass=="consonant") %>% summarize(consonants=n())
+```
+
+    ## `summarise()` has grouped output by 'InventoryID', 'ISO6393', 'Glottocode'. You
+    ## can override using the `.groups` argument.
+
+``` r
 tones <- phoible %>% group_by(InventoryID, ISO6393, Glottocode, Source) %>% filter(SegmentClass=="tone") %>% summarize(tones=n())
 ```
+
+    ## `summarise()` has grouped output by 'InventoryID', 'ISO6393', 'Glottocode'. You
+    ## can override using the `.groups` argument.
 
 ``` r
 # Merge into new df
@@ -57,7 +77,7 @@ phonemes <- left_join(phonemes, tones)
 head(phonemes)
 ```
 
-    ## # A tibble: 6 x 8
+    ## # A tibble: 6 × 8
     ## # Groups:   InventoryID, ISO6393, Glottocode [6]
     ##   InventoryID ISO6393 Glottocode Source phonemes consonants vowels tones
     ##         <int> <chr>   <chr>      <chr>     <int>      <int>  <int> <int>
@@ -81,15 +101,8 @@ phonemes$counts.match <- phonemes$consonants + phonemes$vowels + phonemes$tones 
 expect_true(all(phonemes$counts.match))
 
 # Mark sources without tones as NA from CLDF contributors CSV
-# contribs <- read.csv('https://raw.githubusercontent.com/bambooforest/phoible-scripts/master/to_cldf/cldf/contributors.csv')
-contribs <- read.csv('/Users/stiv/Github/phoible-scripts/to_cldf/cldf/contributors.csv')
+contribs <- read.csv('https://raw.githubusercontent.com/bambooforest/phoible-scripts/master/to_cldf/cldf/contributors.csv')
 phonemes <- left_join(phonemes, contribs, by=c("Source"="ID"))
-```
-
-    ## Warning: Column `Source`/`ID` joining character vector and factor, coercing
-    ## into character vector
-
-``` r
 phonemes <- phonemes %>% mutate(tones = ifelse(!with_tones, NA, tones))
 
 table(phonemes$tones, exclude = F)
@@ -97,7 +110,7 @@ table(phonemes$tones, exclude = F)
 
     ## 
     ##    0    1    2    3    4    5    6    7    8    9   10 <NA> 
-    ## 1578    7  181  217  123   60   25    7   10    4    2  806
+    ## 1578    6  181  217  124   60   25    7   10    4    2  806
 
 ``` r
 range(phonemes$tones, na.rm = TRUE)
@@ -111,7 +124,7 @@ df <- phonemes %>% select(-counts.match, -Name, -Contributor, -Description, -Con
 head(df)
 ```
 
-    ## # A tibble: 6 x 8
+    ## # A tibble: 6 × 8
     ## # Groups:   InventoryID, ISO6393, Glottocode [6]
     ##   InventoryID ISO6393 Glottocode Source phonemes consonants vowels tones
     ##         <int> <chr>   <chr>      <chr>     <int>      <int>  <int> <dbl>
@@ -132,7 +145,7 @@ counts <- table(phonemes$phonemes)
 barplot(counts)
 ```
 
-![](segment-counts_files/figure-markdown_github/unnamed-chunk-8-1.png)
+![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ``` r
 # Total consonants
@@ -140,7 +153,7 @@ counts <- table(phonemes$consonants)
 barplot(counts)
 ```
 
-![](segment-counts_files/figure-markdown_github/unnamed-chunk-9-1.png)
+![](README_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
 # Total vowels
@@ -148,7 +161,7 @@ counts <- table(phonemes$vowels)
 barplot(counts)
 ```
 
-![](segment-counts_files/figure-markdown_github/unnamed-chunk-10-1.png)
+![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ``` r
 # Total counts
@@ -156,4 +169,4 @@ counts <- table(phonemes$tones)
 barplot(counts)
 ```
 
-![](segment-counts_files/figure-markdown_github/unnamed-chunk-11-1.png)
+![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
