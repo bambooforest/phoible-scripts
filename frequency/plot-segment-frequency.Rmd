@@ -1,6 +1,6 @@
 ---
 title: "PHOIBLE phoneme frequencies"
-author: "Steven Moran \\<steven.moran@uzh.ch\\>"
+author: "Steven Moran"
 output: github_document
 ---
   

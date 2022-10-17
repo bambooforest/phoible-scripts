@@ -1,6 +1,6 @@
 PHOIBLE phoneme frequencies
 ================
-Steven Moran &lt;<steven.moran@uzh.ch>&gt;
+Steven Moran
 
 ``` r
 library(knitr)
@@ -23,7 +23,7 @@ phoible <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/data/p
 # Merge in Glottolog data
 # Glottolog 3.3 data
 # https://cdstar.shh.mpg.de/bitstreams/EAEA0-E7DE-FA06-8817-0/glottolog_languoid.csv.zip
-languoids <- read.csv('../data/glottolog_languoid.csv/languoid.csv', stringsAsFactors = FALSE) 
+languoids <- read.csv('../data/glottolog_languoid/languoid.csv', stringsAsFactors = FALSE) 
 geo <- read.csv(url("https://cdstar.shh.mpg.de/bitstreams/EAEA0-E7DE-FA06-8817-0/languages_and_dialects_geo.csv"), stringsAsFactors = FALSE)
 
 phoible <- left_join(phoible, languoids, by=c("Glottocode"="id"))
@@ -35,22 +35,28 @@ phoible <- left_join(phoible, geo)
 ``` r
 # Get cross-linguistic phoneme counts from all inventories
 phonemes <- phoible %>% group_by(Phoneme, SegmentClass) %>% summarize(count=n())
+```
+
+    ## `summarise()` has grouped output by 'Phoneme'. You can override using the
+    ## `.groups` argument.
+
+``` r
 phonemes$coverage <- phonemes$count/nrow(phonemes)
 phonemes.sorted <- phonemes %>% arrange(desc(coverage))
 # phonemes.sorted <- phonemes.sorted %>% head(n=25)
 head(phonemes.sorted)
 ```
 
-    ## # A tibble: 6 x 4
+    ## # A tibble: 6 × 4
     ## # Groups:   Phoneme [6]
     ##   Phoneme SegmentClass count coverage
     ##   <chr>   <chr>        <int>    <dbl>
-    ## 1 m       consonant     2914    0.915
-    ## 2 i       vowel         2779    0.873
-    ## 3 k       consonant     2730    0.858
-    ## 4 j       consonant     2716    0.853
-    ## 5 u       vowel         2646    0.831
-    ## 6 a       vowel         2600    0.817
+    ## 1 m       consonant     2915    0.927
+    ## 2 i       vowel         2779    0.883
+    ## 3 k       consonant     2729    0.867
+    ## 4 j       consonant     2716    0.863
+    ## 5 u       vowel         2646    0.841
+    ## 6 a       vowel         2600    0.826
 
 ``` r
 # All phonemes across all inventories in the full sample
@@ -71,7 +77,7 @@ dev.off()
 p
 ```
 
-![](segment-frequency_files/figure-markdown_github/unnamed-chunk-5-1.png)
+![](segment-frequency_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 ``` r
 # All phonemes across all inventories in the full sample - flipped
@@ -83,11 +89,17 @@ p <- ggplot(aes(y=coverage, x=reorder(Phoneme, coverage)), data=temp) +
 p + coord_flip()
 ```
 
-![](segment-frequency_files/figure-markdown_github/unnamed-chunk-6-1.png)
+![](segment-frequency_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ``` r
 # Get cross-linguistic phoneme counts by grouping all ISO codes
 phonemes.per.iso <- phoible %>% group_by(ISO6393, Phoneme) %>% summarize(count=n())
+```
+
+    ## `summarise()` has grouped output by 'ISO6393'. You can override using the
+    ## `.groups` argument.
+
+``` r
 distinct.isos <- phonemes.per.iso %>% select(ISO6393) %>% distinct()
 phonemes <- phonemes.per.iso %>% group_by(Phoneme) %>% summarize(count=n())
 phonemes$coverage <- phonemes$count/nrow(distinct.isos)
@@ -96,15 +108,15 @@ phonemes.sorted <- phonemes %>% arrange(desc(coverage))
 head(phonemes.sorted)
 ```
 
-    ## # A tibble: 6 x 3
+    ## # A tibble: 6 × 3
     ##   Phoneme count coverage
     ##   <chr>   <int>    <dbl>
-    ## 1 m        2034    0.969
-    ## 2 i        2004    0.954
-    ## 3 k        1945    0.926
-    ## 4 j        1922    0.915
-    ## 5 u        1922    0.915
-    ## 6 a        1911    0.91
+    ## 1 m        2036    0.970
+    ## 2 i        2003    0.954
+    ## 3 k        1942    0.925
+    ## 4 j        1922    0.916
+    ## 5 u        1921    0.915
+    ## 6 a        1913    0.911
 
 ``` r
 # Merge in SegmentClass values
@@ -124,7 +136,7 @@ p <- ggplot(aes(y=coverage, x=reorder(Phoneme, -coverage)), data=temp) +
 p
 ```
 
-![](segment-frequency_files/figure-markdown_github/unnamed-chunk-8-1.png)
+![](segment-frequency_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ``` r
 # All phonemes across all ISOs - flipped
@@ -136,7 +148,7 @@ p <- ggplot(aes(y=coverage, x=reorder(Phoneme, coverage)), data=temp) +
 p + coord_flip()
 ```
 
-![](segment-frequency_files/figure-markdown_github/unnamed-chunk-9-1.png)
+![](segment-frequency_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
 # Consonants only
@@ -148,7 +160,7 @@ p <- ggplot(aes(y=coverage, x=reorder(Phoneme, -coverage)), data=temp) +
 p
 ```
 
-![](segment-frequency_files/figure-markdown_github/unnamed-chunk-10-1.png)
+![](segment-frequency_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ``` r
 # Consonants only flipped
@@ -159,7 +171,7 @@ p <- ggplot(aes(y=coverage, x=reorder(Phoneme, coverage)), data=temp) +
 p + coord_flip()
 ```
 
-![](segment-frequency_files/figure-markdown_github/unnamed-chunk-11-1.png)
+![](segment-frequency_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 ``` r
 # Vowels only
@@ -171,7 +183,7 @@ p <- ggplot(aes(y=coverage, x=reorder(Phoneme, -coverage)), data=temp) +
 p
 ```
 
-![](segment-frequency_files/figure-markdown_github/unnamed-chunk-12-1.png)
+![](segment-frequency_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
 ``` r
 # Vowels only
@@ -183,7 +195,7 @@ p <- ggplot(aes(y=coverage, x=reorder(Phoneme, coverage)), data=temp) +
 p + coord_flip()
 ```
 
-![](segment-frequency_files/figure-markdown_github/unnamed-chunk-13-1.png)
+![](segment-frequency_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 ``` r
 # Summarize how frequent infrequent sounds are
@@ -196,7 +208,7 @@ p <- ggplot(aes(y=segments, x=reorder(count, -segments)), data=temp) +
 p
 ```
 
-![](segment-frequency_files/figure-markdown_github/unnamed-chunk-14-1.png)
+![](segment-frequency_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 ``` r
 # Summarize how frequent infrequent sounds are - flipped
@@ -209,7 +221,7 @@ p <- ggplot(aes(y=segments, x=reorder(count, segments)), data=temp) +
 p + coord_flip()
 ```
 
-![](segment-frequency_files/figure-markdown_github/unnamed-chunk-15-1.png)
+![](segment-frequency_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 ``` r
 iso.marcoareas <- phoible %>% select(ISO6393, macroarea) %>% distinct()
@@ -222,30 +234,41 @@ phonemes.per.iso.with.geo <- left_join(phonemes.per.iso, iso.marcoareas)
 phonemes.per.iso.with.geo
 ```
 
-    ## # A tibble: 82,350 x 4
-    ## # Groups:   ISO6393 [2,100]
-    ##    ISO6393 Phoneme count macroarea    
-    ##    <chr>   <chr>   <int> <chr>        
-    ##  1 <NA>    a          35 South America
-    ##  2 <NA>    a          35 <NA>         
-    ##  3 <NA>    a          35 Eurasia      
-    ##  4 <NA>    a          35 Australia    
-    ##  5 <NA>    a          35 ""           
-    ##  6 <NA>    ã           2 South America
-    ##  7 <NA>    ã           2 <NA>         
-    ##  8 <NA>    ã           2 Eurasia      
-    ##  9 <NA>    ã           2 Australia    
-    ## 10 <NA>    ã           2 ""           
-    ## # … with 82,340 more rows
+    ## # A tibble: 82,138 × 4
+    ## # Groups:   ISO6393 [2,099]
+    ##    ISO6393 Phoneme count macroarea
+    ##    <chr>   <chr>   <int> <chr>    
+    ##  1 aae     a           2 Eurasia  
+    ##  2 aae     b           2 Eurasia  
+    ##  3 aae     c           1 Eurasia  
+    ##  4 aae     ç           2 Eurasia  
+    ##  5 aae     d           2 Eurasia  
+    ##  6 aae     ð           2 Eurasia  
+    ##  7 aae     dz          2 Eurasia  
+    ##  8 aae     d̠ʒ          2 Eurasia  
+    ##  9 aae     ə           1 Eurasia  
+    ## 10 aae     ɛ           2 Eurasia  
+    ## # … with 82,128 more rows
 
 ``` r
 # How many data points do we have per macroregion (by ISO code)
 x <- phonemes.per.iso.with.geo %>% group_by(ISO6393, macroarea) %>% summarize(count=n())
+```
+
+    ## `summarise()` has grouped output by 'ISO6393'. You can override using the
+    ## `.groups` argument.
+
+``` r
 geo.counts <- x %>% group_by(macroarea) %>% summarise(totals=n())
 
 # 
 macro.area.phoneme.counts <- phonemes.per.iso.with.geo %>% group_by(macroarea, Phoneme) %>% summarize(count = n()) %>% filter(macroarea!="")  %>% filter(!is.na(macroarea))
+```
 
+    ## `summarise()` has grouped output by 'macroarea'. You can override using the
+    ## `.groups` argument.
+
+``` r
 y <- left_join(macro.area.phoneme.counts, geo.counts)
 ```
 
@@ -256,21 +279,21 @@ y$coverage <- y$count/y$totals
 y
 ```
 
-    ## # A tibble: 5,421 x 5
+    ## # A tibble: 5,299 × 5
     ## # Groups:   macroarea [6]
     ##    macroarea Phoneme count totals coverage
     ##    <chr>     <chr>   <int>  <int>    <dbl>
-    ##  1 Africa    ˥          40    708  0.0565 
-    ##  2 Africa    ˥˦          4    708  0.00565
-    ##  3 Africa    ˥˧          1    708  0.00141
-    ##  4 Africa    ˥˨          1    708  0.00141
-    ##  5 Africa    ˥˨˧         1    708  0.00141
-    ##  6 Africa    ˥˩         40    708  0.0565 
-    ##  7 Africa    ˦         452    708  0.638  
-    ##  8 Africa    ˦˥          3    708  0.00424
-    ##  9 Africa    ˦˦˨         1    708  0.00141
-    ## 10 Africa    ˦˧          9    708  0.0127 
-    ## # … with 5,411 more rows
+    ##  1 Africa    ˥          40    707  0.0566 
+    ##  2 Africa    ˥˦          4    707  0.00566
+    ##  3 Africa    ˥˧          1    707  0.00141
+    ##  4 Africa    ˥˨          1    707  0.00141
+    ##  5 Africa    ˥˨˧         1    707  0.00141
+    ##  6 Africa    ˥˩         40    707  0.0566 
+    ##  7 Africa    ˦         451    707  0.638  
+    ##  8 Africa    ˦˥          3    707  0.00424
+    ##  9 Africa    ˦˦˨         1    707  0.00141
+    ## 10 Africa    ˦˧          9    707  0.0127 
+    ## # … with 5,289 more rows
 
 ``` r
 z <- left_join(y, phonemes.sorted, by=c("Phoneme"="Phoneme"))
@@ -288,7 +311,7 @@ p <- ggplot(aes(y=coverage.x, x=reorder(Phoneme, -count.y), fill=macroarea), dat
 p
 ```
 
-![](segment-frequency_files/figure-markdown_github/unnamed-chunk-17-1.png)
+![](segment-frequency_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 ``` r
 # Rank with each bar
@@ -302,7 +325,7 @@ p <- ggplot(aes(y=coverage.x, x=reorder(Phoneme, -count.y), fill=macroarea, grou
 p
 ```
 
-![](segment-frequency_files/figure-markdown_github/unnamed-chunk-18-1.png)
+![](segment-frequency_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 ``` r
 # Get top n by area with phonemes on y axis
@@ -316,7 +339,7 @@ p <- ggplot(aes(y=coverage.x, x=reorder(Phoneme, count.y), fill=macroarea), data
 p + coord_flip()
 ```
 
-![](segment-frequency_files/figure-markdown_github/unnamed-chunk-19-1.png)
+![](segment-frequency_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
 ``` r
 # Rank with each bar
@@ -330,7 +353,7 @@ p <- ggplot(aes(y=coverage.x, x=reorder(Phoneme, count.y), fill=macroarea, group
 p + coord_flip()
 ```
 
-![](segment-frequency_files/figure-markdown_github/unnamed-chunk-20-1.png)
+![](segment-frequency_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
 
 ``` r
 # Reshape data for phoneme frequency by area
@@ -338,17 +361,16 @@ library(reshape2)
 head(z)
 ```
 
-    ## # A tibble: 6 x 8
+    ## # A tibble: 6 × 8
     ## # Groups:   macroarea [1]
-    ##   macroarea Phoneme count.x totals coverage.x count.y coverage.y
-    ##   <chr>     <chr>     <int>  <int>      <dbl>   <int>      <dbl>
-    ## 1 Africa    ˥            40    708    0.0565       77   0.0367  
-    ## 2 Africa    ˥˦            4    708    0.00565      16   0.00762 
-    ## 3 Africa    ˥˧            1    708    0.00141       2   0.000952
-    ## 4 Africa    ˥˨            1    708    0.00141       1   0.000476
-    ## 5 Africa    ˥˨˧           1    708    0.00141       1   0.000476
-    ## 6 Africa    ˥˩           40    708    0.0565       65   0.0310  
-    ## # … with 1 more variable: SegmentClass <chr>
+    ##   macroarea Phoneme count.x totals coverage.x count.y coverage.y SegmentClass
+    ##   <chr>     <chr>     <int>  <int>      <dbl>   <int>      <dbl> <chr>       
+    ## 1 Africa    ˥            40    707    0.0566       77   0.0367   tone        
+    ## 2 Africa    ˥˦            4    707    0.00566      16   0.00762  tone        
+    ## 3 Africa    ˥˧            1    707    0.00141       2   0.000953 tone        
+    ## 4 Africa    ˥˨            1    707    0.00141       1   0.000476 tone        
+    ## 5 Africa    ˥˨˧           1    707    0.00141       1   0.000476 tone        
+    ## 6 Africa    ˥˩           40    707    0.0566       65   0.0310   tone
 
 ``` r
 # Extract worldwide coverage
@@ -389,7 +411,7 @@ ggplot(p.test, aes(Phoneme, group=1)) +
   geom_line(aes(y = SouthAmerica, colour = "SouthAmerica")) 
 ```
 
-![](segment-frequency_files/figure-markdown_github/unnamed-chunk-22-1.png)
+![](segment-frequency_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
 
 ``` r
 # By area with points
@@ -412,10 +434,9 @@ ggplot(p.test, aes(Phoneme, group=1)) +
     ## Warning: Removed 3 rows containing missing values (geom_point).
 
     ## Warning: Removed 1 rows containing missing values (geom_point).
+    ## Removed 1 rows containing missing values (geom_point).
 
-    ## Warning: Removed 1 rows containing missing values (geom_point).
-
-![](segment-frequency_files/figure-markdown_github/unnamed-chunk-23-1.png)
+![](segment-frequency_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
 
 ``` r
 # Compare genealogically stratied UPSID sample for PHOIBLE
@@ -439,9 +460,9 @@ ggplot(temp, aes(Phoneme, group=1)) +
   geom_point(aes(y = coverage.y, colour = "UPSID"))
 ```
 
-    ## Warning: Removed 2264 rows containing missing values (geom_point).
+    ## Warning: Removed 2227 rows containing missing values (geom_point).
 
-![](segment-frequency_files/figure-markdown_github/unnamed-chunk-25-1.png)
+![](segment-frequency_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
 
 ``` r
 # Plot a subset of UPSID and PHOIBLE segments
@@ -454,4 +475,4 @@ ggplot(test, aes(Phoneme, group=1)) +
 
     ## Warning: Removed 6 rows containing missing values (geom_point).
 
-![](segment-frequency_files/figure-markdown_github/unnamed-chunk-26-1.png)
+![](segment-frequency_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->

@@ -1,6 +1,6 @@
 PHOIBLE phoneme frequencies
 ================
-Steven Moran &lt;<steven.moran@uzh.ch>&gt;
+Steven Moran
 
 ``` r
 library(dplyr)
@@ -20,22 +20,28 @@ phoible <- read.csv('https://raw.githubusercontent.com/phoible/dev/master/data/p
 ``` r
 # Get cross-linguistic phoneme counts from all inventories
 phonemes <- phoible %>% group_by(Phoneme, SegmentClass) %>% summarize(count=n())
+```
+
+    ## `summarise()` has grouped output by 'Phoneme'. You can override using the
+    ## `.groups` argument.
+
+``` r
 phonemes$coverage <- phonemes$count/nrow(phonemes)
 phonemes.sorted <- phonemes %>% arrange(desc(coverage))
 # phonemes.sorted <- phonemes.sorted %>% head(n=25)
 head(phonemes.sorted)
 ```
 
-    ## # A tibble: 6 x 4
+    ## # A tibble: 6 × 4
     ## # Groups:   Phoneme [6]
     ##   Phoneme SegmentClass count coverage
     ##   <chr>   <chr>        <int>    <dbl>
-    ## 1 m       consonant     2914    0.915
-    ## 2 i       vowel         2779    0.873
-    ## 3 k       consonant     2730    0.858
-    ## 4 j       consonant     2716    0.853
-    ## 5 u       vowel         2646    0.831
-    ## 6 a       vowel         2600    0.817
+    ## 1 m       consonant     2915    0.927
+    ## 2 i       vowel         2779    0.883
+    ## 3 k       consonant     2729    0.867
+    ## 4 j       consonant     2716    0.863
+    ## 5 u       vowel         2646    0.841
+    ## 6 a       vowel         2600    0.826
 
 ``` r
 # temp <- head(phonemes.sorted, n=35)
@@ -55,7 +61,7 @@ p <- ggplot(aes(y=coverage, x=reorder(Phoneme, -coverage)), data=temp) +
 p
 ```
 
-![](plot-segment-frequency_files/figure-markdown_github/unnamed-chunk-4-1.png)
+![](plot-segment-frequency_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 ``` r
 temp <- head(phonemes.sorted, n=100)
@@ -76,7 +82,7 @@ p <- ggplot(aes(y=coverage, x=reorder(Phoneme, -coverage)), data=temp) +
 p
 ```
 
-![](plot-segment-frequency_files/figure-markdown_github/unnamed-chunk-5-1.png)
+![](plot-segment-frequency_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 ``` r
 temp <- head(phonemes.sorted, n=500)
@@ -90,7 +96,7 @@ p <- ggplot(aes(y=coverage, x=reorder(Phoneme, -coverage)), data=temp) +
 p
 ```
 
-![](plot-segment-frequency_files/figure-markdown_github/unnamed-chunk-6-1.png)
+![](plot-segment-frequency_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ``` r
 temp <- head(phonemes.sorted, n=250)
@@ -104,7 +110,7 @@ p <- ggplot(aes(y=coverage, x=reorder(Phoneme, -coverage)), data=temp) +
 p
 ```
 
-![](plot-segment-frequency_files/figure-markdown_github/unnamed-chunk-7-1.png)
+![](plot-segment-frequency_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
 temp <- phonemes %>% filter(SegmentClass!="tone")
@@ -118,7 +124,7 @@ p <- ggplot(aes(y=coverage, x=reorder(Phoneme, -coverage), fill=SegmentClass, co
 p
 ```
 
-![](plot-segment-frequency_files/figure-markdown_github/unnamed-chunk-8-1.png)
+![](plot-segment-frequency_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ``` r
 temp <- head(phonemes.sorted, n=220)
@@ -132,4 +138,4 @@ p <- ggplot(aes(y=coverage, x=reorder(Phoneme, -coverage)), data=temp) +
 p
 ```
 
-![](plot-segment-frequency_files/figure-markdown_github/unnamed-chunk-9-1.png)
+![](plot-segment-frequency_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
