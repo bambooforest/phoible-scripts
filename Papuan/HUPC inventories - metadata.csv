@@ -1,0 +1,183 @@
+InventoryID,FileNames,BibtexKey,LanguageName,SpecificDialect,Glottocode,LanguageCode,URI,Source,NewGlottologcode,LanguageLevelGlottocode
+3022,Visser2016.pdf,Visser2016,Kalamang,,kara1499,kgv,,hupc,,
+3023,mayo1993belorussian.pdf,mayo1993belorussian,Belorussian,,bela1254,bel,,hupc,,
+3024,seiler1977cahuilla.pdf,seiler1977cahuilla,Cahuilla,,cahu1264,chl,,hupc,,
+3025,ebert1997camling.pdf,ebert1997camling,Camling,,caml1239,rab,,hupc,,
+3026,elson1992mixezoque.pdf,elson1992mixezoque,Coatlán Mixe,,coat1238,mco,,hupc,,
+3027,layton2000coptic.pdf,layton2000coptic,Coptic,Sahidic,copt1239,cop,,hupc,,
+3028,bashir2007dardic.pdf,bashir2007dardic,Dameli,,dame1241,dml,,hupc,,
+3029,dejong2009sierrapopoluca.pdf,dejong2009sierrapopoluca,Sierra Popoluca,,high1276,poi,,hupc,,
+3030,hofling2000itzajmaya.pdf,hofling2000itzajmaya,Itzaj Maya,,itza1241,itz,,hupc,,
+3031,dwivedikar2016kanauji.pdf,dwivedikar2016kanauji,Kanauji,Kanpur,kana1281,bjj,,hupc,,
+3032,khalilova2009khwarshi.pdf,,Khwarshi,Kwantlada,khva1239,khv,,hupc,,
+3033,daniels2015sogeram.pdf,,Aisi,Mabɨŋ,musa1266,mmq,,hupc,,
+3034,aarsjo1999ama.pdf,,Ama (Papua New Guinea),,amap1240,amm,,hupc,,
+3035,dohler2016komnzo.pdf,,Anta-Komnzo-Wára-Wérè-Kémä,Komnzo,wara1294,tci,,hupc,,
+3036,collins2003asilulu.pdf,,Asilulu,,asil1242,asl,,hupc,,
+3037,budd2010bierebo.pdf,,Bierebo,Bonkovio,bier1244,bnk,,hupc,,
+3038,dalrymple2012dusner.pdf,,Dusner,,dusn1237,dsn,,hupc,,
+3039,gossner1998easternedolo.pdf,,Edolo,Eastern,east2495,etr,,hupc,,
+3040,daniels2015sogeram.pdf,,Gants,,gant1244,gao,,hupc,,
+3041,auri1991kaure.pdf,,Kaure-Narau,,kaur1271,bpp,,hupc,,
+3042,adelaar2005salako.pdf,,Kendayan,Salako,kend1254,knx,,hupc,,
+3043,blust2003short.pdf,,Kiput,,kipu1237,kyi,,hupc,,
+3044,bradshaw2012koki.pdf,,Doromu-Koki,Koki,koki1244,kqc,,hupc,,
+3045,abdurrahman1979komering.pdf,,Komering,,kome1238,kge,,hupc,,
+3046,aarsjo2016konai.pdf,,Konai,Dahamo,kona1242,kxw,,hupc,,
+3047,blust1998lou.pdf,,Lou,,louu1245,loj,,hupc,,
+3048,correia2011makasae.pdf,,Makasai,Northern,maka1317,mkz,,hupc,,
+3049,huber2011makalero.pdf,,Maklere,,makl1245,mjb,,hupc,,
+3050,aikhenvald2010manambu.pdf,,Manambu,Avatip,mana1298,mle,,hupc,,
+3051,daniels2015sogeram.pdf,,Manat,,payn1244,pmr,,hupc,,
+3052,berghall2015mauwake.pdf,,Mauwake,coastal,mauw1238,mhl,,hupc,,
+3053,hatfield2016mehek.pdf,,Mehek,,mehe1243,nux,,hupc,,
+3054,chlenova2008westdamar.pdf,,West Damar,,west2548,drn,,hupc,,
+3055,MacKenzie1961Kurdish,,Northern Kurdish,Akre,akre1239,kmr,,hupc,,nort2641
+3056,Sabuni1980Aleppo,,Northern Levantine Arabic,Aleppo Arabic,alep1241,apc,,hupc,,nort3139
+3057,Coghill2004Alqosh,,Chaldean Neo-Aramaic,Alqosh,alqo1238,cld,,hupc,,chal1275
+3058,Greenblatt2011Amadiya,,Lishana Deni,Jewish Amadiya,amad1244,lsd,,hupc,,lish1247
+3059,Khan1999Arbel,,Lishanid Nosan,Arbel,arbe1239,aij,,hupc,,lish1245
+3060,Mutzafi2000Baz,,Assyrian Neo-Aramaic,Maha Khtaya d-Baz,bazz1238,aii,,hupc,,assy1241
+3061,Mutzafi2008Betanure,,Lishana Deni,Betanure,beta1257,lsd,,hupc,,lish1247
+3062,MacKenzie1961BingirdPizhi,,Central Kurdish,Bingird and Pizhdar Sorani Kurdish,bing1247,ckb,,hupc,,cent1972
+3063,Fox2009Bohtan,,Bohtan Neo-Aramaic,Bohtan,boht1239,NA,,hupc,,boht1239
+3064,Khan2002Qaraqosh,,Chaldean Neo-Aramaic,Qaraqosh,chal1275,cld,,hupc,chri1238,chal1275
+3065,Todd2002Dimili,,Dimli,Dimli,diml1238,diq,,hupc,,diml1238
+3066,Mahmoudveysi2012GawrajuGorani,,Gurani,Gawraju Gorani,gawh1238,hac,,hupc,,gura1251
+3067,Mahmoudveysi2013ZardaGorani,,Gurani,Zarda Gorani,gura1251,hac,,hupc,zard1234,gura1251
+3068,Jastrow1988Hertevin,,Bohtan Neo-Aramaic,Hertevin,hert1241,hrt,,hupc,,boht1239
+3069,MacKenzie1961ArbilSorani,,Central Kurdish,Arbil Sorani Kurdish,hewl1238,ckb,,hupc,,cent1972
+3070,Encyclopaedia_IranicaNeo-Mandaic,,Mandaic,Neo-Mandaic,iraq1245,mid,,hupc,,nucl1706
+3071,Fox1997Jilu,,Assyrian Neo-Aramaic,Jilu,jilu1238,aii,,hupc,,assy1241
+3072,Yarshater1960KajalTati,,Kajali (Tati),Kajal Tati,kaja1247,xkj,,hupc,,kaja1247
+3073,Mutzafi2004KoySanjaq,,Lishanid Noshan,Koy Sanjaq,koys1241,aij,,hupc,,lish1245
+3074,Fassberg2010Challa,,Lishana Deni,Jewish Challa,lish1247,lsd,,hupc,chal1276,lish1247
+3075,Arnold1990Ma'lula,,Western Neo-Aramaic,Maaloula,malu1250,amw,,hupc,,west2763
+3076,Lahdo2009TilloSiirt,,North Mesopotamian Arabic,Tillo Siirt Arabic,nort3142,ayp,,hupc,siir1234,nort3142
+3077,Khan2009Sanandaj,,Hulaula,Sanandaj,sana1291,huy,,hupc,,hula1244
+3078,Israeli1998Saqqiz,,Hulaula,Jewish Saqqiz,saqi1238,huy,,hupc,,hula1244
+3079,Yarshater1959ShakhrudiTati,,Shahrudi Tati,Shakhrudi Tati,shah1254,shm,,hupc,,shah1254
+3080,MacKenzie1961Sheichan,,Northern Kurdish,Sheichan Kurdish,shei1239,kmr,,hupc,,nort2641
+3081,MacKenzie1961SuleimaniyeSorani,,Central Kurdish,Suleimaniye Sorani Kurdish,sule1239,ckb,,hupc,,cent1972
+3082,Khan2004Sulemaniyya,,Hulaula,Sulemaniyya,sule1243,huy,,hupc,,hula1244
+3083,MacKenzie1961Surchi,,Northern Kurdish,Sūrči Sorani,surc1239,kmr,,hupc,,nort2641
+3084,Doerfer1971Khalaj,,Turkic Khalaj,Khalaj,turk1303,klj,,hupc,,turk1303
+3085,Hoey2013Turkmen,,Turkmen,Turkmen,turk1304,tuk,,hupc,,turk1304
+3086,Jastrow2011Turoyo,,Turoyo,Turoyo,turo1239,tru,,hupc,,turo1239
+3087,Hobrack2000Umra,,Hertevin Neo-Aramaic,Umra Christian NENA,umra1238,hrt,,hupc,,hert1241
+3088,Khan2008Barwar,,Assyrian Neo-Aramaic,Barwar,uppe1449,aii,,hupc,,assy1241
+3089,Hetzron1969Urmi,,Assyrian Neo-Aramaic,Urmi,urmi1250,aii,,hupc,,assy1241
+3090,MacKenzie1961Warmawa,,Central Kurdish,Wārmāwa Sorani Kurdish,warm1239,ckb,,hupc,,cent1972
+3091,paul2018persian,,Western Farsi,Standard Persian,west2369,pes,,hupc,,west2369
+3092,MacKenzie1961Zakho,,Northern Kurdish,Zakho Kurdish,zakh1242,kmr,,hupc,,nort2641
+3093,Arnold2011BedouinAntiochia,,Arabic,Bedouin dialects of Antiochia Arabic,cent2323,ars,,hupc,,
+3094,Schönig2015Azerbaijanian,,Turkic,Azerbajanian (Azerbiajani),mode1262,NA,,hupc,,
+3095,andersen1999witaea.pdf,andersen1999witaea,Moronene,Wita Ea,wita1237,mqn,,,,
+3096,foley1991yimas.pdf,foley1991yimas,Yimas,,yima1243,yee,,,,
+3097,nekitel1985abu.pdf,nekitel1985abu,Abu' Arapesh,,abua1245,aah,,,,
+3098,quakenbushetal2010agutaynen.pdf,quakenbushetal2010agutaynen,Agutaynen,,agut1237,agn,,,,
+3099,whitney1991akoye.pdf,whitney1991akoye,Akoye,,akoy1238,miw,,,,
+3100,klamer2011alorese.pdf,klamer2011alorese,Alorese,,alor1247,aol,,,,
+3101,edwards2016amarasi.pdf,edwards2016amarasi,Amarasi,Kotos,amar1273,aaz,,,,
+3102,thurston1976anem.pdf,thurston1976anem,Anem,Coastal,anem1249,anz,,,,
+3103,schneider2010abma.pdf,schneider2010abma,Apma,Suru-Marani,apma1240,app,,,,
+3104,mckenzie1991aralletabulahan.pdf,mckenzie1991aralletabulahan,Aralle-Tabulahan,Tabulahn,aral1243,atq,,,,
+3105,hull2001baikeno.pdf,hull2001baikeno,Baikeno,,baik1238,bkx,,,,
+3106,vandenberg2012balantak.pdf,vandenberg2012balantak,Balantak,Batubiring,bala1315,blz,,,,
+3107,schokkin2014paluai.pdf,schokkin2014paluai,Paluai,Baluan,balu1257,blq,,,,
+3108,sudarsono2002riukbekati.pdf,sudarsono2002riukbekati,Riuk Bekati',,beka1241,bei,,,,
+3109,steinhauer2014blagar.pdf,steinhauer2014blagar,Blagar,Apuri,blag1240,beu,,,,
+3110,mead2001bobongko.pdf,mead2001bobongko,Bobongko,,bobo1255,bgb,,,,
+3111,yamashita1992botolansambal.pdf,yamashita1992botolansambal,Botolan Sambal,Kakilingan,boto1242,sbl,,,,
+3112,maan1951buli.pdf,maan1951buli,Buli,,buli1255,bzq,,,,
+3113,schapper2009bunak.pdf,schapper2009bunak,Bunak,Lamaknen,buna1278,bfn,,,,
+3114,grimes1991buru.pdf,grimes1991buru,Buru,,buru1303,mhs,,,,
+3115,price2007bundudusun.pdf,price2007bundudusun,Central Dusun,Bundu,cent2100,dtp,,,,
+3116,blust1988melanau.pdf,blust1988melanau,Central Melanau,Mukah,cent2101,mel,,,,
+3117,white1988cheke.pdf,white1988cheke,Cheke Holo,Maringe,chek1238,mrn,,,,
+3118,vandenberg1991ciacia.pdf,vandenberg1991ciacia,Cia-Cia,,ciac1237,cia,,,,
+3119,barr1988daakaili.pdf,barr1988daakaili,Da'a Kaili,Da'a,daak1235,kzf,,,,
+3120,tryon1968dehu.pdf,tryon1968dehu,Dehu,,dehu1237,dhv,,,,
+3121,tida2006dom.pdf,tida2006dom,Dom,Non Ku,domm1246,doa,,,,
+3122,shintani1990dumbea.pdf,shintani1990dumbea,Dumbea,Paita,dumb1241,duf,,,,
+3123,mcdonnell2009ende.pdf,mcdonnell2009ende,Ende,Ja'o,ende1246,end,,,,
+3124,rule1993foi.pdf,rule1993foi,Foi,,foii1241,foi,,,,
+3125,marshall2000fordata.pdf,marshall2000fordata,Fordata,Romean,ford1242,frd,,,,
+3126,calimag1967gaddang.pdf,calimag1967gaddang,Gaddang,,gadd1244,gad,,,,
+3127,penn2006galoli.pdf,penn2006galoli,Galoli,Dadua,galo1243,gal,,,,
+3128,steinhauer1996metathesis.pdf,steinhauer1996metathesis,Helong,Helong Darat,helo1243,heg,,,,
+3129,franccois2010hiw.pdf,franccois2010hiw,Hiw,,hiww1237,hiw,,,,
+3130,vandenheuvel1997inonhan.pdf,vandenheuvel1997inonhan,Inonhan,,inon1237,loc,,,,
+3131,yanti2010jambimalay.pdf,yanti2010jambimalay,Jambi Malay,Tanjung Raden,jamb1236,jax,,,,
+3132,wendell1978kagankalagan.pdf,wendell1978kagankalagan,Kagan Kalagan,,kaga1255,kll,,,,
+3133,harmon1977kagayanen.pdf,harmon1977kagayanen,Kagayanen,,kaga1256,cgc,,,,
+3134,tsuchida1975tsouic.pdf,tsuchida1975tsouic,Kanakanavu,,kana1286,xnb,,,,
+3135,sumbuk1999kapriman.pdf,sumbuk1999kapriman,Kapriman,,kapr1245,dju,,,,
+3136,connell2013mateq.pdf,connell2013mateq,Mateq,,kemb1249,xem,,,,
+3137,mckinnon2011kerinci.pdf,mckinnon2011kerinci,Kerinci,Tanjung Pauh Mudik,keri1250,kvr,,,,
+3138,fernandez1989komodo.pdf,fernandez1989komodo,Komodo,,komo1261,kvh,,,,
+3139,sato2013kove.pdf,sato2013kove,Kove,Central Kove,kove1237,kvc,,,,
+3140,laidig1999barang.pdf,laidig1999barang,Laiyolo,Barang-Barang,laiy1246,lji,,,,
+3141,"ross2002lala.pdf, symonds1989lala.pdf","ross2002lala, symonds1989lala",Lala,,lala1268,nrz,,,,
+3142,kroon2016lamaholot.pdf,kroon2016lamaholot,Lamaholot,Ritaebang,lama1277,slp,,,,
+3143,matanggui1984lampungnyo.pdf,matanggui1984lampungnyo,Lampung Nyo,,lamp1242,abl,,,,
+3144,walker1976lampungapi.pdf,walker1976lampungapi,Lampung Api,,lamp1243,ljp,,,,
+3145,laidig1995larike.pdf,laidig1995larike,Larike-Wakasihu,Larike,lari1255,alo,,,,
+3146,nagaya2012lamaholot.pdf,nagaya2012lamaholot,Lewotobi,,lewo1244,lwt,,,,
+3147,blust2016kelabit.pdf,blust2016kelabit,Lun Dayeh,Lun Bawang,lund1271,lnd,,,,
+3148,matti1991mamasa.pdf,matti1991mamasa,Mamasa,Northern Mamasa,mama1276,mqj,,,,
+3149,svelmoe1974mansaka.pdf,svelmoe1974mansaka,Mansaka,,mans1262,msk,,,,
+3150,wang2006matigsalug.pdf,wang2006matigsalug,Matigsalug Manobo,,mati1250,mbt,,,,
+3151,vanderleeden1987misoolsalawatimaya.pdf,vanderleeden1987misoolsalawatimaya,Misool-Salawati Ma'ya,,maya1282,slz,,,,
+3152,vandermark2007minigir.pdf,vandermark2007minigir,Minigir,Luvuani,mini1251,vmg,,,,
+3153,thiessen1980molbog.pdf,thiessen1980molbog,Molbog,,molb1237,pwm,,,,
+3154,odango2015mortlockese.pdf,odango2015mortlockese,Mortlockese,Pakin (southern dialect),mort1237,mrl,,,,
+3155,volker1994nalik.pdf,volker1994nalik,Nalik,,nali1244,nal,,,,
+3156,vaa2013engdewu.pdf,vaa2013engdewu,Nanggu,,nang1262,ngr,,,,
+3157,hanna1991napu.pdf,hanna1991napu,Napu,,napu1241,npy,,,,
+3158,veloso2016nauete.pdf,veloso2016nauete,Nauete,Uatocarbau-Baguia (eastern dialect),naue1237,nxa,,,,
+3159,tryon1967nengone.pdf,tryon1967nengone,Nengone,,neng1238,nen,,,,
+3160,takau2016nese.pdf,takau2016nese,Nese,,nese1235,NA,,,,
+3161,peckham1991mairasi.pdf,peckham1991mairasi,Mairasi,,nucl1594,zrs,,,,
+3162,wimbish1992pagu.pdf,wimbish1992pagu,Pagu,,pagu1249,pgu,,,,
+3163,kluge2017papuanmalay.pdf,kluge2017papuanmalay,Papuan Malay,,papu1250,pmy,,,,
+3164,tadmor1995pattanimalay.pdf,tadmor1995pattanimalay,Pattani Malay,,patt1249,mfa,,,,
+3165,quick2008pendau.pdf,quick2008pendau,Pendau,,pend1242,ums,,,,
+3166,naess2011vaeakau.pdf,naess2011vaeakau,Vaeakau-Taumako,Vaeakau (Pileni),pile1238,piv,,,,
+3167,salisbury2002pukapuka.pdf,salisbury2002pukapuka,Pukapuka,,puka1242,pkp,,,,
+3168,himmelmann1999ratahan.pdf,himmelmann1999ratahan,Ratahan,,rata1244,rth,,,,
+3169,pan2012saaroa.pdf,pan2012saaroa,Saaroa,,saar1237,sxr,,,,
+3170,visser1987sahu.pdf,visser1987sahu,Sahu,Pa'disua,sahu1245,saj,,,,
+3171,"hunkin2009samoan.pdf, mosel1992samoan.pdf","hunkin2009samoan, mosel1992samoan",Samoan,,samo1305,smo,,,,
+3172,kratochvil2014sawila.pdf,kratochvil2014sawila,Sawila,Lalamana (northern dialect),sawi1256,swt,,,,
+3173,onishi1994motuna.pdf,onishi1994motuna,Motuna (Siwai),Central Siwai,siwa1245,siw,,,,
+3174,steinhauer2009babar.pdf,steinhauer2009babar,Southeast Babar,Letwurung,sout2883,vbb,,,,
+3175,hayami1995sumbawa.pdf,hayami1995sumbawa,Sumbawa,Taliwang,sumb1241,smw,,,,
+3176,hussey1965tagbanwa.pdf,hussey1965tagbanwa,Tagbanwa,,tagb1258,tbw,,,,
+3177,mayani2013tajio.pdf,mayani2013tajio,Tajio,,taji1246,tdj,,,,
+3178,mosel2007teop.pdf,mosel2007teop,Teop,Coastal,teop1238,tio,,,,
+3179,williams2002tetun.pdf,williams2002tetun,Tetun Dili,,tetu1246,tdt,,,,
+3180,vanstaderi2000tidore.pdf,vanstaderi2000tidore,Tidore,,tido1248,tvo,,,,
+3181,prentice1971murut.pdf,prentice1971murut,Timugon Murut,,timu1262,tih,,,,
+3182,osumi1995tirimea.pdf,osumi1995tirimea,Tiri-Mea,Tiri,tiri1258,cir,,,,
+3183,lichtenberk2008toqabaqita.pdf,lichtenberk2008toqabaqita,To'abaita,,toab1237,mlu,,,,
+3184,holton2003tobelo.pdf,holton2003tobelo,Tobelo,Heleworuru,tobe1252,tlb,,,,
+3185,tobisa2010tobilung.pdf,tobisa2010tobilung,Tobilung,,tobi1239,tgb,,,,
+3186,kuki1970tuamotuan.pdf,kuki1970tuamotuan,Tuamotuan,Tapuhoe,tuam1242,pmt,,,,
+3187,hinton1991tugun.pdf,hinton1991tugun,Tugun,Tomliapat,tugu1245,tzn,,,,
+3188,pearce2015unua.pdf,pearce2015unua,Unua,,unua1237,onu,,,,
+3189,steinhauer2008urak.pdf,steinhauer2008urak,Urak Lawoi',Phuket Old People's dialect,urak1238,urk,,,,
+3190,musgrave2007neveei.pdf,musgrave2007neveei,Neve'ei,,vinm1237,vnm,,,,
+3191,"malau2016vures,pdf",malau2016vures,Vurës,,vure1239,msn,,,,
+3192,hull2002waimaha.pdf,hull2002waimaha,Waima'a,Aubaca,waim1252,wmh,,,,
+3193,gasser2014windesi.pdf,gasser2014windesi,Wandamen,Windesi,wand1267,wad,,,,
+3194,vandenberg2008wolio.pdf,vandenberg2008wolio,Wolio,,woli1241,wlo,,,,
+3195,mead2013wotu.pdf,mead2013wotu,Wotu,,wotu1240,wtw,,,,
+3196,marmion2010wutung.pdf,marmion2010wutung,Wutung,,wutu1244,wut,,,,
+3197,"ross2002yabem.pdf, ross1993tonogenesis.pdf","ross2002yabem, ross1993tonogenesis",Yabem,,yabe1254,jae,,,,
+3198,sarvasy2017nungon.pdf,sarvasy2017nungon,Yau,Towet Nungon,yaum1237,yuw,,,,
+3199,schooling1992yuanga.pdf,schooling1992yuanga,Yuaga,Gomen,yuag1237,nua,,,,
+3200,kieviet2017rapanui.pdf,kieviet2017rapanui,Rapanui,,rapa1244,rap,,,,
+3201,frostad2013ughele.pdf,frostad2013ughele,Ughele,,ughe1237,uge,,,,
+3202,abbi2013greatandamanese.pdf,abbi2013greatandamanese,Aka-Jeru,Great Andamanese Koine,akaj1239,akj,,,,
+3203,suttles2004musqueam.pdf,suttles2004musqueam,Halkomelem,Musqueam,musq1240,hur,,,,
