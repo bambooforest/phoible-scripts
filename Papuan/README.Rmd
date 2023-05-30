@@ -1,24 +1,33 @@
 ---
 title: "Papuan phoneme inventories in PHOIBLE"
-author: "Steven Moran"
+author: ""
 date: "(`r format(Sys.time(), '%d %B, %Y')`)"
 output:
-  github_document:
-      toc: true
+  github_document
 ---
+
+Load the R libraries.
 
 ```{r warning=FALSE, message=FALSE}
 library(tidyverse)
 library(maps)
 ```
 
-Get the current PHOIBLE inventories in CLDF format.
+Get the current [PHOIBLE inventories](https://phoible.org) in [CLDF format](https://github.com/cldf-datasets/phoible). See also:
+
+* https://cldf.clld.org
+* https://clld.org/datasets.html
+
 
 ```{r, warning=FALSE, message=FALSE}
-values <- read_csv(url('https://raw.githubusercontent.com/cldf-datasets/phoible/master/cldf/values.csv'))
-languages <- read_csv(url('https://raw.githubusercontent.com/cldf-datasets/phoible/master/cldf/languages.csv'))
-inventories <- read_csv(url('https://raw.githubusercontent.com/cldf-datasets/phoible/master/cldf/inventories.csv'))
-parameters <- read_csv(url('https://raw.githubusercontent.com/cldf-datasets/phoible/master/cldf/parameters.csv'))
+values <- 
+  read_csv(url('https://raw.githubusercontent.com/cldf-datasets/phoible/master/cldf/values.csv'))
+languages <- 
+  read_csv(url('https://raw.githubusercontent.com/cldf-datasets/phoible/master/cldf/languages.csv'))
+inventories <- 
+  read_csv(url('https://raw.githubusercontent.com/cldf-datasets/phoible/master/cldf/inventories.csv'))
+parameters <- 
+  read_csv(url('https://raw.githubusercontent.com/cldf-datasets/phoible/master/cldf/parameters.csv'))
 ```
 
 Merge CLDF tables into a single data frame at the level of inventories.
@@ -28,6 +37,12 @@ phoible <- values %>% select(Language_ID, Inventory_ID) %>% distinct()
 phoible <- left_join(phoible, inventories, by=c("Inventory_ID" = "ID"))
 phoible <- phoible %>% rename(Source_name = Name)
 phoible <- left_join(phoible, languages, by=c("Language_ID" = "ID"))
+```
+
+This is what the data format looks like.
+
+```{r}
+phoible %>% head()
 ```
 
 Merge CLDF tables into a single data frame at the level of segments.
@@ -40,7 +55,14 @@ parameters <- parameters %>% rename(SegmentName = Name)
 segments <- left_join(segments, parameters, by=c("Parameter_ID" = "ID"))
 ```
 
-Filter out languages -- note this is not 100% correct according to Harald, i.e., Glottolog Papunesian languages minus Austronesian does not equal Papuan languages exactly, so this is an approximation for exploratory analysis.
+This is how the data look at the level of segments.
+
+```{r}
+segments %>% filter(Name == "Hawaiian") %>% head()
+```
+
+
+Filter out languages -- note this is not 100% correct according to Harald Hammarstrom (p.c.), i.e., Glottolog Papunesian languages minus Austronesian does not equal Papuan languages exactly, so this is an approximation for exploratory analysis.
 
 ```{r}
 png <- segments %>% filter(Macroarea == "Papunesia")
